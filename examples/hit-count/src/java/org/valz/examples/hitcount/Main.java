@@ -16,9 +16,11 @@ public class Main {
 
         Val<Integer> hitCount = Valz.register("org.valz.examples.hitcount.hitCount", new IntSum());
 
-        for(int i = 0; i < 100; ++i) {
+        for(int i = 0; i < 1; ++i) {
             hitCount.submit(1);
             Thread.sleep(50);
         }
+
+        
     }
 }
