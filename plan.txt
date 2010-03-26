@@ -18,9 +18,7 @@ Components: client api, server, viewer api, client example (uses client api), vi
 
     Clients send aggregate descriptions
     Aggregate parsers are hardcoded on server
-
-    Server uses a plugin mechanism to parse aggregates
-    
+--------------- We are here ----------------------
     Program supports the following aggregates: int and double sum, ordered list merge (order by JSONObject key), list concatenation, map merge, pair, minimum
 
     Client sends data to multiple servers at once (roundrobin scheduling)
@@ -29,6 +27,8 @@ Components: client api, server, viewer api, client example (uses client api), vi
 
     Program stores data on disk (flushes data to disk immediately as it is received)
         Use some kind of database (say, H2)
+    
+    Server uses a plugin mechanism to parse aggregates
 
     Variables with history:
         History of current values of the aggregate
