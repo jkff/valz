@@ -33,6 +33,7 @@ public class AggregateParser {
         }
         Class<? extends Aggregate<?>> clazz = method2class.get(method);
         if(clazz == null) {
+            // TODO: may be, throw exception?
             return null;
         }
         for(Method m : clazz.getDeclaredMethods()) {
