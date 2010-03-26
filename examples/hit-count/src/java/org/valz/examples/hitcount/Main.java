@@ -4,16 +4,13 @@ import org.valz.api.Configuration;
 import org.valz.api.IntegerParser;
 import org.valz.api.Val;
 import org.valz.api.Valz;
-import org.valz.util.MessageType;
 import org.valz.util.aggregates.IntSum;
-
-import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
         Configuration conf = new Configuration();
-        conf.setServers(Arrays.asList("localhost:8080"));
+        conf.setServerURL("http://localhost:8080");
         
         Valz.init(conf);
 

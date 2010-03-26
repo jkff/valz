@@ -1,18 +1,16 @@
 package org.valz.api;
 
-import java.util.List;
-
 public class Configuration {
-    private List<String> servers;
+    private String serverURL;
 
     public Configuration() {
     }
 
-    public List<String> getServers() {
-        return servers;
+    public String getServerURL() {
+        return serverURL;
     }
 
-    public void setServers(List<String> servers) {
-        this.servers = servers;
+    public void setServerURL(String serverURL) {
+        this.serverURL = serverURL;
     }
 }

@@ -2,14 +2,9 @@ package org.valz.server;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.valz.util.aggregates.IntSum;
+import org.valz.util.aggregates.MergeJson;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -21,7 +16,12 @@ public class ValzServer {
         
         Server server = new Server(port);
 
-        server.addHandler(new ValzHandler());
+        ValzBackend backend = new ValzBackend();
+
+        backend.registerSupportedAggregate(IntSum.class);
+        backend.registerSupportedAggregate(MergeJson.class);
+
+        server.addHandler(new ValzHandler(backend));
 
         try {
             server.start();

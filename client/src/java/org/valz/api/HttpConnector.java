@@ -10,8 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 class HttpConnector {
-    public static String post(@NotNull String data) throws IOException {
-        URL url = new URL("http://localhost:8080");
+    public static String post(String serverURL, @NotNull String data) throws IOException {
+        URL url = new URL(serverURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod("POST");
@@ -22,17 +22,18 @@ class HttpConnector {
         OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
         try {
             writer.write(data);
-        }
-        finally {
+        } finally {
             writer.close();
         }
 
         BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder sb = new StringBuilder();
-        String line = null;
+        String line;
         while ((line = rd.readLine()) != null) {
             sb.append(line);
         }
+
+        connection.disconnect();
 
         return sb.toString();
     }
