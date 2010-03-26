@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.valz.util.json.JSONBuilder.json;
+import static org.valz.util.json.JSONBuilder.makeJson;
 
 public final class Valz {
     private static Configuration conf;
@@ -38,10 +38,11 @@ public final class Valz {
                     } catch (InvocationTargetException e) {
                         throw new RuntimeException("Non-serializable aggregate " + aggregate, e);
                     }
-                    HttpConnector.post(conf.getServerURL(), json(
+                    aggregate.toJson(json);
+                    HttpConnector.post(conf.getServerURL(), makeJson(
                             "messageType",MessageType.SUBMIT.name(),
                             "name",name, "aggregate", json,
-                            "value",sample.toString()
+                            "value", sample
                     ).toJSONString());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -50,12 +51,11 @@ public final class Valz {
         };
     }
 
-    public static synchronized <T> T getValue(@NotNull String name, ValueParser<T> valueParser) throws IOException {
+    public static synchronized Object getValue(@NotNull String name) throws IOException {
         String response = HttpConnector.post(conf.getServerURL(),
-                json("messageType", MessageType.GET_VALUE.name(), "name", name).toJSONString());
+                makeJson("messageType", MessageType.GET_VALUE.name(), "name", name).toJSONString());
         try {
-            JSONObject jsonResponse = (JSONObject)new JSONParser().parse(response);
-            return valueParser.parse(jsonResponse.get("value").toString());
+            return new JSONParser().parse(response);
         } catch (ParseException e) {
             throw new IOException("Malformed server response: "+response, e);
         }
@@ -63,7 +63,7 @@ public final class Valz {
 
     public static synchronized List<String> listVars() throws IOException {
         String response = HttpConnector.post(conf.getServerURL(),
-                json("messageType",MessageType.LIST_VARS.name()).toJSONString());
+                makeJson("messageType",MessageType.LIST_VARS.name()).toJSONString());
         List<String> res = new ArrayList<String>();
         try {
             for(Object obj : (JSONArray)new JSONParser().parse(response)) res.add(obj.toString());

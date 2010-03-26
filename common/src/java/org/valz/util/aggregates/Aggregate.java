@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * Every implementor must have a static method "String getMethod()" and
- * "Aggregate<T> parse(JSONObject json)" to facilitate parsing of json objects
+ * "Aggregate<T> parse(JSONObject makeJson)" to facilitate parsing of makeJson objects
  * like {method:"...", ...} into aggregates.
  */
 public interface Aggregate<T> {

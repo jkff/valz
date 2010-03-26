@@ -1,7 +1,6 @@
 package org.valz.examples.hitcount;
 
 import org.valz.api.Configuration;
-import org.valz.api.IntegerParser;
 import org.valz.api.Val;
 import org.valz.api.Valz;
 import org.valz.util.aggregates.IntSum;
@@ -22,8 +21,7 @@ public class Main {
         }
 
         for (String name : Valz.listVars()) {
-            int value = Valz.getValue(name, new IntegerParser());
-            System.out.println(String.format("%s = %d", name, value));
+            System.out.println(String.format("%s = %s", name, Valz.getValue(name)));
         }
     }
 }

@@ -1,27 +1,36 @@
 package org.valz.util.aggregates;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.valz.util.Pair;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.*;
 
-public class MergeJson implements Aggregate<Iterator<JSONObject>> {
+public class MergeJson implements Aggregate<JSONArray> {
     private String key;
 
     public MergeJson(final String key) {
         this.key = key;
     }
 
-    public Iterator<JSONObject> reduce(Iterator<Iterator<JSONObject>> stream) {
-        return reduce(new Comparator<JSONObject>() {
+    public JSONArray reduce(Iterator<JSONArray> stream) {
+        List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
+
+        while(stream.hasNext())
+            iters.add(stream.next().iterator());
+
+        Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
             public int compare(JSONObject o1, JSONObject o2) {
                 Comparable v1 = (Comparable) o1.get(key);
                 Comparable v2 = (Comparable) o2.get(key);
                 return v1.compareTo(v2);
             }
-        }, stream);
+        }, iters.iterator());
+
+        JSONArray res = new JSONArray();
+        while(resIter.hasNext())
+            res.add(resIter.next());
+        return res;
     }
 
     private static <T> Iterator<T> reduce(final Comparator<T> comparator, Iterator<Iterator<T>> stream) {

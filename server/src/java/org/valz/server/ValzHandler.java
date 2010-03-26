@@ -1,29 +1,22 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.protocol.MessageType;
-import org.valz.util.aggregates.IntSum;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.valz.util.io.IOUtils.readInputStream;
-import static org.valz.util.json.JSONBuilder.json;
+import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
@@ -46,9 +39,8 @@ public class ValzHandler extends AbstractHandler {
                 case SUBMIT: {
                     String name = (String) obj.get("name");
                     JSONObject spec = (JSONObject) obj.get("aggregate");
-                    int value = Integer.parseInt((String) obj.get("value"));
 
-                    backend.submit(name, spec, value);
+                    backend.submit(name, spec, obj.get("value"));
                 }
                 break;
                 case LIST_VARS: {
@@ -66,7 +58,7 @@ public class ValzHandler extends AbstractHandler {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     } else {
                         Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
-                        json("value", value).writeJSONString(out);
+                        makeJson("value", value).writeJSONString(out);
                         out.close();
                     }
                 }

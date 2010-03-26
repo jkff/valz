@@ -29,7 +29,7 @@ public class AggregateParser {
     public Aggregate<?> parse(JSONObject json) {
         String method = (String)json.get("method");
         if(method == null) {
-            throw new IllegalArgumentException("No 'method' in json object " + json.toJSONString());
+            throw new IllegalArgumentException("No 'method' in makeJson object " + json.toJSONString());
         }
         Class<? extends Aggregate<?>> clazz = method2class.get(method);
         if(clazz == null) {

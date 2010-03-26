@@ -13,7 +13,7 @@ public class ValzBackend {
     private AggregateParser parser = new AggregateParser();
     private Map<String, Object> name2val = new HashMap<String, Object>();
 
-    void submit(String name, JSONObject aggregateSpec, Object value) {
+    synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
         Aggregate aggregate;
         try {
             aggregate = parser.parse(aggregateSpec);
@@ -31,15 +31,15 @@ public class ValzBackend {
         }
     }
 
-    Collection<String> listVars() {
-        return name2val.keySet();
+    synchronized Collection<String> listVars() {
+        return new ArrayList<String>(name2val.keySet());
     }
 
-    Object getValue(String name) {
+    synchronized Object getValue(String name) {
         return name2val.get(name);
     }
 
-    public void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
+    public synchronized void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
         parser.registerSupportedAggregate(clazz);
     }
 }

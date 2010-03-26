@@ -8,10 +8,15 @@
     <target name="compile">
         <path id="project.classpath">
             <fileset dir="lib" includes="**/*.jar"/>
+            <fileset dir="../common/lib" includes="**/*.jar"/>
+        </path>
+        <path id="project.sourcepath">
+            <fileset dir="../common/src/java" includes="**/*.java"/>
         </path>
 
         <mkdir dir="build/classes"/>
         <javac srcdir="src/java"
+               sourcepathref="project.sourcepath"
                classpathref="project.classpath"
                destdir="build/classes"/>
     </target>
