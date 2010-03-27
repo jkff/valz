@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="jetty">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/servlet-api-2.5-20081211.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-util-6.1.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22-src.zip!/jetty-6.1.22/modules/jetty/src/main/java" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22-src.zip!/jetty-6.1.22/modules/util/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="log4j">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/log4j/log4j-1.2.15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/log4j/apache-log4j-1.2.15.zip!/apache-log4j-1.2.15/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="common" />
+  </component>
+</module>
+

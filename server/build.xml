@@ -1,0 +1,46 @@
+<project name="ValzServer" default="all">
+    <target name="all" depends="clean, make-dist"/>
+
+    <target name="clean">
+        <delete dir="build"/>    
+    </target>
+
+    <target name="compile">
+        <path id="project.classpath">
+            <fileset dir="lib" includes="**/*.jar"/>
+            <fileset dir="../common/lib" includes="**/*.jar"/>
+        </path>
+
+        <mkdir dir="build/classes"/>
+        <javac classpathref="project.classpath"
+               destdir="build/classes">
+            <src location="src/java"/>
+            <src location="../common/src/java"/>
+        </javac>
+    </target>
+
+    <target name="make-manifest">
+        <manifest file="build/MANIFEST.MF">
+            <attribute name="Main-Class"
+                       value="org.valz.server.ValzServer"/>
+        </manifest>
+    </target>
+    
+    <target name="make-jar" depends="compile, make-manifest">
+        <jar basedir="build/classes"
+             destfile="build/valz-server.jar"
+             includes="**/*"
+             manifest="build/MANIFEST.MF"/>
+    </target>
+
+    <target name="make-dist" depends="make-jar">
+        <copy todir="build/dist">
+            <fileset dir="src/script">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="build">
+                <include name="valz-server.jar"/>
+            </fileset>
+        </copy>
+    </target>
+</project>
