@@ -5,12 +5,27 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class IOUtils {
+    private IOUtils() {
+    }
+
     public static void closeInputSilently(@Nullable InputStream is) {
         try {
-            if(is != null)
+            if (is != null) {
                 is.close();
+            }
+        } catch (IOException e) {
+            // Ignore
+        }
+    }
+
+    public static void closeOutputSilently(@Nullable OutputStream os) {
+        try {
+            if (os != null) {
+                os.close();
+            }
         } catch (IOException e) {
             // Ignore
         }

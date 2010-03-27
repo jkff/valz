@@ -5,14 +5,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 public class IntSum extends AbstractAggregate<Integer> {
-    @NotNull
-    public Integer reduce(Iterator<Integer> stream) {
+    @Override
+    public Integer reduce(@NotNull Iterator<Integer> stream) {
         int res = 0;
-        while (stream.hasNext())
+        while (stream.hasNext()) {
             res += stream.next();
+        }
         return res;
     }
 
+    @Override
     public Integer reduce(Integer item1, Integer item2) {
         return item1 + item2;
     }

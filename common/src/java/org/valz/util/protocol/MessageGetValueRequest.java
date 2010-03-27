@@ -18,7 +18,7 @@ public class MessageGetValueRequest extends Message {
 
 
 
-    private String name;
+    private final String name;
 
 
     
@@ -33,7 +33,7 @@ public class MessageGetValueRequest extends Message {
 
     @NotNull
     @Override
-    String getDataString() {
+    String toDataString() {
         return makeJson(
                 "name", name
         ).toJSONString();

@@ -5,8 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 public class MinInt extends AbstractAggregate<Integer> {
-    @NotNull
-    public Integer reduce(Iterator<Integer> stream) {
+    @Override
+    public Integer reduce(@NotNull Iterator<Integer> stream) {
         int res = stream.next();
         while (stream.hasNext()) {
             int value = stream.next();
@@ -17,6 +17,7 @@ public class MinInt extends AbstractAggregate<Integer> {
         return res;
     }
 
+    @Override
     public Integer reduce(Integer item1, Integer item2) {
         return item1 < item2 ? item1 : item2;
     }

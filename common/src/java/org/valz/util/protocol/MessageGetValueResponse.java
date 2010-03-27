@@ -14,7 +14,6 @@ public class MessageGetValueResponse extends Message {
     public static MessageGetValueResponse parseDataString(@NotNull String dataString) throws ParseException {
         JSONObject dataObject = (JSONObject) new JSONParser().parse(dataString);
         return new MessageGetValueResponse(
-                (String)dataObject.get("name"),
                 (Aggregate<?>)dataObject.get("aggregate"),
                 dataObject.get("value")
         );
@@ -22,20 +21,26 @@ public class MessageGetValueResponse extends Message {
 
 
 
-    private String name;
-    private Object value;
-    private Aggregate<?> aggregate;
+    private final Object value;
+    private final Aggregate<?> aggregate;
 
 
 
-    public MessageGetValueResponse(@NotNull String name, @NotNull Aggregate<?> aggregate, Object value) {
-        this.name = name;
+    public MessageGetValueResponse(@NotNull Aggregate<?> aggregate, Object value) {
         this.value = value;
         this.aggregate = aggregate;
     }
 
 
 
+    public Object getValue() {
+        return value;
+    }
+
+    public Aggregate<?> getAggregate() {
+        return aggregate;
+    }
+    
     @Override
     public MessageType getMessageType() {
         return MessageType.GET_VALUE_RESPONSE;
@@ -43,10 +48,9 @@ public class MessageGetValueResponse extends Message {
 
     @NotNull
     @Override
-    String getDataString() {
+    String toDataString() {
         return makeJson(
-                "name", name,
-                "aggregate", AggregateRegistry.toJson(aggregate),
+                "aggregate", AggregateRegistry.toAggregateString(aggregate),
                 "value", value
         ).toJSONString();
     }

@@ -16,7 +16,7 @@ public class ValzBackend {
     synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
         Aggregate aggregate;
         try {
-            aggregate = _registry.parseJson(aggregateSpec);
+            aggregate = _registry.parseAggregateString(aggregateSpec);
         } catch (Exception e) {
             log.error("Malformed aggregate spec: " + aggregateSpec.toJSONString(), e);
             return;

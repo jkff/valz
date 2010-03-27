@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * Every implementor must have a static method "String getMethod()" and
- * "Aggregate<T> parseJson(JSONObject makeJson)" to facilitate parsing of makeJson objects
+ * "Aggregate<T> parseAggregateString(JSONObject makeJson)" to facilitate parsing of makeJson objects
  * like {method:"...", ...} into aggregates.
  */
 public interface Aggregate<T> {
@@ -27,7 +27,7 @@ public interface Aggregate<T> {
     T reduce(@NotNull Iterator<T> stream);
 
     @Nullable
-    T reduce(@NotNull T item1, @NotNull T item2);
+    T reduce(T item1, T item2);
 
     @Nullable
     Object toSerialized();

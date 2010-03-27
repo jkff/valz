@@ -1,23 +1,27 @@
 package org.valz.util.aggregates;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.valz.util.Pair;
 
 import java.util.*;
+import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class OrderedListMerge extends AbstractAggregate<JSONArray> {
-    private String key;
+    private final String key;
 
     public OrderedListMerge(final String key) {
         this.key = key;
     }
 
-    public JSONArray reduce(Iterator<JSONArray> stream) {
+    @Override
+    public JSONArray reduce(@NotNull Iterator<JSONArray> stream) {
         List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
 
-        while (stream.hasNext())
+        while (stream.hasNext()) {
             iters.add(stream.next().iterator());
+        }
 
         Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
             public int compare(JSONObject o1, JSONObject o2) {
@@ -28,11 +32,13 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
         }, iters.iterator());
 
         JSONArray res = new JSONArray();
-        while (resIter.hasNext())
+        while (resIter.hasNext()) {
             res.add(resIter.next());
+        }
         return res;
     }
 
+    @Override
     public JSONArray reduce(JSONArray item1, JSONArray item2) {
         List<JSONArray> iters = new ArrayList<JSONArray>();
         iters.add(item1);
@@ -50,9 +56,10 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
         );
 
         while (stream.hasNext()) {
-            Iterator<T> i = stream.next();
-            if (i.hasNext())
-                q.offer(new Pair<T, Iterator<T>>(i.next(), i));
+            Iterator<T> iter = stream.next();
+            if (iter.hasNext()) {
+                q.offer(new Pair<T, Iterator<T>>(iter.next(), iter));
+            }
         }
 
         return new Iterator<T>() {
@@ -77,10 +84,9 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
     }
 
 
+    @Override
     public Object toSerialized() {
-        JSONObject json = new JSONObject();
-        json.put("key", key);
-        return json;
+        return makeJson("key", key);
     }
 
     public static OrderedListMerge deserialize(Object object, AggregateRegistry registry) {

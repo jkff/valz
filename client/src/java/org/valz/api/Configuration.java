@@ -1,5 +1,7 @@
 package org.valz.api;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Configuration {
     private String serverURL;
 
@@ -10,7 +12,7 @@ public class Configuration {
         return serverURL;
     }
 
-    public void setServerURL(String serverURL) {
+    public void setServerURL(@NotNull String serverURL) {
         this.serverURL = serverURL;
     }
 }

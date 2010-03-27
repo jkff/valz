@@ -21,7 +21,7 @@ public class MessageListVarsRequest extends Message {
 
     @NotNull
     @Override
-    String getDataString() {
+    String toDataString() {
         return "";
     }
 }

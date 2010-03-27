@@ -18,13 +18,18 @@ public class MessageListVarsResponse extends Message {
     }
 
 
-
-    private List<String> vars;
+    private final List<String> vars;
 
 
 
     public MessageListVarsResponse(@NotNull List<String> vars) {
         this.vars = vars;
+    }
+
+
+    
+    public List<String> getVars() {
+        return vars;
     }
 
     @Override
@@ -34,9 +39,9 @@ public class MessageListVarsResponse extends Message {
 
     @NotNull
     @Override
-    String getDataString() {
+    String toDataString() {
         JSONArray jsonArray = new JSONArray();
-        jsonArray.addAll(vars); 
+        jsonArray.addAll(vars);
         return jsonArray.toJSONString();
     }
 }

@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
+import static org.valz.util.json.JSONBuilder.makeJson;
+
 public class MapMerge extends AbstractAggregate<JSONObject> {
 
-    private Aggregate<Object> mergeConflictsAggregate;
+    private final Aggregate<Object> mergeConflictsAggregate;
 
     public MapMerge(@NotNull Aggregate<Object> mergeConflictsAggregate) {
         this.mergeConflictsAggregate = mergeConflictsAggregate;
@@ -17,7 +19,7 @@ public class MapMerge extends AbstractAggregate<JSONObject> {
 
     @Override
     @NotNull
-    public JSONObject reduce(Iterator<JSONObject> stream) {
+    public JSONObject reduce(@NotNull Iterator<JSONObject> stream) {
         JSONObject res = new JSONObject();
         while (stream.hasNext()) {
             for (Object objectEntry : stream.next().entrySet()) {
@@ -42,14 +44,14 @@ public class MapMerge extends AbstractAggregate<JSONObject> {
 
     @Override
     public Object toSerialized() {
-        JSONObject json = new JSONObject();
-        json.put("mergeConflictsAggregate", AggregateRegistry.toJson(mergeConflictsAggregate));
-        return json;
+        return makeJson(
+                "mergeConflictsAggregate", AggregateRegistry.toAggregateString(mergeConflictsAggregate));
     }
 
     public static MapMerge deserialize(Object object, AggregateRegistry registry) {
-        Object jsonMergeConflictsAggregate = ((JSONObject) object).get("mergeConflictsAggregate");
-        Aggregate mergeConflictsAggregate = registry.parseJson((JSONObject) jsonMergeConflictsAggregate);
+        Object aggregateObject = ((JSONObject) object).get("mergeConflictsAggregate");
+        Aggregate<Object> mergeConflictsAggregate =
+                (Aggregate<Object>)registry.parseAggregateString((JSONObject) aggregateObject);
         return new MapMerge(mergeConflictsAggregate);
     }
 }

@@ -22,9 +22,9 @@ public class MessageSubmitRequest extends Message {
 
 
 
-    private String name;
-    private Object value;
-    private Aggregate<?> aggregate;
+    private final String name;
+    private final Object value;
+    private final Aggregate<?> aggregate;
 
 
 
@@ -43,10 +43,10 @@ public class MessageSubmitRequest extends Message {
 
     @NotNull
     @Override
-    String getDataString() {
+    String toDataString() {
         return makeJson(
                 "name", name,
-                "aggregate", AggregateRegistry.toJson(aggregate),
+                "aggregate", AggregateRegistry.toAggregateString(aggregate),
                 "value", value
         ).toJSONString();
     }

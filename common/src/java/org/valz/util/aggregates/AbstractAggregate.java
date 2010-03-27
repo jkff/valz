@@ -1,12 +1,13 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
 public abstract class AbstractAggregate<T> implements Aggregate<T> {
-    @NotNull
-    public T reduce(Iterator<T> stream) {
+    @Nullable
+    public T reduce(@NotNull Iterator<T> stream) {
         T res = stream.next();
         while (stream.hasNext()) {
             res = reduce(res, stream.next());
@@ -14,8 +15,10 @@ public abstract class AbstractAggregate<T> implements Aggregate<T> {
         return res;
     }
 
+    @Nullable
     public abstract T reduce(T item1, T item2);
 
+    @Nullable
     public Object toSerialized() {
         return null;
     }
