@@ -36,14 +36,14 @@ public class ValzHandler extends AbstractHandler {
             MessageType messageType = MessageType.valueOf(messageString);
 
             switch (messageType) {
-                case SUBMIT: {
+                case SUBMIT_REQUEST: {
                     String name = (String) obj.get("name");
-                    JSONObject spec = (JSONObject) obj.get("aggregate");
+                    JSONObject jsonAggregate = (JSONObject) obj.get("aggregate");
 
-                    backend.submit(name, spec, obj.get("value"));
+                    backend.submit(name, jsonAggregate, obj.get("value"));
                 }
                 break;
-                case LIST_VARS: {
+                case LIST_VARS_REQUEST: {
                     JSONArray arr = new JSONArray();
                     arr.addAll(backend.listVars());
                     Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
@@ -51,7 +51,7 @@ public class ValzHandler extends AbstractHandler {
                     out.close();
                 }
                 break;
-                case GET_VALUE: {
+                case GET_VALUE_REQUEST: {
                     String name = (String) obj.get("name");
                     Object value = backend.getValue(name);
                     if(value == null) {

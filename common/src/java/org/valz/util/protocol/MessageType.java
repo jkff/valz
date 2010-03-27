@@ -1,9 +1,9 @@
 package org.valz.util.protocol;
 
-import java.util.Map;
-
 public enum MessageType {
-    SUBMIT,
-    LIST_VARS,
-    GET_VALUE;
+    SUBMIT_REQUEST,
+    LIST_VARS_REQUEST,
+    LIST_VARS_RESPONSE,
+    GET_VALUE_REQUEST,
+    GET_VALUE_RESPONSE,
 }

@@ -13,7 +13,8 @@ import java.util.Map;
 public class AggregateRegistry {
     private Map<String, Class<? extends Aggregate<?>>> method2class = new HashMap<String, Class<? extends Aggregate<?>>>();
 
-    private static Method getDeserialize(Class<? extends Aggregate<?>> clazz) {
+    @NotNull
+    private static Method getDeserialize(@NotNull Class<? extends Aggregate<?>> clazz) {
         for (Method m : clazz.getDeclaredMethods()) {
             if ("deserialize".equals(m.getName()) &&
                     (0 != (m.getModifiers() & Modifier.PUBLIC)) &&
@@ -29,16 +30,16 @@ public class AggregateRegistry {
                 "The class %s does not declare a public static Aggregate deserialize(Object)", clazz));
     }
 
-    public void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
+    public void registerSupportedAggregate(@NotNull Class<? extends Aggregate<?>> clazz) {
         Method method = getDeserialize(clazz);
         method2class.put(clazz.getName(), clazz);
     }
 
-    @Nullable
-    public Aggregate<?> parseJson(JSONObject json) {
-        String methodName = (String) json.get("methodName");
+    @NotNull
+    public Aggregate<?> parseJson(@NotNull JSONObject json) {
+        String methodName = (String) json.get("method");
         if (methodName == null) {
-            throw new IllegalArgumentException("No 'methodName' in makeJson object " + json.toJSONString());
+            throw new IllegalArgumentException("No 'method' in makeJson object " + json.toJSONString());
         }
         Class<? extends Aggregate<?>> clazz = method2class.get(methodName);
         if (clazz == null) {

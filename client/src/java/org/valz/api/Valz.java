@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.protocol.MessageType;
 
 import java.io.IOException;
@@ -29,9 +30,9 @@ public final class Valz {
             public void submit(T sample) {
                 try {
                     HttpConnector.post(conf.getServerURL(), makeJson(
-                            "messageType", MessageType.SUBMIT.name(),
+                            "messageType", MessageType.SUBMIT_REQUEST.name(),
                             "name", name,
-                            "aggregate", aggregate.toSerialized(),
+                            "aggregate", AggregateRegistry.toJson(aggregate),
                             "value", sample
                     ).toJSONString());
                 } catch (IOException e) {
@@ -43,7 +44,7 @@ public final class Valz {
 
     public static synchronized Object getValue(@NotNull String name) throws IOException {
         String response = HttpConnector.post(conf.getServerURL(), makeJson(
-                "messageType", MessageType.GET_VALUE.name(),
+                "messageType", MessageType.GET_VALUE_REQUEST.name(),
                 "name", name).toJSONString());
         try {
             return new JSONParser().parse(response);
@@ -54,7 +55,7 @@ public final class Valz {
 
     public static synchronized List<String> listVars() throws IOException {
         String response = HttpConnector.post(conf.getServerURL(), makeJson(
-                "messageType", MessageType.LIST_VARS.name()).toJSONString());
+                "messageType", MessageType.LIST_VARS_REQUEST.name()).toJSONString());
         List<String> res = new ArrayList<String>();
         try {
             for (Object obj : (JSONArray) new JSONParser().parse(response)) {
