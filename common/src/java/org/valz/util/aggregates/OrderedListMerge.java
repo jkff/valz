@@ -6,17 +6,17 @@ import org.valz.util.Pair;
 
 import java.util.*;
 
-public class MergeJson implements Aggregate<JSONArray> {
+public class OrderedListMerge extends AbstractAggregate<JSONArray> {
     private String key;
 
-    public MergeJson(final String key) {
+    public OrderedListMerge(final String key) {
         this.key = key;
     }
 
     public JSONArray reduce(Iterator<JSONArray> stream) {
         List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
 
-        while(stream.hasNext())
+        while (stream.hasNext())
             iters.add(stream.next().iterator());
 
         Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
@@ -28,13 +28,20 @@ public class MergeJson implements Aggregate<JSONArray> {
         }, iters.iterator());
 
         JSONArray res = new JSONArray();
-        while(resIter.hasNext())
+        while (resIter.hasNext())
             res.add(resIter.next());
         return res;
     }
 
+    public JSONArray reduce(JSONArray item1, JSONArray item2) {
+        List<JSONArray> iters = new ArrayList<JSONArray>();
+        iters.add(item1);
+        iters.add(item2);
+        return reduce(iters.iterator());
+    }
+
     private static <T> Iterator<T> reduce(final Comparator<T> comparator, Iterator<Iterator<T>> stream) {
-        final PriorityQueue<Pair<T,Iterator<T>>> q = new PriorityQueue<Pair<T, Iterator<T>>>(
+        final PriorityQueue<Pair<T, Iterator<T>>> q = new PriorityQueue<Pair<T, Iterator<T>>>(
                 0, new Comparator<Pair<T, Iterator<T>>>() {
                     public int compare(Pair<T, Iterator<T>> p1, Pair<T, Iterator<T>> p2) {
                         return comparator.compare(p1.first, p2.first);
@@ -42,9 +49,10 @@ public class MergeJson implements Aggregate<JSONArray> {
                 }
         );
 
-        while(stream.hasNext()) {
+        while (stream.hasNext()) {
             Iterator<T> i = stream.next();
-            if(i.hasNext()) q.offer(new Pair<T, Iterator<T>>(i.next(), i));
+            if (i.hasNext())
+                q.offer(new Pair<T, Iterator<T>>(i.next(), i));
         }
 
         return new Iterator<T>() {
@@ -55,7 +63,7 @@ public class MergeJson implements Aggregate<JSONArray> {
             public T next() {
                 Pair<T, Iterator<T>> p = q.remove();
                 T res = p.first;
-                if(p.second.hasNext()) {
+                if (p.second.hasNext()) {
                     T next = p.second.next();
                     q.offer(new Pair<T, Iterator<T>>(next, p.second));
                 }
@@ -68,15 +76,14 @@ public class MergeJson implements Aggregate<JSONArray> {
         };
     }
 
-    public void toJson(JSONObject stub) {
-        stub.put("key", key);
+
+    public Object toSerialized() {
+        JSONObject json = new JSONObject();
+        json.put("key", key);
+        return json;
     }
 
-    public static String getMethod() {
-        return "mergeJson";
-    }
-
-    public static MergeJson fromJson(JSONObject json) {
-        return new MergeJson((String) json.get("key"));
+    public static OrderedListMerge deserialize(Object object, AggregateRegistry registry) {
+        return new OrderedListMerge((String) ((JSONObject) object).get("key"));
     }
 }

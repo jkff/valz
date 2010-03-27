@@ -2,15 +2,12 @@ package org.valz.api;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.valz.util.aggregates.AggregateUtils;
-import org.valz.util.protocol.MessageType;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.protocol.MessageType;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,17 +28,10 @@ public final class Valz {
         return new Val<T>() {
             public void submit(T sample) {
                 try {
-                    JSONObject json = new JSONObject();
-                    try {
-                        json.put("method", AggregateUtils.findGetMethod(aggregate.getClass()).invoke(null));
-                    } catch (IllegalAccessException e) {
-                    } catch (InvocationTargetException e) {
-                        throw new RuntimeException("Non-serializable aggregate " + aggregate, e);
-                    }
-                    aggregate.toJson(json);
                     HttpConnector.post(conf.getServerURL(), makeJson(
-                            "messageType",MessageType.SUBMIT.name(),
-                            "name",name, "aggregate", json,
+                            "messageType", MessageType.SUBMIT.name(),
+                            "name", name,
+                            "aggregate", aggregate.toSerialized(),
                             "value", sample
                     ).toJSONString());
                 } catch (IOException e) {
@@ -52,23 +42,26 @@ public final class Valz {
     }
 
     public static synchronized Object getValue(@NotNull String name) throws IOException {
-        String response = HttpConnector.post(conf.getServerURL(),
-                makeJson("messageType", MessageType.GET_VALUE.name(), "name", name).toJSONString());
+        String response = HttpConnector.post(conf.getServerURL(), makeJson(
+                "messageType", MessageType.GET_VALUE.name(),
+                "name", name).toJSONString());
         try {
             return new JSONParser().parse(response);
         } catch (ParseException e) {
-            throw new IOException("Malformed server response: "+response, e);
+            throw new IOException("Malformed server response: " + response, e);
         }
     }
 
     public static synchronized List<String> listVars() throws IOException {
-        String response = HttpConnector.post(conf.getServerURL(),
-                makeJson("messageType",MessageType.LIST_VARS.name()).toJSONString());
+        String response = HttpConnector.post(conf.getServerURL(), makeJson(
+                "messageType", MessageType.LIST_VARS.name()).toJSONString());
         List<String> res = new ArrayList<String>();
         try {
-            for(Object obj : (JSONArray)new JSONParser().parse(response)) res.add(obj.toString());
+            for (Object obj : (JSONArray) new JSONParser().parse(response)) {
+                res.add(obj.toString());
+            }
         } catch (ParseException e) {
-            throw new IOException("Malformed server response: "+response, e);
+            throw new IOException("Malformed server response: " + response, e);
         }
         return res;
     }

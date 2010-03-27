@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.util.aggregates.IntSum;
-import org.valz.util.aggregates.MergeJson;
+import org.valz.util.aggregates.MapMerge;
+import org.valz.util.aggregates.MinInt;
+import org.valz.util.aggregates.OrderedListMerge;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -19,7 +21,9 @@ public class ValzServer {
         ValzBackend backend = new ValzBackend();
 
         backend.registerSupportedAggregate(IntSum.class);
-        backend.registerSupportedAggregate(MergeJson.class);
+        backend.registerSupportedAggregate(MinInt.class);
+        backend.registerSupportedAggregate(OrderedListMerge.class);
+        backend.registerSupportedAggregate(MapMerge.class);
 
         server.addHandler(new ValzHandler(backend));
 

@@ -1,28 +1,23 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
-public class IntSum implements Aggregate<Integer> {
+public class IntSum extends AbstractAggregate<Integer> {
     @NotNull
     public Integer reduce(Iterator<Integer> stream) {
         int res = 0;
-        while(stream.hasNext())
-            res+=stream.next();
+        while (stream.hasNext())
+            res += stream.next();
         return res;
     }
 
-    public void toJson(JSONObject stub) {
-        // Nothing
+    public Integer reduce(Integer item1, Integer item2) {
+        return item1 + item2;
     }
 
-    public static String getMethod() {
-        return "intSum";
-    }
-
-    public static IntSum fromJson(JSONObject json) {
+    public static IntSum deserialize(Object object, AggregateRegistry registry) {
         return new IntSum();
     }
 }

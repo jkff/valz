@@ -2,21 +2,21 @@ package org.valz.server;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.AggregateRegistry;
 
 import java.util.*;
 
 public class ValzBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private AggregateParser parser = new AggregateParser();
+    private AggregateRegistry _registry = new AggregateRegistry();
     private Map<String, Object> name2val = new HashMap<String, Object>();
 
     synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
         Aggregate aggregate;
         try {
-            aggregate = parser.parse(aggregateSpec);
+            aggregate = _registry.parseJson(aggregateSpec);
         } catch (Exception e) {
             log.error("Malformed aggregate spec: " + aggregateSpec.toJSONString(), e);
             return;
@@ -40,6 +40,6 @@ public class ValzBackend {
     }
 
     public synchronized void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
-        parser.registerSupportedAggregate(clazz);
+        _registry.registerSupportedAggregate(clazz);
     }
 }

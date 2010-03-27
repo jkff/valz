@@ -1,14 +1,13 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
-public class MinInt implements Aggregate<Integer> {
+public class MinInt extends AbstractAggregate<Integer> {
     @NotNull
     public Integer reduce(Iterator<Integer> stream) {
-        int res = Integer.MAX_VALUE;
+        int res = stream.next();
         while (stream.hasNext()) {
             int value = stream.next();
             if (value < res) {
@@ -18,15 +17,11 @@ public class MinInt implements Aggregate<Integer> {
         return res;
     }
 
-    public void toJson(JSONObject stub) {
-        // Nothing
+    public Integer reduce(Integer item1, Integer item2) {
+        return item1 < item2 ? item1 : item2;
     }
 
-    public static String getMethod() {
-        return "minInt";
-    }
-
-    public static MinInt fromJson(JSONObject json) {
+    public static MinInt deserialize(Object object, AggregateRegistry registry) {
         return new MinInt();
     }
 }
