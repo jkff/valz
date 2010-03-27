@@ -11,11 +11,13 @@ import org.valz.util.aggregates.OrderedListMerge;
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
 
+
+
     public static void main(String[] args) {
         PropertyConfigurator.configure("log4j.properties");
 
         int port = 8080;
-        
+
         Server server = new Server(port);
 
         ValzBackend backend = new ValzBackend();
@@ -40,5 +42,10 @@ public class ValzServer {
         } catch (InterruptedException e) {
             log.error("Could not stop server", e);
         }
+    }
+
+
+    
+    private ValzServer() {
     }
 }

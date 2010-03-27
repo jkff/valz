@@ -1,7 +1,6 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateRegistry;
 
@@ -10,20 +9,28 @@ import java.util.*;
 public class ValzBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private AggregateRegistry _registry = new AggregateRegistry();
-    private Map<String, Object> name2val = new HashMap<String, Object>();
 
-    synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
-        Aggregate aggregate;
-        try {
-            aggregate = _registry.parseAggregateString(aggregateSpec);
-        } catch (Exception e) {
-            log.error("Malformed aggregate spec: " + aggregateSpec.toJSONString(), e);
-            return;
-        }
+
+    private final AggregateRegistry registry = new AggregateRegistry();
+    private final Map<String, Object> name2val = new HashMap<String, Object>();
+    private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
+
+
+
+    public ValzBackend() {
+    }
+
+    
+
+    public synchronized void submit(String name, Aggregate aggregate, Object value) {
         if (!name2val.containsKey(name)) {
             name2val.put(name, value);
+            name2aggregate.put(name, aggregate);
         } else {
+            if (!aggregate.equals(name2aggregate.get(name))) {
+                throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
+            }
+
             Object oldValue = name2val.get(name);
             List<Object> list = Arrays.asList(oldValue, value);
             Object newValue = aggregate.reduce(list.iterator());
@@ -31,15 +38,19 @@ public class ValzBackend {
         }
     }
 
-    synchronized Collection<String> listVars() {
+    public synchronized Collection<String> listVars() {
         return new ArrayList<String>(name2val.keySet());
     }
 
-    synchronized Object getValue(String name) {
+    public synchronized Object getValue(String name) {
         return name2val.get(name);
     }
 
+    public synchronized Aggregate getAggregate(String name) {
+        return name2aggregate.get(name);
+    }
+
     public synchronized void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
-        _registry.registerSupportedAggregate(clazz);
+        registry.registerSupportedAggregate(clazz);
     }
 }

@@ -39,13 +39,18 @@ public class AggregateRegistry {
 
 
 
-    private final Map<String, Class<? extends Aggregate<?>>> method2class = new HashMap<String, Class<? extends Aggregate<?>>>();
+    private final Map<String, Class<? extends Aggregate<?>>> name2class = new HashMap<String, Class<? extends Aggregate<?>>>();
 
     
 
+    public String getAggregateName(@NotNull String name) {
+        Class<? extends Aggregate<?>> clazz = name2class.get(name);
+        return clazz.getName();
+    }
+
     public void registerSupportedAggregate(@NotNull Class<? extends Aggregate<?>> clazz) {
-        Method method = getDeserialize(clazz);
-        method2class.put(clazz.getName(), clazz);
+        getDeserialize(clazz);
+        name2class.put(clazz.getName(), clazz);
     }
 
     @NotNull
@@ -55,7 +60,7 @@ public class AggregateRegistry {
             throw new IllegalArgumentException(String.format(
                     "No 'deserializeMethod' in makeJson object %s.", json.toJSONString()));
         }
-        Class<? extends Aggregate<?>> clazz = method2class.get(methodName);
+        Class<? extends Aggregate<?>> clazz = name2class.get(methodName);
         if (clazz == null) {
             throw new RuntimeException(
                     String.format("Aggregate with '%s' name is not registered.", methodName));

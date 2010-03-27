@@ -1,16 +1,11 @@
 package org.valz.util.io;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class IOUtils {
-    private IOUtils() {
-    }
-
     public static void closeInputSilently(@Nullable InputStream is) {
         try {
             if (is != null) {
@@ -43,5 +38,19 @@ public class IOUtils {
         } finally {
             closeInputSilently(stream);
         }
+    }
+
+    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws IOException {
+        try {
+            Writer out = new OutputStreamWriter(stream, encoding);
+            out.write(data);
+        } finally {
+            closeOutputSilently(stream);
+        }
+    }
+
+
+
+    private IOUtils() {
     }
 }

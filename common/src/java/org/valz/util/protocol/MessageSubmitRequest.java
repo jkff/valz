@@ -12,7 +12,7 @@ import static org.valz.util.json.JSONBuilder.makeJson;
 public class MessageSubmitRequest extends Message {
     @NotNull
     public static MessageSubmitRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject) new JSONParser().parse(dataString);
+        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
         return new MessageSubmitRequest(
                 (String)dataObject.get("name"),
                 (Aggregate<?>)dataObject.get("aggregate"),
@@ -20,7 +20,7 @@ public class MessageSubmitRequest extends Message {
         );
     }
 
-
+    
 
     private final String name;
     private final Object value;
@@ -35,6 +35,18 @@ public class MessageSubmitRequest extends Message {
     }
 
 
+
+    public String getName() {
+        return name;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public Aggregate<?> getAggregate() {
+        return aggregate;
+    }
 
     @Override
     public MessageType getMessageType() {

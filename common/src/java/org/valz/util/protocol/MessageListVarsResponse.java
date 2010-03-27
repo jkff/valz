@@ -2,33 +2,31 @@ package org.valz.util.protocol;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.util.List;
-
-import static org.valz.util.json.JSONBuilder.makeJson;
+import java.util.Collection;
 
 public class MessageListVarsResponse extends Message {
     @NotNull
     public static MessageListVarsResponse parseDataString(@NotNull String dataString) throws ParseException {
-        JSONArray dataObject = (JSONArray) new JSONParser().parse(dataString);
+        JSONArray dataObject = (JSONArray)new JSONParser().parse(dataString);
         return new MessageListVarsResponse(dataObject);
     }
 
+    
 
-    private final List<String> vars;
+    private final Collection<String> vars;
 
 
 
-    public MessageListVarsResponse(@NotNull List<String> vars) {
+    public MessageListVarsResponse(@NotNull Collection<String> vars) {
         this.vars = vars;
     }
 
 
-    
-    public List<String> getVars() {
+
+    public Collection<String> getVars() {
         return vars;
     }
 

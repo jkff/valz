@@ -20,7 +20,7 @@ class HttpConnector {
 
             OutputStream os = connection.getOutputStream();
             try {
-                OutputStreamWriter writer = new OutputStreamWriter(os);
+                Writer writer = new OutputStreamWriter(os);
                 writer.write(data);
             } finally {
                 IOUtils.closeOutputSilently(os);
@@ -36,12 +36,17 @@ class HttpConnector {
                     sb.append(line);
                 }
                 return sb.toString();
-                
+
             } finally {
                 IOUtils.closeInputSilently(is);
             }
         } finally {
             connection.disconnect();
         }
+    }
+
+
+    
+    private HttpConnector() {
     }
 }

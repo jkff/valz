@@ -10,9 +10,9 @@ import static org.valz.util.json.JSONBuilder.makeJson;
 public class MessageGetValueRequest extends Message {
     @NotNull
     public static MessageGetValueRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject) new JSONParser().parse(dataString);
+        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
         return new MessageGetValueRequest(
-                (String) dataObject.get("name")
+                (String)dataObject.get("name")
         );
     }
 
@@ -21,9 +21,15 @@ public class MessageGetValueRequest extends Message {
     private final String name;
 
 
-    
+
     public MessageGetValueRequest(@NotNull String name) {
         this.name = name;
+    }
+
+
+
+    public String getName() {
+        return name;
     }
 
     @Override

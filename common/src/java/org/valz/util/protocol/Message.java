@@ -13,11 +13,9 @@ public abstract class Message {
     @NotNull
     public static Message parseMessageString(@NotNull String messageString) throws IOException {
         try {
-            JSONObject messageObject = null;
-
-            messageObject = (JSONObject) new JSONParser().parse(messageString);
-            MessageType messageType = MessageType.valueOf((String) messageObject.get("messageType"));
-            String dataString = (String) messageObject.get("data");
+            JSONObject messageObject = (JSONObject)new JSONParser().parse(messageString);
+            MessageType messageType = MessageType.valueOf((String)messageObject.get("messageType"));
+            String dataString = (String)messageObject.get("data");
 
             switch (messageType) {
                 case SUBMIT_REQUEST:
@@ -38,8 +36,10 @@ public abstract class Message {
     }
 
 
+
     Message() {
     }
+
 
 
     public abstract MessageType getMessageType();

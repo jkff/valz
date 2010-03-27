@@ -1,28 +1,23 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.valz.util.protocol.MessageType;
+import org.valz.util.io.IOUtils;
+import org.valz.util.protocol.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 import static org.valz.util.io.IOUtils.readInputStream;
-import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
 
-    private ValzBackend backend;
-    
+    private final ValzBackend backend;
+
     public ValzHandler(ValzBackend backend) {
         this.backend = backend;
     }
@@ -31,38 +26,31 @@ public class ValzHandler extends AbstractHandler {
         response.setContentType("text/html");
         try {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
-            JSONObject obj = (JSONObject)new JSONParser().parse(reqStr);
-            String messageString = (String) obj.get("messageType");
-            MessageType messageType = MessageType.valueOf(messageString);
+            Message message = Message.parseMessageString(reqStr);
 
-            switch (messageType) {
+            switch (message.getMessageType()) {
                 case SUBMIT_REQUEST: {
-                    String name = (String) obj.get("name");
-                    JSONObject jsonAggregate = (JSONObject) obj.get("aggregate");
-
-                    backend.submit(name, jsonAggregate, obj.get("value"));
+                    MessageSubmitRequest recvMsg = (MessageSubmitRequest) message;
+                    backend.submit(recvMsg.getName(), recvMsg.getAggregate(), recvMsg.getValue());
                 }
                 break;
                 case LIST_VARS_REQUEST: {
-                    JSONArray arr = new JSONArray();
-                    arr.addAll(backend.listVars());
-                    Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
-                    arr.writeJSONString(out);
-                    out.close();
+                    MessageListVarsRequest recvMsg = (MessageListVarsRequest) message;
+                    Message sendMsg = new MessageListVarsResponse(backend.listVars());
+                    IOUtils.writeOutputStream(response.getOutputStream(), sendMsg.toMessageString(), "UTF-8");
                 }
                 break;
                 case GET_VALUE_REQUEST: {
-                    String name = (String) obj.get("name");
-                    Object value = backend.getValue(name);
-                    if(value == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    } else {
-                        Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
-                        makeJson("value", value).writeJSONString(out);
-                        out.close();
-                    }
+                    MessageGetValueRequest recvMsg = (MessageGetValueRequest) message;
+                    Message sendMsg = new MessageGetValueResponse(
+                            backend.getAggregate(recvMsg.getName()),
+                            backend.getValue(recvMsg.getName()));
+                    IOUtils.writeOutputStream(response.getOutputStream(), sendMsg.toMessageString(), "UTF-8");
                 }
                 break;
+                case GET_VALUE_RESPONSE:
+                case LIST_VARS_RESPONSE:
+                    throw new IllegalArgumentException("Can not serve this request.");
             }
 
             response.setStatus(HttpServletResponse.SC_OK);

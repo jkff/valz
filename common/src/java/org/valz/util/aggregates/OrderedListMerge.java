@@ -9,42 +9,6 @@ import java.util.*;
 import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class OrderedListMerge extends AbstractAggregate<JSONArray> {
-    private final String key;
-
-    public OrderedListMerge(final String key) {
-        this.key = key;
-    }
-
-    @Override
-    public JSONArray reduce(@NotNull Iterator<JSONArray> stream) {
-        List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
-
-        while (stream.hasNext()) {
-            iters.add(stream.next().iterator());
-        }
-
-        Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
-            public int compare(JSONObject o1, JSONObject o2) {
-                Comparable v1 = (Comparable) o1.get(key);
-                Comparable v2 = (Comparable) o2.get(key);
-                return v1.compareTo(v2);
-            }
-        }, iters.iterator());
-
-        JSONArray res = new JSONArray();
-        while (resIter.hasNext()) {
-            res.add(resIter.next());
-        }
-        return res;
-    }
-
-    @Override
-    public JSONArray reduce(JSONArray item1, JSONArray item2) {
-        List<JSONArray> iters = new ArrayList<JSONArray>();
-        iters.add(item1);
-        iters.add(item2);
-        return reduce(iters.iterator());
-    }
 
     private static <T> Iterator<T> reduce(final Comparator<T> comparator, Iterator<Iterator<T>> stream) {
         final PriorityQueue<Pair<T, Iterator<T>>> q = new PriorityQueue<Pair<T, Iterator<T>>>(
@@ -83,13 +47,55 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
         };
     }
 
+    public static OrderedListMerge deserialize(Object object, AggregateRegistry registry) {
+        return new OrderedListMerge((String) ((JSONObject) object).get("key"));
+    }
+
+
+
+    private final String key;
+
+
+
+    public OrderedListMerge(final String key) {
+        this.key = key;
+    }
+
+
 
     @Override
     public Object toSerialized() {
         return makeJson("key", key);
     }
 
-    public static OrderedListMerge deserialize(Object object, AggregateRegistry registry) {
-        return new OrderedListMerge((String) ((JSONObject) object).get("key"));
+    @Override
+    public JSONArray reduce(@NotNull Iterator<JSONArray> stream) {
+        List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
+
+        while (stream.hasNext()) {
+            iters.add(stream.next().iterator());
+        }
+
+        Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
+            public int compare(JSONObject o1, JSONObject o2) {
+                Comparable v1 = (Comparable) o1.get(key);
+                Comparable v2 = (Comparable) o2.get(key);
+                return v1.compareTo(v2);
+            }
+        }, iters.iterator());
+
+        JSONArray res = new JSONArray();
+        while (resIter.hasNext()) {
+            res.add(resIter.next());
+        }
+        return res;
+    }
+
+    @Override
+    public JSONArray reduce(JSONArray item1, JSONArray item2) {
+        List<JSONArray> iters = new ArrayList<JSONArray>();
+        iters.add(item1);
+        iters.add(item2);
+        return reduce(iters.iterator());
     }
 }

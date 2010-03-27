@@ -5,6 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 public class MinInt extends AbstractAggregate<Integer> {
+
+    public static MinInt deserialize(Object object, AggregateRegistry registry) {
+        return new MinInt();
+    }
+
+
+
     @Override
     public Integer reduce(@NotNull Iterator<Integer> stream) {
         int res = stream.next();
@@ -20,9 +27,5 @@ public class MinInt extends AbstractAggregate<Integer> {
     @Override
     public Integer reduce(Integer item1, Integer item2) {
         return item1 < item2 ? item1 : item2;
-    }
-
-    public static MinInt deserialize(Object object, AggregateRegistry registry) {
-        return new MinInt();
     }
 }

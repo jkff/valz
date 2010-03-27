@@ -12,7 +12,7 @@ import static org.valz.util.json.JSONBuilder.makeJson;
 public class MessageGetValueResponse extends Message {
     @NotNull
     public static MessageGetValueResponse parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject) new JSONParser().parse(dataString);
+        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
         return new MessageGetValueResponse(
                 (Aggregate<?>)dataObject.get("aggregate"),
                 dataObject.get("value")
@@ -40,7 +40,7 @@ public class MessageGetValueResponse extends Message {
     public Aggregate<?> getAggregate() {
         return aggregate;
     }
-    
+
     @Override
     public MessageType getMessageType() {
         return MessageType.GET_VALUE_RESPONSE;
