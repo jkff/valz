@@ -15,25 +15,23 @@ public abstract class Message {
         String dataString = (String) messageObject.get("data");
 
         switch (messageType) {
-            case SUBMIT_REQUEST: {
+            case SUBMIT_REQUEST:
                 return MessageSubmitRequest.parseDataString(dataString);
-            }
-            case LIST_VARS_REQUEST: {
+            case LIST_VARS_REQUEST:
                 return MessageListVarsRequest.parseDataString(dataString);
-            }
-            case GET_VALUE_REQUEST: {
+            case GET_VALUE_REQUEST:
                 return MessageGetValueRequest.parseDataString(dataString);
-            }
-            default:
-                throw new IllegalArgumentException(String.format("Can not serve request '%s'.", messageType));
+            case LIST_VARS_RESPONSE:
+                return MessageListVarsResponse.parseDataString(dataString);
+            case GET_VALUE_RESPONSE:
+                return MessageGetValueResponse.parseDataString(dataString);
         }
+        throw new IllegalArgumentException(String.format("Can not serve request '%s'.", messageType));
     }
-
 
 
     Message() {
     }
-
 
 
     public abstract MessageType getMessageType();
