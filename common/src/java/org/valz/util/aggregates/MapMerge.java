@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class MapMerge implements Aggregate<JSONObject> {
-
     private boolean keepFirst = false;
 
     public MapMerge(boolean keepFirst) {
