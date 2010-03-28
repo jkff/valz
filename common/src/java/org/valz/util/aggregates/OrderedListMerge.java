@@ -70,6 +70,7 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
 
     @Override
     public JSONArray reduce(@NotNull Iterator<JSONArray> stream) {
+        // TODO: разобратсья с дублированием с private static <T> Iterator<T> reduce
         List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
 
         while (stream.hasNext()) {

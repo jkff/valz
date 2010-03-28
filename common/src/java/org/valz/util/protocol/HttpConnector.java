@@ -37,7 +37,7 @@ public class HttpConnector {
                 return sb.toString();
 
             } finally {
-                IOUtils.closeInputSilently(is);
+                IOUtils.closeSilently(is);
             }
         } finally {
             connection.disconnect();

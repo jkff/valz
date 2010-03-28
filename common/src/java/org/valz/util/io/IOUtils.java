@@ -6,22 +6,12 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 
 public class IOUtils {
-    public static void closeInputSilently(@Nullable InputStream is) {
+    public static void closeSilently(Closeable c) {
         try {
-            if (is != null) {
-                is.close();
+            if (c != null) {
+                c.close();
             }
-        } catch (IOException e) {
-            // Ignore
-        }
-    }
-
-    public static void closeOutputSilently(@Nullable OutputStream os) {
-        try {
-            if (os != null) {
-                os.close();
-            }
-        } catch (IOException e) {
+        } catch(IOException e) {
             // Ignore
         }
     }
@@ -36,7 +26,7 @@ public class IOUtils {
             }
             return new String(bos.toByteArray(), encoding);
         } finally {
-            closeInputSilently(stream);
+            closeSilently(stream);
         }
     }
 
@@ -53,13 +43,5 @@ public class IOUtils {
 
 
     private IOUtils() {
-    }
-
-    public static void closeSilently(Closeable c) {
-        try {
-            if(c != null) c.close();
-        } catch(IOException e) {
-            // Ignore
-        }
     }
 }
