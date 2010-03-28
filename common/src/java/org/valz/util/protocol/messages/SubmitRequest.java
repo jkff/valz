@@ -11,7 +11,7 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class SubmitRequest extends Message {
+public class SubmitRequest extends Message<SubmitRequest.Submission> {
     @NotNull
     public static SubmitRequest parseDataString(@NotNull String dataString) throws ParseException {
         JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
@@ -22,46 +22,29 @@ public class SubmitRequest extends Message {
         );
     }
 
-    
-
-    private final String name;
-    private final Object value;
-    private final Aggregate<?> aggregate;
-
-
-
     public SubmitRequest(@NotNull String name, @NotNull Aggregate<?> aggregate, Object value) {
-        this.name = name;
-        this.value = value;
-        this.aggregate = aggregate;
-    }
-
-
-
-    public String getName() {
-        return name;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public Aggregate<?> getAggregate() {
-        return aggregate;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.SUBMIT_REQUEST;
+        super(new Submission(name, aggregate, value), MessageType.SUBMIT_REQUEST);
     }
 
     @NotNull
     @Override
     public String toDataString() {
         return makeJson(
-                "name", name,
-                "aggregate", AggregateRegistry.toJson(aggregate),
-                "value", value
+                "name", getData().name,
+                "aggregate", AggregateRegistry.toJson(getData().aggregate),
+                "value", getData().value
         ).toJSONString();
+    }
+
+    public static class Submission {
+        public final String name;
+        public final Aggregate<?> aggregate;
+        public final Object value;
+
+        public Submission(String name, Aggregate<?> aggregate, Object value) {
+            this.name = name;
+            this.aggregate = aggregate;
+            this.value = value;
+        }
     }
 }

@@ -10,7 +10,10 @@ import java.io.IOException;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public abstract class Message {
+public abstract class Message<T> {
+    private MessageType type;
+    private T data;
+
     @NotNull
     public static Message parseMessageString(@NotNull String messageString) throws IOException {
         try {
@@ -40,12 +43,15 @@ public abstract class Message {
         }
     }
 
-    Message() {
+    protected Message(T data, MessageType type) {
+        this.data = data;
+        this.type = type;
     }
 
-    public abstract MessageType getMessageType();
+    public MessageType getMessageType() {
+        return type;
+    }
 
-    @NotNull
     abstract String toDataString();
 
     @NotNull
@@ -54,5 +60,9 @@ public abstract class Message {
                 "messageType", getMessageType().name(),
                 "data", toDataString()
         ).toJSONString();
+    }
+
+    public T getData() {
+        return data;
     }
 }

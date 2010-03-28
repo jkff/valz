@@ -10,8 +10,11 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetAggregateResponse extends Message {
-    @NotNull
+public class GetAggregateResponse extends Message<Aggregate<?>> {
+    public GetAggregateResponse(@NotNull Aggregate<?> aggregate) {
+        super(aggregate, MessageType.GET_AGGREGATE_RESPONSE);
+    }
+
     public static GetAggregateResponse parseDataString(@NotNull String dataString) throws ParseException {
         JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
         Aggregate<?> agg = AggregateRegistry.INSTANCE.parseAggregateString(
@@ -19,24 +22,7 @@ public class GetAggregateResponse extends Message {
         return new GetAggregateResponse(agg);
     }
 
-    private final Aggregate<?> aggregate;
-
-    public GetAggregateResponse(@NotNull Aggregate<?> aggregate) {
-        this.aggregate = aggregate;
-    }
-
-    public Aggregate<?> getAggregate() {
-        return aggregate;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.GET_AGGREGATE_RESPONSE;
-    }
-
-    @NotNull
-    @Override
     String toDataString() {
-        return makeJson("aggregate", AggregateRegistry.toJson(aggregate)).toJSONString();
+        return makeJson("aggregate", AggregateRegistry.toJson(getData())).toJSONString();
     }
 }
