@@ -15,14 +15,13 @@ public class GetAggregateResponse extends Message<Aggregate<?>> {
         super(aggregate, MessageType.GET_AGGREGATE_RESPONSE);
     }
 
-    public static GetAggregateResponse parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
-        Aggregate<?> agg = AggregateRegistry.INSTANCE.parseAggregateString(
-                (JSONObject) dataObject.get("aggregate"));
+    public static GetAggregateResponse fromDataJson(@NotNull Object json) throws ParseException {
+        JSONObject obj = (JSONObject) json;
+        Aggregate<?> agg = AggregateRegistry.INSTANCE.parseAggregateString((JSONObject) obj.get("aggregate"));
         return new GetAggregateResponse(agg);
     }
 
-    String toDataString() {
-        return makeJson("aggregate", AggregateRegistry.toJson(getData())).toJSONString();
+    public JSONObject dataToJson() {
+        return makeJson("aggregate", AggregateRegistry.toJson(getData()));
     }
 }

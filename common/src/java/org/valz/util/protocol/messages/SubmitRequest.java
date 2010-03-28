@@ -12,28 +12,23 @@ import org.valz.util.protocol.MessageType;
 import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class SubmitRequest extends Message<SubmitRequest.Submission> {
-    @NotNull
-    public static SubmitRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
+    public static SubmitRequest fromDataJson(Object json) throws ParseException {
+        JSONObject dataObject = (JSONObject)json;
         return new SubmitRequest(
                 (String)dataObject.get("name"),
                 AggregateRegistry.INSTANCE.parseAggregateString(((JSONObject) dataObject.get("aggregate"))),
-                dataObject.get("value")
-        );
+                dataObject.get("value"));
     }
 
-    public SubmitRequest(@NotNull String name, @NotNull Aggregate<?> aggregate, Object value) {
+    public SubmitRequest(String name, Aggregate<?> aggregate, Object value) {
         super(new Submission(name, aggregate, value), MessageType.SUBMIT_REQUEST);
     }
 
-    @NotNull
-    @Override
-    public String toDataString() {
+    public JSONObject dataToJson() {
         return makeJson(
                 "name", getData().name,
                 "aggregate", AggregateRegistry.toJson(getData().aggregate),
-                "value", getData().value
-        ).toJSONString();
+                "value", getData().value);
     }
 
     public static class Submission {

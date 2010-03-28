@@ -19,23 +19,23 @@ public abstract class Message<T> {
         try {
             JSONObject messageObject = (JSONObject)new JSONParser().parse(messageString);
             MessageType messageType = MessageType.valueOf((String)messageObject.get("messageType"));
-            String dataString = (String)messageObject.get("data");
+            Object data = messageObject.get("data");
 
             switch (messageType) {
                 case SUBMIT_REQUEST:
-                    return SubmitRequest.parseDataString(dataString);
+                    return SubmitRequest.fromDataJson(data);
                 case LIST_VARS_REQUEST:
-                    return ListVarsRequest.parseDataString(dataString);
+                    return ListVarsRequest.fromDataJson(data);
                 case GET_VALUE_REQUEST:
-                    return GetValueRequest.parseDataString(dataString);
+                    return GetValueRequest.fromDataJson(data);
                 case GET_AGGREGATE_REQUEST:
-                    return GetAggregateRequest.parseDataString(dataString);
+                    return GetAggregateRequest.fromDataJson(data);
                 case LIST_VARS_RESPONSE:
-                    return ListVarsResponse.parseDataString(dataString);
+                    return ListVarsResponse.fromDataJson(data);
                 case GET_VALUE_RESPONSE:
-                    return GetValueResponse.parseDataString(dataString);
+                    return GetValueResponse.fromDataJson(data);
                 case GET_AGGREGATE_RESPONSE:
-                    return GetAggregateResponse.parseDataString(dataString);
+                    return GetAggregateResponse.fromDataJson(data);
             }
             throw new IllegalArgumentException(String.format("Can not serve request '%s'.", messageType));
         } catch (ParseException e) {
@@ -52,13 +52,13 @@ public abstract class Message<T> {
         return type;
     }
 
-    abstract String toDataString();
+    abstract Object dataToJson();
 
     @NotNull
     public final String toMessageString() {
         return makeJson(
                 "messageType", getMessageType().name(),
-                "data", toDataString()
+                "data", dataToJson()
         ).toJSONString();
     }
 
