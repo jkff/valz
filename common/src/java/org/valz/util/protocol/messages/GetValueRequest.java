@@ -9,13 +9,13 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetValueRequest extends Message<String> {
-    public GetValueRequest(@NotNull String name) {
+public class GetValueRequest extends Message<String, JSONObject> {
+    public GetValueRequest(String name) {
         super(name, MessageType.GET_VALUE_REQUEST);
     }
 
-    public static GetValueRequest fromDataJson(@NotNull Object json) throws ParseException {
-        return new GetValueRequest((String) ((JSONObject)json).get("name"));
+    public static GetValueRequest fromDataJson(JSONObject json) throws ParseException {
+        return new GetValueRequest((String)json.get("name"));
     }
 
     public JSONObject dataToJson() {

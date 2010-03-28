@@ -1,6 +1,7 @@
 package org.valz.util.protocol.messages;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public abstract class Message<T> {
+public abstract class Message<T, R> {
     private MessageType type;
     private T data;
 
@@ -23,19 +24,19 @@ public abstract class Message<T> {
 
             switch (messageType) {
                 case SUBMIT_REQUEST:
-                    return SubmitRequest.fromDataJson(data);
+                    return SubmitRequest.fromDataJson((JSONObject) data);
                 case LIST_VARS_REQUEST:
                     return ListVarsRequest.fromDataJson(data);
                 case GET_VALUE_REQUEST:
-                    return GetValueRequest.fromDataJson(data);
+                    return GetValueRequest.fromDataJson((JSONObject) data);
                 case GET_AGGREGATE_REQUEST:
-                    return GetAggregateRequest.fromDataJson(data);
+                    return GetAggregateRequest.fromDataJson((JSONObject) data);
                 case LIST_VARS_RESPONSE:
-                    return ListVarsResponse.fromDataJson(data);
+                    return ListVarsResponse.fromDataJson((JSONArray) data);
                 case GET_VALUE_RESPONSE:
-                    return GetValueResponse.fromDataJson(data);
+                    return GetValueResponse.fromDataJson((JSONObject) data);
                 case GET_AGGREGATE_RESPONSE:
-                    return GetAggregateResponse.fromDataJson(data);
+                    return GetAggregateResponse.fromDataJson((JSONObject) data);
             }
             throw new IllegalArgumentException(String.format("Can not serve request '%s'.", messageType));
         } catch (ParseException e) {
@@ -52,7 +53,7 @@ public abstract class Message<T> {
         return type;
     }
 
-    abstract Object dataToJson();
+    abstract R dataToJson();
 
     @NotNull
     public final String toMessageString() {
