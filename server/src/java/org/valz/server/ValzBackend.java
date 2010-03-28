@@ -3,8 +3,7 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.AggregateParser;
-import org.valz.util.aggregates.AggregateUtils;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.protocol.Backend;
 import org.valz.util.protocol.RemoteReadException;
 
@@ -13,22 +12,21 @@ import java.util.*;
 public class ValzBackend implements Backend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private AggregateParser parser = new AggregateParser();
-    private Map<String, Object> name2val = new HashMap<String, Object>();
-    private Map<String, Aggregate> name2agg = new HashMap<String, Aggregate>();
+    private final Map<String, Object> name2val = new HashMap<String, Object>();
+    private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
 
-    public synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
-        Aggregate aggregate;
-        try {
-            aggregate = parser.parse(aggregateSpec);
-        } catch (Exception e) {
-            log.error("Malformed aggregate spec: " + aggregateSpec.toJSONString(), e);
-            return;
-        }
+    public ValzBackend() {
+    }
+
+    public synchronized void submit(String name, Aggregate aggregate, Object value) {
         if (!name2val.containsKey(name)) {
             name2val.put(name, value);
-            name2agg.put(name, aggregate);
+            name2aggregate.put(name, aggregate);
         } else {
+            if (!aggregate.equals(name2aggregate.get(name))) {
+                throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
+            }
+
             Object oldValue = name2val.get(name);
             List<Object> list = Arrays.asList(oldValue, value);
             Object newValue = aggregate.reduce(list.iterator());
@@ -40,15 +38,15 @@ public class ValzBackend implements Backend {
         return new ArrayList<String>(name2val.keySet());
     }
 
-    public JSONObject getAggregateDescription(String name) throws RemoteReadException {
-        return AggregateUtils.toJson(name2agg.get(name));
-    }
-
     public synchronized Object getValue(String name) {
         return name2val.get(name);
     }
 
+    public synchronized Aggregate getAggregate(String name) {
+        return name2aggregate.get(name);
+    }
+
     public synchronized void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
-        parser.registerSupportedAggregate(clazz);
+        AggregateRegistry.INSTANCE.registerSupportedAggregate(clazz);
     }
 }

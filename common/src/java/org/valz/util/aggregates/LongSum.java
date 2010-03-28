@@ -5,24 +5,23 @@ import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
-public class LongSum implements Aggregate<Long> {
-    @NotNull
-    public Long reduce(Iterator<Long> stream) {
+public class LongSum extends AbstractAggregate<Long> {
+
+    public static LongSum deserialize(Object object, AggregateRegistry registry) {
+        return new LongSum();
+    }
+
+    @Override
+    public Long reduce(@NotNull Iterator<Long> stream) {
         long res = 0;
-        while(stream.hasNext())
-            res+=stream.next();
+        while (stream.hasNext()) {
+            res += stream.next();
+        }
         return res;
     }
 
-    public void toJson(JSONObject stub) {
-        // Nothing
-    }
-
-    public static String getMethod() {
-        return "longSum";
-    }
-
-    public static LongSum fromJson(JSONObject json) {
-        return new LongSum();
+    @Override
+    public Long reduce(Long item1, Long item2) {
+        return item1 + item2;
     }
 }

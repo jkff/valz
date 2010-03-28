@@ -1,14 +1,12 @@
 package org.valz.util.protocol;
 
-import org.json.simple.JSONObject;
+import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.HttpConnector;
-import org.valz.util.protocol.MessageType;
 import org.valz.util.protocol.RemoteWriteException;
 import org.valz.util.protocol.WriteBackend;
+import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.io.IOException;
-
-import static org.valz.util.json.JSONBuilder.makeJson;
 
 /**
  * Created on: 28.03.2010 10:50:36
@@ -20,15 +18,13 @@ public class RemoteWriteBackend implements WriteBackend {
         this.conf = conf;
     }
 
-    public void submit(String name, JSONObject aggregateSpec, Object value) throws RemoteWriteException {
+    public void submit(String name, Aggregate<?> aggregate, Object value) throws RemoteWriteException {
         try {
-            HttpConnector.post(conf.getServerURL(), makeJson(
-                    "messageType", MessageType.SUBMIT.name(),
-                    "name",name, "aggregate", aggregateSpec,
-                    "value", value
-            ).toJSONString());
+            HttpConnector.post(conf.getServerURL(),
+                    new SubmitRequest(name, aggregate, value).toMessageString());
         } catch (IOException e) {
             throw new RemoteWriteException("Server unreachable: " + conf.getServerURL(), e);
+            // TODO: save val to queue and try send later
         }
     }
 }
