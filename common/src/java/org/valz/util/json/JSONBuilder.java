@@ -10,4 +10,9 @@ public class JSONBuilder {
         }
         return res;
     }
+
+
+    
+    private JSONBuilder() {
+    }
 }

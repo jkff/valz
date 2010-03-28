@@ -7,7 +7,6 @@ import org.valz.util.aggregates.LongSum;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-
         WriteConfiguration conf = new WriteConfiguration();
         conf.setServerURL("http://localhost:8080");
         

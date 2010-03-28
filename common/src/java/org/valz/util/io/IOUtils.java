@@ -1,16 +1,26 @@
 package org.valz.util.io;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 public class IOUtils {
     public static void closeInputSilently(@Nullable InputStream is) {
         try {
-            if(is != null)
+            if (is != null) {
                 is.close();
+            }
+        } catch (IOException e) {
+            // Ignore
+        }
+    }
+
+    public static void closeOutputSilently(@Nullable OutputStream os) {
+        try {
+            if (os != null) {
+                os.close();
+            }
         } catch (IOException e) {
             // Ignore
         }
@@ -27,6 +37,29 @@ public class IOUtils {
             return new String(bos.toByteArray(), encoding);
         } finally {
             closeInputSilently(stream);
+        }
+    }
+
+    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws IOException {
+        Writer w = null;
+        try {
+            w = new OutputStreamWriter(stream, encoding);
+            w.write(data);
+        } finally {
+            closeSilently(w);
+        }
+    }
+
+
+
+    private IOUtils() {
+    }
+
+    public static void closeSilently(Closeable c) {
+        try {
+            if(c != null) c.close();
+        } catch(IOException e) {
+            // Ignore
         }
     }
 }

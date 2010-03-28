@@ -1,7 +1,5 @@
 package org.valz.client;
 
-import org.json.simple.JSONObject;
-import org.valz.util.aggregates.AggregateUtils;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.WriteConfiguration;
 import org.valz.util.protocol.RemoteWriteBackend;
@@ -23,7 +21,7 @@ public final class Valz {
         return new Val<T>() {
             public void submit(T sample) {
                 try {
-                    backend.submit(name, AggregateUtils.toJson(aggregate), sample);
+                    backend.submit(name, aggregate, sample);
                 } catch (RemoteWriteException e) {
                     throw new RuntimeException(e);
                 }

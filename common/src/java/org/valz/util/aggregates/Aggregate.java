@@ -1,13 +1,13 @@
 package org.valz.util.aggregates;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
 /**
  * Every implementor must have a static method "String getMethod()" and
- * "Aggregate<T> parse(JSONObject makeJson)" to facilitate parsing of makeJson objects
+ * "Aggregate<T> parseAggregateString(JSONObject makeJson)" to facilitate parsing of makeJson objects
  * like {method:"...", ...} into aggregates.
  */
 public interface Aggregate<T> {
@@ -17,17 +17,18 @@ public interface Aggregate<T> {
      * (equivalence of results for different permutations of the same stream
      * may be defined in the application's terms, t.i., it does not have to be
      * equivalence on .equals())
-     *
+     * <p/>
      * It is guaranteed that the stream will not contain nulls and will not be empty.
-     *
+     * <p/>
      * Note that we use 'Iterator' instead of 'Iterable', because the stream
      * may fail to provide the ability to traverse it several times.
      */
     @Nullable
-    T reduce(Iterator<T> stream);
+    T reduce(@NotNull Iterator<T> stream);
 
-    /**
-     * Serialize this object into a JSONObject of the form {method: getMethod()}.
-     */
-    void toJson(JSONObject stub);
+    @Nullable
+    T reduce(T item1, T item2);
+
+    @Nullable
+    Object toSerialized();
 }

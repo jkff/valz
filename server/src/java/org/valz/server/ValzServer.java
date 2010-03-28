@@ -4,22 +4,28 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.aggregates.MergeJson;
+import org.valz.util.aggregates.MapMerge;
+import org.valz.util.aggregates.MinLong;
+import org.valz.util.aggregates.OrderedListMerge;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
+
+
 
     public static void main(String[] args) {
         PropertyConfigurator.configure("log4j.properties");
 
         int port = 8080;
-        
+
         Server server = new Server(port);
 
         ValzBackend backend = new ValzBackend();
 
         backend.registerSupportedAggregate(LongSum.class);
-        backend.registerSupportedAggregate(MergeJson.class);
+        backend.registerSupportedAggregate(MinLong.class);
+        backend.registerSupportedAggregate(OrderedListMerge.class);
+        backend.registerSupportedAggregate(MapMerge.class);
 
         server.addHandler(new ValzHandler(backend));
 
@@ -36,5 +42,10 @@ public class ValzServer {
         } catch (InterruptedException e) {
             log.error("Could not stop server", e);
         }
+    }
+
+
+    
+    private ValzServer() {
     }
 }

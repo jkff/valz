@@ -1,6 +1,7 @@
 package org.valz.util.protocol;
 
 public class WriteConfiguration {
+
     private String serverURL;
 
     public WriteConfiguration() {
