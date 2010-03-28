@@ -9,21 +9,17 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-/**
- * Created on: 28.03.2010 12:26:12
- */
 public class GetAggregateRequest extends Message<String> {
     public GetAggregateRequest(@NotNull String name) {
         super(name, MessageType.GET_AGGREGATE_REQUEST);
     }
 
     @NotNull
-    public static GetAggregateRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
-        return new GetAggregateRequest((String) dataObject.get("name"));
+    public static GetAggregateRequest fromDataJson(@NotNull Object json) throws ParseException {
+        return new GetAggregateRequest((String) ((JSONObject)json).get("name"));
     }
 
-    public String toDataString() {
-        return makeJson("name", getData()).toJSONString();
+    public JSONObject dataToJson() {
+        return makeJson("name", getData());
     }
 }

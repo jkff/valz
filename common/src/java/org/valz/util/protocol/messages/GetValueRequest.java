@@ -14,14 +14,11 @@ public class GetValueRequest extends Message<String> {
         super(name, MessageType.GET_VALUE_REQUEST);
     }
 
-    public static GetValueRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
-        return new GetValueRequest(
-                (String)dataObject.get("name")
-        );
+    public static GetValueRequest fromDataJson(@NotNull Object json) throws ParseException {
+        return new GetValueRequest((String) ((JSONObject)json).get("name"));
     }
 
-    public String toDataString() {
-        return makeJson("name", getData()).toJSONString();
+    public JSONObject dataToJson() {
+        return makeJson("name", getData());
     }
 }
