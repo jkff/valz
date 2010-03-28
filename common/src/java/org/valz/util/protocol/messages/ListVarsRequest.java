@@ -5,19 +5,15 @@ import org.json.simple.parser.ParseException;
 import org.valz.util.protocol.messages.Message;
 import org.valz.util.protocol.MessageType;
 
-public class ListVarsRequest extends Message {
-    @NotNull
+public class ListVarsRequest extends Message<Void> {
+    public ListVarsRequest() {
+        super(null, MessageType.LIST_VARS_REQUEST);
+    }
+
     public static ListVarsRequest parseDataString(@NotNull String dataString) throws ParseException {
         return new ListVarsRequest();
     }
 
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.LIST_VARS_REQUEST;
-    }
-
-    @NotNull
-    @Override
     public String toDataString() {
         return "";
     }

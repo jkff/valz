@@ -18,10 +18,10 @@ Components: client api, server, viewer api, client example (uses client api), vi
 
     Clients send aggregate descriptions
     Aggregate parsers are hardcoded on server
---------------- We are here ----------------------
     Viewer exists (an extremely simple http server)  [jkff]
     Fix build script [jkff]
     Viewer is able to assemble small replies for getValue from multiple servers on the fly [jkff]
+--------------- We are here ----------------------
     
     Program supports the following aggregates: int and double sum, ordered list merge (order by JSONObject key), list concatenation, map merge, pair, minimum [slon]
  

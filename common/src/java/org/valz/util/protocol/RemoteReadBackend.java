@@ -52,7 +52,7 @@ public class RemoteReadBackend implements ReadBackend {
         try {
             response = HttpConnector.post(serverUrl, new GetAggregateRequest(name).toMessageString());
             GetAggregateResponse message = (GetAggregateResponse) Message.parseMessageString(response);
-            return message.getAggregate();
+            return message.getData();
         } catch (IOException e) {
             throw new RemoteReadException("Server unreachable: " + serverUrl, e);
         }
@@ -63,7 +63,7 @@ public class RemoteReadBackend implements ReadBackend {
         try {
             response = HttpConnector.post(serverUrl, new GetValueRequest(name).toMessageString());
             GetValueResponse message = (GetValueResponse) Message.parseMessageString(response);
-            return message.getValue();
+            return message.getData();
         } catch (IOException e) {
             throw new RemoteReadException("Server unreachable: " + serverUrl, e);
         }
@@ -74,7 +74,7 @@ public class RemoteReadBackend implements ReadBackend {
         try {
             response = HttpConnector.post(serverUrl, new ListVarsRequest().toMessageString());
             ListVarsResponse message = (ListVarsResponse) Message.parseMessageString(response);
-            return message.getVars();
+            return message.getData();
         } catch (IOException e) {
             throw new RemoteReadException("Server unreachable: " + serverUrl, e);
         }

@@ -9,8 +9,11 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetValueRequest extends Message {
-    @NotNull
+public class GetValueRequest extends Message<String> {
+    public GetValueRequest(@NotNull String name) {
+        super(name, MessageType.GET_VALUE_REQUEST);
+    }
+
     public static GetValueRequest parseDataString(@NotNull String dataString) throws ParseException {
         JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
         return new GetValueRequest(
@@ -18,24 +21,7 @@ public class GetValueRequest extends Message {
         );
     }
 
-    private final String name;
-
-    public GetValueRequest(@NotNull String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.GET_VALUE_REQUEST;
-    }
-
-    @NotNull
-    @Override
     public String toDataString() {
-        return makeJson("name", name).toJSONString();
+        return makeJson("name", getData()).toJSONString();
     }
 }
