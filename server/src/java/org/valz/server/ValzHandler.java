@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.valz.util.protocol.Backend;
 import org.valz.util.protocol.MessageType;
 
 import javax.servlet.ServletException;
@@ -21,9 +22,9 @@ import static org.valz.util.json.JSONBuilder.makeJson;
 public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
 
-    private ValzBackend backend;
+    private Backend backend;
     
-    public ValzHandler(ValzBackend backend) {
+    public ValzHandler(Backend backend) {
         this.backend = backend;
     }
 
@@ -36,33 +37,42 @@ public class ValzHandler extends AbstractHandler {
             MessageType messageType = MessageType.valueOf(messageString);
 
             switch (messageType) {
-                case SUBMIT: {
-                    String name = (String) obj.get("name");
-                    JSONObject spec = (JSONObject) obj.get("aggregate");
+            case SUBMIT: {
+                String name = (String) obj.get("name");
+                JSONObject spec = (JSONObject) obj.get("aggregate");
 
-                    backend.submit(name, spec, obj.get("value"));
+                backend.submit(name, spec, obj.get("value"));
+            }
+            break;
+
+            case LIST_VARS: {
+                JSONArray arr = new JSONArray();
+                arr.addAll(backend.listVars());
+                arr.writeJSONString(response.getWriter());
+            }
+            break;
+
+            case GET_VALUE: {
+                String name = (String) obj.get("name");
+                Object value = backend.getValue(name);
+                if(value == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                } else {
+                    makeJson("value", value).writeJSONString(response.getWriter());
                 }
-                break;
-                case LIST_VARS: {
-                    JSONArray arr = new JSONArray();
-                    arr.addAll(backend.listVars());
-                    Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
-                    arr.writeJSONString(out);
-                    out.close();
+            }
+            break;
+
+            case GET_AGGREGATE: {
+                String name = (String) obj.get("name");
+                JSONObject value = backend.getAggregateDescription(name);
+                if(value == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                } else {
+                    value.writeJSONString(response.getWriter());
                 }
-                break;
-                case GET_VALUE: {
-                    String name = (String) obj.get("name");
-                    Object value = backend.getValue(name);
-                    if(value == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    } else {
-                        Writer out = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
-                        makeJson("value", value).writeJSONString(out);
-                        out.close();
-                    }
-                }
-                break;
+            }
+            break;
             }
 
             response.setStatus(HttpServletResponse.SC_OK);

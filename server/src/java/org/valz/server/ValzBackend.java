@@ -2,18 +2,22 @@ package org.valz.server;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.AggregateParser;
+import org.valz.util.aggregates.AggregateUtils;
+import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.RemoteReadException;
 
 import java.util.*;
 
-public class ValzBackend {
+public class ValzBackend implements Backend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
     private AggregateParser parser = new AggregateParser();
     private Map<String, Object> name2val = new HashMap<String, Object>();
+    private Map<String, Aggregate> name2agg = new HashMap<String, Aggregate>();
 
-    synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
+    public synchronized void submit(String name, JSONObject aggregateSpec, Object value) {
         Aggregate aggregate;
         try {
             aggregate = parser.parse(aggregateSpec);
@@ -23,6 +27,7 @@ public class ValzBackend {
         }
         if (!name2val.containsKey(name)) {
             name2val.put(name, value);
+            name2agg.put(name, aggregate);
         } else {
             Object oldValue = name2val.get(name);
             List<Object> list = Arrays.asList(oldValue, value);
@@ -31,11 +36,15 @@ public class ValzBackend {
         }
     }
 
-    synchronized Collection<String> listVars() {
+    public synchronized Collection<String> listVars() {
         return new ArrayList<String>(name2val.keySet());
     }
 
-    synchronized Object getValue(String name) {
+    public JSONObject getAggregateDescription(String name) throws RemoteReadException {
+        return AggregateUtils.toJson(name2agg.get(name));
+    }
+
+    public synchronized Object getValue(String name) {
         return name2val.get(name);
     }
 

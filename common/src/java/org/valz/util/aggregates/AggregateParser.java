@@ -1,4 +1,4 @@
-package org.valz.server;
+package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
@@ -14,7 +14,7 @@ import java.util.Map;
 public class AggregateParser {
     private Map<String, Class<? extends Aggregate<?>>> method2class = new HashMap<String, Class<? extends Aggregate<?>>>();
 
-    void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
+    public void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
         Method getMethod = AggregateUtils.findGetMethod(clazz);
         try {
             String method = (String) getMethod.invoke(null);

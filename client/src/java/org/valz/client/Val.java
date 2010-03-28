@@ -1,4 +1,4 @@
-package org.valz.api;
+package org.valz.client;
 
 public interface Val<T> {
     void submit(T sample);

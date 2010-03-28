@@ -5,10 +5,10 @@ import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
-public class IntSum implements Aggregate<Integer> {
+public class LongSum implements Aggregate<Long> {
     @NotNull
-    public Integer reduce(Iterator<Integer> stream) {
-        int res = 0;
+    public Long reduce(Iterator<Long> stream) {
+        long res = 0;
         while(stream.hasNext())
             res+=stream.next();
         return res;
@@ -19,10 +19,10 @@ public class IntSum implements Aggregate<Integer> {
     }
 
     public static String getMethod() {
-        return "intSum";
+        return "longSum";
     }
 
-    public static IntSum fromJson(JSONObject json) {
-        return new IntSum();
+    public static LongSum fromJson(JSONObject json) {
+        return new LongSum();
     }
 }

@@ -1,27 +1,23 @@
 package org.valz.examples.hitcount;
 
-import org.valz.api.Configuration;
-import org.valz.api.Val;
-import org.valz.api.Valz;
-import org.valz.util.aggregates.IntSum;
+import org.valz.util.protocol.WriteConfiguration;
+import org.valz.client.Val;
+import org.valz.client.Valz;
+import org.valz.util.aggregates.LongSum;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Configuration conf = new Configuration();
+        WriteConfiguration conf = new WriteConfiguration();
         conf.setServerURL("http://localhost:8080");
         
         Valz.init(conf);
 
-        Val<Integer> hitCount = Valz.register("org.valz.examples.hitcount.hitCount", new IntSum());
+        Val<Long> hitCount = Valz.register("org.valz.examples.hitcount.hitCount", new LongSum());
 
         for(int i = 0; i < 1; ++i) {
-            hitCount.submit(1);
+            hitCount.submit(1L);
             Thread.sleep(50);
-        }
-
-        for (String name : Valz.listVars()) {
-            System.out.println(String.format("%s = %s", name, Valz.getValue(name)));
         }
     }
 }

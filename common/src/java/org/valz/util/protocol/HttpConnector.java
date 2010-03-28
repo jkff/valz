@@ -1,4 +1,4 @@
-package org.valz.api;
+package org.valz.util.protocol;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class HttpConnector {
+public class HttpConnector {
     public static String post(String serverURL, @NotNull String data) throws IOException {
         URL url = new URL(serverURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
