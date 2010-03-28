@@ -1,9 +1,10 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.messages;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.valz.util.protocol.MessageType;
 
 import java.io.IOException;
 
@@ -19,15 +20,19 @@ public abstract class Message {
 
             switch (messageType) {
                 case SUBMIT_REQUEST:
-                    return MessageSubmitRequest.parseDataString(dataString);
+                    return SubmitRequest.parseDataString(dataString);
                 case LIST_VARS_REQUEST:
-                    return MessageListVarsRequest.parseDataString(dataString);
+                    return ListVarsRequest.parseDataString(dataString);
                 case GET_VALUE_REQUEST:
-                    return MessageGetValueRequest.parseDataString(dataString);
+                    return GetValueRequest.parseDataString(dataString);
+                case GET_AGGREGATE_REQUEST:
+                    return GetAggregateRequest.parseDataString(dataString);
                 case LIST_VARS_RESPONSE:
-                    return MessageListVarsResponse.parseDataString(dataString);
+                    return ListVarsResponse.parseDataString(dataString);
                 case GET_VALUE_RESPONSE:
-                    return MessageGetValueResponse.parseDataString(dataString);
+                    return GetValueResponse.parseDataString(dataString);
+                case GET_AGGREGATE_RESPONSE:
+                    return GetAggregateResponse.parseDataString(dataString);
             }
             throw new IllegalArgumentException(String.format("Can not serve request '%s'.", messageType));
         } catch (ParseException e) {
@@ -35,12 +40,8 @@ public abstract class Message {
         }
     }
 
-
-
     Message() {
     }
-
-
 
     public abstract MessageType getMessageType();
 
@@ -50,7 +51,7 @@ public abstract class Message {
     @NotNull
     public final String toMessageString() {
         return makeJson(
-                "messageType", MessageType.SUBMIT_REQUEST.name(),
+                "messageType", getMessageType().name(),
                 "data", toDataString()
         ).toJSONString();
     }
