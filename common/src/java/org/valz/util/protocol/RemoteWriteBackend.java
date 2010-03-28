@@ -1,9 +1,6 @@
 package org.valz.util.protocol;
 
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.HttpConnector;
-import org.valz.util.protocol.RemoteWriteException;
-import org.valz.util.protocol.WriteBackend;
 import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.io.IOException;

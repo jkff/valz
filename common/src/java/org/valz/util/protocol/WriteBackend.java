@@ -1,6 +1,5 @@
 package org.valz.util.protocol;
 
-import org.json.simple.JSONObject;
 import org.valz.util.aggregates.Aggregate;
 
 /**

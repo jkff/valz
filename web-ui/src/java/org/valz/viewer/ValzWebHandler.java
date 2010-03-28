@@ -1,6 +1,5 @@
 package org.valz.viewer;
 
-import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.protocol.ReadBackend;
@@ -10,9 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Collection;
 
 import static org.valz.viewer.HtmlBuilder.html;
 import static org.valz.viewer.HtmlBuilder.text;
