@@ -1,9 +1,9 @@
 package org.valz.examples.hitcount;
 
-import org.valz.util.protocol.WriteConfiguration;
 import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.util.aggregates.LongSum;
+import org.valz.util.protocol.WriteConfiguration;
 
 public class Main {
     public static void main(String[] args) throws Exception {
