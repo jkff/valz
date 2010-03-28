@@ -1,0 +1,59 @@
+Components: client api, server, viewer api, client example (uses client api), viewer.
+
+
+ Steps:
+    client registers "hitCount" variable on server.
+    client submits several values to it.
+    viewer connects to that server and sees the results.
+
+    Simplifications:
+        Only one aggregate supported (no JSON parsing at all, everything that comes to server is intSum)
+        Data stored in server's memory
+        Only one server
+        No batching (submit() sends data immediately)
+    
+    Several clients may register variables with different names
+
+    Server also provides HTTP api to list variable names and get variable value by name
+
+    Clients send aggregate descriptions
+    Aggregate parsers are hardcoded on server
+--------------- We are here ----------------------
+    Viewer exists (an extremely simple http server)  [jkff]
+    Fix build script [jkff]
+    Viewer is able to assemble small replies for getValue from multiple servers on the fly [jkff]
+    
+    Program supports the following aggregates: int and double sum, ordered list merge (order by JSONObject key), list concatenation, map merge, pair, minimum [slon]
+ 
+    Server: get() request returns not only value but also aggregate (perhaps a separate call: getAggregate()...)
+   
+    Storage engine [slon]
+        engine.modify(key, {T t => aggregate.reduce({t, nextValue})});
+        get(key), modify(key, {T=>T}), list()
+        Memory
+        Database (say, H2; flushes data to disk immediately as it is received)
+
+    Clients and servers aggregate data on their own before sending to parent
+
+    Client sends data to multiple servers at once (roundrobin scheduling)
+    Servers send data to parent servers. Servers are arranged in a tree-like structure, so no duplicate update problem arises.
+  
+
+    Variables with history:
+        History of current values of the aggregate
+        Sliding aggregate
+        Discrete 
+        (see email)
+
+    Submits are asynchronous.
+    Clients and servers send updates to higher-level servers but do not erase them till it becomes known that the server has received the update (t.i. if parent server dies, updates are buffered until the server is resurrected). Dead servers are ignored among parent servers. Servers that get resurrected are used as parents again. 
+
+    Program supports large maps
+
+    Program supports large lists
+
+    Viewer is able to assemble large replies for getValue from multiple servers on the fly
+
+    Client sends data to multiple servers at once (replication). Servers discard data that they've already received.
+
+    Server uses a plugin mechanism to parse aggregates
