@@ -7,7 +7,6 @@
 
     <target name="compile">
         <path id="project.classpath">
-            <fileset dir="lib" includes="**/*.jar"/>
             <fileset dir="../common/lib" includes="**/*.jar"/>
         </path>
 

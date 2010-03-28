@@ -3,7 +3,7 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.aggregates.IntSum;
+import org.valz.util.aggregates.LongSum;
 import org.valz.util.aggregates.MergeJson;
 
 public class ValzServer {
@@ -18,7 +18,7 @@ public class ValzServer {
 
         ValzBackend backend = new ValzBackend();
 
-        backend.registerSupportedAggregate(IntSum.class);
+        backend.registerSupportedAggregate(LongSum.class);
         backend.registerSupportedAggregate(MergeJson.class);
 
         server.addHandler(new ValzHandler(backend));

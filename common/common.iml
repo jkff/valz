@@ -26,6 +26,32 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="jetty">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jetty/servlet-api-2.5-20081211.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-util-6.1.22.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22-src.zip!/jetty-6.1.22/modules/jetty/src/main/java" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22-src.zip!/jetty-6.1.22/modules/jsp-api-2.0/src/main/java" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22-src.zip!/jetty-6.1.22/modules/util/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/log4j/log4j-1.2.15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/log4j/apache-log4j-1.2.15.zip!/apache-log4j-1.2.15/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
 

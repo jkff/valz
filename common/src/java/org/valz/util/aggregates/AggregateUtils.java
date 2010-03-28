@@ -1,5 +1,8 @@
 package org.valz.util.aggregates;
 
+import org.json.simple.JSONObject;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -22,5 +25,17 @@ public class AggregateUtils {
         throw new IllegalArgumentException(
                 "The class " + clazz + " does not declare a public static String getMethod()");
         return getMethod;
+    }
+
+    public static JSONObject toJson(Aggregate<?> aggregate) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("method", findGetMethod(aggregate.getClass()).invoke(null));
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Non-serializable aggregate " + aggregate, e);
+        }
+        aggregate.toJson(json);
+        return json;
     }
 }

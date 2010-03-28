@@ -1,9 +1,9 @@
-package org.valz.api;
+package org.valz.util.protocol;
 
-public class Configuration {
+public class WriteConfiguration {
     private String serverURL;
 
-    public Configuration() {
+    public WriteConfiguration() {
     }
 
     public String getServerURL() {

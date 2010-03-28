@@ -5,12 +5,12 @@ import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 
-public class MinInt implements Aggregate<Integer> {
+public class MinLong implements Aggregate<Long> {
     @NotNull
-    public Integer reduce(Iterator<Integer> stream) {
-        int res = Integer.MAX_VALUE;
+    public Long reduce(Iterator<Long> stream) {
+        long res = Long.MAX_VALUE;
         while (stream.hasNext()) {
-            int value = stream.next();
+            long value = stream.next();
             if (value < res) {
                 res = value;
             }
@@ -23,10 +23,10 @@ public class MinInt implements Aggregate<Integer> {
     }
 
     public static String getMethod() {
-        return "minInt";
+        return "minLong";
     }
 
-    public static MinInt fromJson(JSONObject json) {
-        return new MinInt();
+    public static MinLong fromJson(JSONObject json) {
+        return new MinLong();
     }
 }
