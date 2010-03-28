@@ -32,7 +32,7 @@ public class ValzHandler extends AbstractHandler {
             switch (message.getMessageType()) {
             case SUBMIT_REQUEST: {
                 SubmitRequest recvMsg = (SubmitRequest) message;
-                backend.submit(recvMsg.getName(), recvMsg.getAggregate(), recvMsg.getValue());
+                backend.submit(recvMsg.getData().name, recvMsg.getData().aggregate, recvMsg.getData().value);
             }
             break;
 
@@ -46,7 +46,7 @@ public class ValzHandler extends AbstractHandler {
             case GET_VALUE_REQUEST: {
                 GetValueRequest recvMsg = (GetValueRequest) message;
                 Message sendMsg = new GetValueResponse(
-                        backend.getValue(recvMsg.getName()));
+                        backend.getValue(recvMsg.getData()));
                 IOUtils.writeOutputStream(response.getOutputStream(), sendMsg.toMessageString(), "UTF-8");
             }
             break;
@@ -54,7 +54,7 @@ public class ValzHandler extends AbstractHandler {
             case GET_AGGREGATE_REQUEST: {
                 GetAggregateRequest recvMsg = (GetAggregateRequest) message;
                 Message sendMsg = new GetAggregateResponse(
-                        backend.getAggregate(recvMsg.getName()));
+                        backend.getAggregate(recvMsg.getData()));
                 IOUtils.writeOutputStream(response.getOutputStream(), sendMsg.toMessageString(), "UTF-8");
             }
             break;

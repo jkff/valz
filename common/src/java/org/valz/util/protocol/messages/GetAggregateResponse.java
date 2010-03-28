@@ -10,33 +10,17 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetAggregateResponse extends Message {
-    @NotNull
-    public static GetAggregateResponse parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
-        Aggregate<?> agg = AggregateRegistry.INSTANCE.parseAggregateString(
-                (JSONObject) dataObject.get("aggregate"));
+public class GetAggregateResponse extends Message<Aggregate<?>, JSONObject> {
+    public GetAggregateResponse(Aggregate<?> aggregate) {
+        super(aggregate, MessageType.GET_AGGREGATE_RESPONSE);
+    }
+
+    public static GetAggregateResponse fromDataJson(JSONObject json) throws ParseException {
+        Aggregate<?> agg = AggregateRegistry.INSTANCE.parseAggregateString((JSONObject)json.get("aggregate"));
         return new GetAggregateResponse(agg);
     }
 
-    private final Aggregate<?> aggregate;
-
-    public GetAggregateResponse(@NotNull Aggregate<?> aggregate) {
-        this.aggregate = aggregate;
-    }
-
-    public Aggregate<?> getAggregate() {
-        return aggregate;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.GET_AGGREGATE_RESPONSE;
-    }
-
-    @NotNull
-    @Override
-    String toDataString() {
-        return makeJson("aggregate", AggregateRegistry.toJson(aggregate)).toJSONString();
+    public JSONObject dataToJson() {
+        return makeJson("aggregate", AggregateRegistry.toJson(getData()));
     }
 }

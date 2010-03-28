@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="329880a2-fa08-4f4c-b152-a6718df7cc2c" name="Default" comment="" />
-    <ignored path="valz.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="valz.iws" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,64 +60,28 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ValzHandler.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/src/java/org/valz/server/ValzHandler.java">
+      <file leaf-file-name="GetAggregateRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="0" selection-start="922" selection-end="922" vertical-scroll-proportion="0.0">
+            <state line="16" column="0" selection-start="535" selection-end="535" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IOUtils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/io/IOUtils.java">
+      <file leaf-file-name="GetValueRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="47" column="26" selection-start="1405" selection-end="1405" vertical-scroll-proportion="0.0">
+            <state line="17" column="47" selection-start="658" selection-end="658" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SocketInputStream.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files (x86)/Java/jdk1.6.0_18/src.zip!/java/net/SocketInputStream.java">
+      <file leaf-file-name="GetValueResponse.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueResponse.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="76" column="23" selection-start="2261" selection-end="2261" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HttpConnector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/HttpConnector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="25" selection-start="867" selection-end="867" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReadBackend.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/ReadBackend.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="17" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RemoteReadBackend.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteReadBackend.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="22" selection-start="1991" selection-end="1991" vertical-scroll-proportion="0.5122807">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/hit-count/src/java/org/valz/examples/hitcount/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="551" selection-end="551" vertical-scroll-proportion="0.0">
+            <state line="21" column="26" selection-start="773" selection-end="773" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -126,7 +90,16 @@
       <file leaf-file-name="ListVarsRequest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="37" selection-start="522" selection-end="522" vertical-scroll-proportion="0.0">
+            <state line="8" column="57" selection-start="314" selection-end="314" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ListVarsResponse.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsResponse.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="32" selection-start="694" selection-end="694" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -135,16 +108,34 @@
       <file leaf-file-name="Message.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/Message.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="47" selection-start="2053" selection-end="2053" vertical-scroll-proportion="0.0">
+            <state line="26" column="46" selection-start="946" selection-end="946" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SubmitRequest.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="GetAggregateResponse.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateResponse.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="87" selection-start="786" selection-end="786" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ValzHandler.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/src/java/org/valz/server/ValzHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="66" selection-start="2295" selection-end="2295" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SubmitRequest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/SubmitRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="607" selection-end="607" vertical-scroll-proportion="0.0">
+            <state line="14" column="32" selection-start="564" selection-end="564" vertical-scroll-proportion="0.23224044">
               <folding />
             </state>
           </provider>
@@ -160,22 +151,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateResponse.java" />
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/ReadBackend.java" />
-        <option value="$PROJECT_DIR$/server/src/java/org/valz/server/ValzBackend.java" />
-        <option value="$PROJECT_DIR$/web-ui/src/java/org/valz/viewer/ValzWebServer.java" />
-        <option value="$PROJECT_DIR$/examples/hit-count/src/java/org/valz/examples/hitcount/Main.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/HttpConnector.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteWriteBackend.java" />
-        <option value="$PROJECT_DIR$/server/src/java/org/valz/server/ValzHandler.java" />
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/SubmitRequest.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/MapMerge.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/LongSum.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/AggregateRegistry.java" />
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteReadBackend.java" />
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsRequest.java" />
-        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/Message.java" />
         <option value="$PROJECT_DIR$/common/src/java/org/valz/util/io/IOUtils.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteReadBackend.java" />
+        <option value="$PROJECT_DIR$/server/src/java/org/valz/server/ValzHandler.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateRequest.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateResponse.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueRequest.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsRequest.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsResponse.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueResponse.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/SubmitRequest.java" />
+        <option value="$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/Message.java" />
       </list>
     </option>
   </component>
@@ -214,8 +205,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -546,22 +537,22 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="OverrideImplement.combined" value="true" />
-    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="recentsLimit" value="5" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.showClasses" value="true" />
-    <property name="project.structure.side.proportion" value="0.2" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -744,23 +735,23 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29032257" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.29032257" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32767403" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1301059" sideWeight="0.6977929" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28441754" sideWeight="0.5602716" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4278438" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28895614" sideWeight="0.6977929" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4278438" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.55178267" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="92" y="92" width="1416" height="976" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32767403" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Analyze Dataflow to" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3293718" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Analyze Dataflow from" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -811,114 +802,104 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/client/src/java/org/valz/client/Valz.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="700" selection-end="700" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/MapMerge.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="26" selection-start="305" selection-end="684" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/LongSum.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="317" selection-end="317" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/aggregates/AggregateRegistry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="0" selection-start="2086" selection-end="2086" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web-ui/src/java/org/valz/viewer/ValzWebHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="17" selection-start="698" selection-end="698" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/ReadBackend.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="17" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/SubmitRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="607" selection-end="607" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/MessageType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="4" selection-start="165" selection-end="165" vertical-scroll-proportion="0.40350878">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="37" selection-start="522" selection-end="522" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="47" selection-start="2053" selection-end="2053" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/io/IOUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="26" selection-start="1405" selection-end="1405" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="47" column="26" selection-start="1405" selection-end="1405" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="jar://C:/Program Files (x86)/Java/jdk1.6.0_18/src.zip!/java/net/SocketInputStream.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="23" selection-start="2261" selection-end="2261" vertical-scroll-proportion="0.0">
+        <state line="76" column="23" selection-start="2261" selection-end="2261" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/HttpConnector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="25" selection-start="867" selection-end="867" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/ReadBackend.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="17" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/hit-count/src/java/org/valz/examples/hitcount/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="0" selection-start="551" selection-end="551" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteReadBackend.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="34" selection-start="2941" selection-end="2941" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/src/java/org/valz/server/ValzHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="0" selection-start="922" selection-end="922" vertical-scroll-proportion="0.0">
+        <state line="56" column="66" selection-start="2295" selection-end="2295" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/HttpConnector.java">
+    <entry file="jar://$PROJECT_DIR$/common/lib/json_simple-1.1.jar!/org/json/simple/JSONObject.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="25" selection-start="867" selection-end="867" vertical-scroll-proportion="0.0">
+        <state line="5" column="20" selection-start="140" selection-end="1251" vertical-scroll-proportion="0.13465346">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/hit-count/src/java/org/valz/examples/hitcount/Main.java">
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateResponse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="551" selection-end="551" vertical-scroll-proportion="0.0">
+        <state line="18" column="87" selection-start="786" selection-end="786" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/RemoteReadBackend.java">
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetAggregateRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="22" selection-start="1991" selection-end="1991" vertical-scroll-proportion="0.5122807">
+        <state line="16" column="0" selection-start="535" selection-end="535" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="47" selection-start="658" selection-end="658" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/GetValueResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="26" selection-start="773" selection-end="773" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="57" selection-start="314" selection-end="314" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/ListVarsResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="32" selection-start="694" selection-end="694" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/Message.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="46" selection-start="946" selection-end="946" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/java/org/valz/util/protocol/messages/SubmitRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="32" selection-start="564" selection-end="564" vertical-scroll-proportion="0.23224044">
           <folding />
         </state>
       </provider>

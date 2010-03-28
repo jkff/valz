@@ -9,33 +9,16 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetValueRequest extends Message {
-    @NotNull
-    public static GetValueRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
-        return new GetValueRequest(
-                (String)dataObject.get("name")
-        );
+public class GetValueRequest extends Message<String, JSONObject> {
+    public GetValueRequest(String name) {
+        super(name, MessageType.GET_VALUE_REQUEST);
     }
 
-    private final String name;
-
-    public GetValueRequest(@NotNull String name) {
-        this.name = name;
+    public static GetValueRequest fromDataJson(JSONObject json) throws ParseException {
+        return new GetValueRequest((String)json.get("name"));
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.GET_VALUE_REQUEST;
-    }
-
-    @NotNull
-    @Override
-    public String toDataString() {
-        return makeJson("name", name).toJSONString();
+    public JSONObject dataToJson() {
+        return makeJson("name", getData());
     }
 }

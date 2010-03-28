@@ -11,57 +11,34 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class SubmitRequest extends Message {
-    @NotNull
-    public static SubmitRequest parseDataString(@NotNull String dataString) throws ParseException {
-        JSONObject dataObject = (JSONObject)new JSONParser().parse(dataString);
+public class SubmitRequest extends Message<SubmitRequest.Submission, JSONObject> {
+    public static SubmitRequest fromDataJson(JSONObject json) throws ParseException {
         return new SubmitRequest(
-                (String)dataObject.get("name"),
-                AggregateRegistry.INSTANCE.parseAggregateString(((JSONObject) dataObject.get("aggregate"))),
-                dataObject.get("value")
-        );
+                (String)json.get("name"),
+                AggregateRegistry.INSTANCE.parseAggregateString(((JSONObject) json.get("aggregate"))),
+                json.get("value"));
     }
 
-    
-
-    private final String name;
-    private final Object value;
-    private final Aggregate<?> aggregate;
-
-
-
-    public SubmitRequest(@NotNull String name, @NotNull Aggregate<?> aggregate, Object value) {
-        this.name = name;
-        this.value = value;
-        this.aggregate = aggregate;
+    public SubmitRequest(String name, Aggregate<?> aggregate, Object value) {
+        super(new Submission(name, aggregate, value), MessageType.SUBMIT_REQUEST);
     }
 
-
-
-    public String getName() {
-        return name;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public Aggregate<?> getAggregate() {
-        return aggregate;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.SUBMIT_REQUEST;
-    }
-
-    @NotNull
-    @Override
-    public String toDataString() {
+    public JSONObject dataToJson() {
         return makeJson(
-                "name", name,
-                "aggregate", AggregateRegistry.toJson(aggregate),
-                "value", value
-        ).toJSONString();
+                "name", getData().name,
+                "aggregate", AggregateRegistry.toJson(getData().aggregate),
+                "value", getData().value);
+    }
+
+    public static class Submission {
+        public final String name;
+        public final Aggregate<?> aggregate;
+        public final Object value;
+
+        public Submission(String name, Aggregate<?> aggregate, Object value) {
+            this.name = name;
+            this.aggregate = aggregate;
+            this.value = value;
+        }
     }
 }

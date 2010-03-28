@@ -2,6 +2,7 @@ package org.valz.util.protocol.messages;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.valz.util.protocol.messages.Message;
@@ -9,39 +10,18 @@ import org.valz.util.protocol.MessageType;
 
 import java.util.Collection;
 
-public class ListVarsResponse extends Message {
-    @NotNull
-    public static ListVarsResponse parseDataString(@NotNull String dataString) throws ParseException {
-        JSONArray dataObject = (JSONArray)new JSONParser().parse(dataString);
-        return new ListVarsResponse(dataObject);
+public class ListVarsResponse extends Message<Collection<String>, JSONArray> {
+    public ListVarsResponse(Collection<String> vars) {
+        super(vars, MessageType.LIST_VARS_RESPONSE);
     }
 
-    
-
-    private final Collection<String> vars;
-
-
-
-    public ListVarsResponse(@NotNull Collection<String> vars) {
-        this.vars = vars;
+    public static ListVarsResponse fromDataJson(JSONArray json) throws ParseException {
+        return new ListVarsResponse(json);
     }
 
-
-
-    public Collection<String> getVars() {
-        return vars;
-    }
-
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.LIST_VARS_RESPONSE;
-    }
-
-    @NotNull
-    @Override
-    String toDataString() {
+    public JSONArray dataToJson() {
         JSONArray jsonArray = new JSONArray();
-        jsonArray.addAll(vars);
-        return jsonArray.toJSONString();
+        jsonArray.addAll(getData());
+        return jsonArray;
     }
 }
