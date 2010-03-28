@@ -11,13 +11,13 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class GetValueResponse extends Message<Object> {
-    public static GetValueResponse fromDataJson(@NotNull Object json) throws ParseException {
-        return new GetValueResponse(((JSONObject)json).get("value"));
-    }
-
+public class GetValueResponse extends Message<Object, JSONObject> {
     public GetValueResponse(Object value) {
         super(value, MessageType.GET_VALUE_RESPONSE);
+    }
+
+    public static GetValueResponse fromDataJson(JSONObject json) throws ParseException {
+        return new GetValueResponse(json.get("value"));
     }
 
     public JSONObject dataToJson() {

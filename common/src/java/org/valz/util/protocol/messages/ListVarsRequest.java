@@ -6,7 +6,7 @@ import org.json.simple.parser.ParseException;
 import org.valz.util.protocol.messages.Message;
 import org.valz.util.protocol.MessageType;
 
-public class ListVarsRequest extends Message<Void> {
+public class ListVarsRequest extends Message<Void, Object> {
     public ListVarsRequest() {
         super(null, MessageType.LIST_VARS_REQUEST);
     }

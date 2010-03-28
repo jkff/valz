@@ -11,13 +11,12 @@ import org.valz.util.protocol.MessageType;
 
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class SubmitRequest extends Message<SubmitRequest.Submission> {
-    public static SubmitRequest fromDataJson(Object json) throws ParseException {
-        JSONObject dataObject = (JSONObject)json;
+public class SubmitRequest extends Message<SubmitRequest.Submission, JSONObject> {
+    public static SubmitRequest fromDataJson(JSONObject json) throws ParseException {
         return new SubmitRequest(
-                (String)dataObject.get("name"),
-                AggregateRegistry.INSTANCE.parseAggregateString(((JSONObject) dataObject.get("aggregate"))),
-                dataObject.get("value"));
+                (String)json.get("name"),
+                AggregateRegistry.INSTANCE.parseAggregateString(((JSONObject) json.get("aggregate"))),
+                json.get("value"));
     }
 
     public SubmitRequest(String name, Aggregate<?> aggregate, Object value) {
