@@ -125,11 +125,33 @@ public class ObjectBinder {
     }
 
     public Object bindIntoObject(Map jsonOwner, Object target, Type targetType) {
+//        try {
+//            objectStack.add( target );
+//            for( Class current = target.getClass(); current != null; current = current.getSuperclass() ) {
+//                for (Field field : current.getDeclaredFields()) {
+//                    Object value = findFieldInJson( jsonOwner, field.getName() );
+//                    if( value == null ) {
+//                        continue;
+//                    }
+//                    currentPath.enqueue( field.getName() );
+//                    field.setAccessible( true );
+//                    if( value instanceof Map ) {
+//                        field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
+//                    } else {
+//                        field.set( target, convert( value, field.getGenericType() ) );
+//                    }
+//                    currentPath.pop();
+//                }
+//            }
+//            return objectStack.removeLast();
+//        } catch (IllegalAccessException e) {
+//            throw new JSONException(currentPath + ":  Could not access the no-arg constructor for " + target.getClass().getName(), e);
+//        }
         try {
             objectStack.add( target );
             BeanInfo info = Introspector.getBeanInfo( target.getClass() );
             for( PropertyDescriptor descriptor : info.getPropertyDescriptors() ) {
-                Object value = findFieldInJson( jsonOwner, descriptor );
+                Object value = findFieldInJson( jsonOwner, descriptor.getName() );
                 if( value != null ) {
                     currentPath.enqueue( descriptor.getName() );
                     Method setMethod = descriptor.getWriteMethod();
@@ -303,13 +325,11 @@ public class ObjectBinder {
         }
     }
 
-    private Object findFieldInJson( Map map, PropertyDescriptor descriptor ) {
-        Object value = map.get( descriptor.getName() );
+    private Object findFieldInJson( Map map, String descriptorName ) {
+        Object value = map.get( descriptorName );
         if( value == null ) {
-            String field = descriptor.getName();
-            value = map.get( upperCase(field) );
+            value = map.get( upperCase(descriptorName) );
         }
-
         return value;
     }
 
