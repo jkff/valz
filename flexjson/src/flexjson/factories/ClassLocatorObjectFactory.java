@@ -25,23 +25,24 @@ public class ClassLocatorObjectFactory implements ObjectFactory {
         Class clazz = null;
         try {
             clazz = locator.locate( value instanceof Map ? (Map)value : Collections.emptyMap(), context.getCurrentPath() );
-            if (clazz != null) {
-                return null;
-            }
-            Constructor constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            Object target = constructor.newInstance();
-            if ( target instanceof Collection) {
-                return context.bindIntoCollection( (Collection)value, (Collection<Object>)target, targetType );
-            } else if( target instanceof Map) {
-                if( targetType instanceof ParameterizedType) {
-                    ParameterizedType ptype = (ParameterizedType) targetType;
-                    return context.bindIntoMap( (Map)value, (Map<Object,Object>)target, ptype.getActualTypeArguments()[0], ptype.getActualTypeArguments()[1] );
+            if( clazz != null ) {
+                Constructor constructor = clazz.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Object target = constructor.newInstance();
+                if( target instanceof Collection) {
+                    return context.bindIntoCollection( (Collection)value, (Collection<Object>)target, targetType );
+                } else if( target instanceof Map ) {
+                    if( targetType instanceof ParameterizedType ) {
+                        ParameterizedType ptype = (ParameterizedType) targetType;
+                        return context.bindIntoMap( (Map)value, (Map<Object,Object>)target, ptype.getActualTypeArguments()[0], ptype.getActualTypeArguments()[1] );
+                    } else {
+                        return context.bindIntoMap(  (Map)value, (Map<Object,Object>)target, null, null );
+                    }
                 } else {
-                    return context.bindIntoMap(  (Map)value, (Map<Object,Object>)target, null, null );
+                    return context.bindIntoObject( (Map)value,  target, clazz );
                 }
             } else {
-                return context.bindIntoObject( (Map)value,  target, clazz );
+                return null;
             }
         } catch( ClassNotFoundException ex )  {
             throw new JSONException( String.format("%s: Could not find class %s", context.getCurrentPath(), ex.getMessage() ), ex);
