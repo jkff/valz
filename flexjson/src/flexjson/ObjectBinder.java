@@ -170,11 +170,26 @@ public class ObjectBinder {
     private Object convert(Object value, Type targetType) {
         Class targetClass = getTargetClass( targetType );
         ObjectFactory factory = findFactoryFor( targetClass );
-        if( factory != null ) {
-            return factory.instantiate(this, value, targetType, targetClass);
-        } else {
-            throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
+        if (factory == null) {
+            // try to find class
+            if (value instanceof Map) {
+                try {
+                    String className = (String)((Map)value).get("class");
+                    Class clazz = Class.forName(className);
+                    if (clazz != null) {
+                        targetClass = clazz;
+                    }
+                } catch (ClassNotFoundException e) {
+                    // None
+                }
+            }
+
+            factory = findFactoryFor( targetClass );
+            if (factory == null) {
+                throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
+            }
         }
+        return factory.instantiate(this, value, targetType, targetClass);
     }
 
     private Class getTargetClass(Type targetType) {
