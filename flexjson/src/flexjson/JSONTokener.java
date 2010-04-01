@@ -573,30 +573,26 @@ public class JSONTokener {
                 if (s.length() > 2 &&
                         (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
                     try {
-                        return Integer.parseInt(s.substring(2),
+                        return Long.parseLong(s.substring(2),
                                 16);
                     } catch (Exception e) {
                         /* Ignore the error */
                     }
                 } else {
                     try {
-                        return Integer.parseInt(s, 8);
+                        return Long.parseLong(s, 8);
                     } catch (Exception e) {
                         /* Ignore the error */
                     }
                 }
             }
             try {
-                return new Integer(s);
+                return new Long(s);
             } catch (Exception e) {
                 try {
-                    return new Long(s);
-                } catch (Exception f) {
-                    try {
-                        return new Double(s);
-                    }  catch (Exception g) {
-                    	/* Ignore the error */
-                    }
+                    return new Double(s);
+                }  catch (Exception g) {
+                    /* Ignore the error */
                 }
             }
         }
