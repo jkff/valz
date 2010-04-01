@@ -1,12 +1,9 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.valz.util.Pair;
 
 import java.util.*;
-import static org.valz.util.json.JSONBuilder.makeJson;
 
 public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 

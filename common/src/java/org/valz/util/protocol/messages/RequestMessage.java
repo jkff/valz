@@ -3,8 +3,10 @@ package org.valz.util.protocol.messages;
 import org.valz.util.protocol.RequestType;
 
 public class RequestMessage {
-    public RequestType type;
-    public Object data;
+    private RequestType type;
+    private Object data;
+
+
 
     public RequestMessage() {
     }
@@ -13,4 +15,23 @@ public class RequestMessage {
         this.type = type;
         this.data = data;
     }
+
+    
+
+    public RequestType getType() {
+        return type;
+    }
+
+    public void setType(RequestType type) {
+        this.type = type;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
 }

@@ -1,7 +1,6 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
 
 import java.util.Iterator;
 

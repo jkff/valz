@@ -1,24 +1,23 @@
 package org.valz.util.protocol.messages;
 
-import flexjson.JSON;
 import org.valz.util.aggregates.Aggregate;
 
-public class SubmitRequest {
+public class SubmitRequest<T> {
 
     public String name;
-    public Aggregate<?> aggregate;
-    public Object value;
+    public Aggregate<T> aggregate;
+    public T value;
 
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setAggregate(Aggregate<?> aggregate) {
+    public void setAggregate(Aggregate<T> aggregate) {
         this.aggregate = aggregate;
     }
 
-    public void setValue(Object value) {
+    public void setValue(T value) {
         this.value = value;
     }
 
@@ -26,7 +25,7 @@ public class SubmitRequest {
     public SubmitRequest() {
     }
 
-    public SubmitRequest(String name, Aggregate<?> aggregate, Object value) {
+    public SubmitRequest(String name, Aggregate<T> aggregate, T value) {
         this.name = name;
         this.aggregate = aggregate;
         this.value = value;

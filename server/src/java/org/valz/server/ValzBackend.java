@@ -2,7 +2,6 @@ package org.valz.server;
 
 import org.apache.log4j.Logger;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.protocol.Backend;
 
 import java.util.*;
@@ -42,9 +41,5 @@ public class ValzBackend implements Backend {
 
     public synchronized Aggregate getAggregate(String name) {
         return name2aggregate.get(name);
-    }
-
-    public synchronized void registerSupportedAggregate(Class<? extends Aggregate<?>> clazz) {
-        AggregateRegistry.INSTANCE.registerSupportedAggregate(clazz);
     }
 }

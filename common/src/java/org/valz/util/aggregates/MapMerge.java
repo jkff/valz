@@ -1,19 +1,18 @@
 package org.valz.util.aggregates;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.valz.util.json.JSONBuilder.makeJson;
-public class MapMerge extends AbstractAggregate<Map> {
+public class MapMerge<K, V> extends AbstractAggregate<Map> {
 
     // TODO: make private final
-    public Aggregate<Object> mergeConflictsAggregate;
+    public Aggregate<? super V> mergeConflictsAggregate;
 
-    public MapMerge(@NotNull Aggregate<Object> mergeConflictsAggregate) {
+    public MapMerge(@NotNull Aggregate<? super V> mergeConflictsAggregate) {
         this.mergeConflictsAggregate = mergeConflictsAggregate;
     }
 
@@ -21,17 +20,18 @@ public class MapMerge extends AbstractAggregate<Map> {
 
     @Override
     @NotNull
-    public JSONObject reduce(@NotNull Iterator<Map> stream) {
-        JSONObject res = new JSONObject();
+    public Map<K, V> reduce(@NotNull Iterator<Map> stream) {
+        Map<K, V> res = new HashMap<K, V>();
         while (stream.hasNext()) {
-            for (Object objectEntry : stream.next().entrySet()) {
-                Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) objectEntry;
-                Object existingValue = res.get(entry.getKey());
+
+            for (Object entryObject : stream.next().entrySet()) {
+                Map.Entry<K, V> entry = (Map.Entry<K, V>)entryObject;
+                V existingValue = res.get(entry.getKey());
                 if (existingValue == null) {
                     res.put(entry.getKey(), entry.getValue());
                 } else {
                     res.put(entry.getKey(),
-                            mergeConflictsAggregate.reduce(existingValue, entry.getValue()));
+                            (V)mergeConflictsAggregate.reduce(existingValue, entry.getValue()));
                 }
             }
         }
@@ -39,7 +39,7 @@ public class MapMerge extends AbstractAggregate<Map> {
     }
 
     @Override
-    public JSONObject reduce(Map item1, Map item2) {
+    public Map<K, V> reduce(Map item1, Map item2) {
         return reduce(Arrays.asList(item1, item2).iterator());
     }
 }

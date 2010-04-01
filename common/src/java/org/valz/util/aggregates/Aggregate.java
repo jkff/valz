@@ -5,11 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
-/**
- * Every implementor must have a static method "String getMethod()" and
- * "Aggregate<T> parseAggregateString(JSONObject makeJson)" to facilitate parsing of makeJson objects
- * like {method:"...", ...} into aggregates.
- */
 public interface Aggregate<T> {
     /**
      * The result of this method must be independent on the order of items

@@ -36,9 +36,9 @@ public class ValzHandler extends AbstractHandler {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
             RequestMessage requestMessage = new JSONDeserializer<RequestMessage>().deserialize(reqStr);
 
-            switch (requestMessage.type) {
+            switch (requestMessage.getType()) {
                 case SUBMIT: {
-                    SubmitRequest submitRequest = (SubmitRequest)requestMessage.data;
+                    SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
                     backend.submit(submitRequest.name, submitRequest.aggregate, submitRequest.value);
                 }
                 break;
@@ -49,13 +49,13 @@ public class ValzHandler extends AbstractHandler {
                 break;
 
                 case GET_VALUE: {
-                    String name = (String)requestMessage.data;
+                    String name = (String)requestMessage.getData();
                     answer(response.getOutputStream(), ResponseType.GET_VALUE, backend.getValue(name));
                 }
                 break;
 
                 case GET_AGGREGATE: {
-                    String name = (String)requestMessage.data;
+                    String name = (String)requestMessage.getData();
                     answer(response.getOutputStream(), ResponseType.GET_AGGREGATE, backend.getAggregate(name));
                 }
                 break;
