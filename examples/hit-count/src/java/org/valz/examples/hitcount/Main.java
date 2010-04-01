@@ -2,29 +2,23 @@ package org.valz.examples.hitcount;
 
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
-import org.json.simple.parser.JSONParser;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.protocol.RequestType;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.SubmitRequest;
 
-import java.util.Date;
-
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        SubmitRequest submitRequest = new SubmitRequest("foo", new LongSum(), 1);
-        RequestMessage msg = new RequestMessage();
-        msg.type = RequestType.SUBMIT;
-        msg.data = submitRequest;
+        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
+        RequestMessage msg = new RequestMessage(RequestType.SUBMIT, submitRequest);
 
 
         String s = new JSONSerializer()
-                .include("aggregate.class")
-                .serialize(submitRequest);
+                .serialize(msg);
 
-        SubmitRequest msg2 = new JSONDeserializer<SubmitRequest>()
-                .use("aggregate.class", LongSum.class)
+        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
+                .use("data.aggregate.class", LongSum.class)
                 .deserialize(s);
 
         int x = 0;
