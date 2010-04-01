@@ -586,21 +586,41 @@ public class JSONSerializer {
                 visits.add( object );
                 beginObject();
                 try {
-                    add("class", object.getClass(), true);
+                    BeanInfo info = Introspector.getBeanInfo( findBeanClass( object ) );
+                    PropertyDescriptor[] props = info.getPropertyDescriptors();
+                    boolean firstField = true;
+                    for (PropertyDescriptor prop : props) {
+                        String name = prop.getName();
+                        path.enqueue( name );
+                        Method accessor = prop.getReadMethod();
+                        if (accessor != null && isIncluded( prop ) ) {
+                            Object value = accessor.invoke(object, (Object[]) null);
+                            if( !visits.contains( value ) ) {
+                                add(name, value, firstField);
+                                firstField = false;
+                            }
+                        }
+                        path.pop();
+                    }
                     for( Class current = object.getClass(); current != null; current = current.getSuperclass() ) {
-                        for (Field field : current.getDeclaredFields()) {
+                        Field[] ff = current.getDeclaredFields();
+                        for (Field field : ff) {
                             path.enqueue( field.getName() );
                             if (isValidField(field)) {
-                                field.setAccessible(true);
                                 if( !visits.contains( field.get(object) ) ) {
-                                    add(field.getName(), field.get(object), false);
+                                    add(field.getName(), field.get(object), firstField);
+                                    firstField = false;
                                 }
                             }
                             path.pop();
                         }
                     }
-                } catch (IllegalAccessException e) {
-                    throw new JSONException(e);
+                } catch( IllegalAccessException e ) {
+                    throw new JSONException( e );
+                } catch (IntrospectionException e) {
+                    throw new JSONException( e );
+                } catch (InvocationTargetException e) {
+                    throw new JSONException( e );
                 }
                 endObject();
                 visits = (ChainedSet) visits.getParent();

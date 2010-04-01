@@ -127,18 +127,32 @@ public class ObjectBinder {
     public Object bindIntoObject(Map jsonOwner, Object target, Type targetType) {
         try {
             objectStack.add( target );
-            for( Class current = target.getClass(); current != null; current = current.getSuperclass() ) {
-                for (Field field : current.getDeclaredFields()) {
-                    Object value = findFieldInJson( jsonOwner, field.getName() );
-                    if( value == null ) {
-                        continue;
-                    }
-                    currentPath.enqueue( field.getName() );
-                    field.setAccessible( true );
-                    if( value instanceof Map ) {
-                        field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
+            BeanInfo info = Introspector.getBeanInfo( target.getClass() );
+            for( PropertyDescriptor descriptor : info.getPropertyDescriptors() ) {
+                Object value = findFieldInJson( jsonOwner, descriptor );
+                if( value != null ) {
+                    currentPath.enqueue( descriptor.getName() );
+                    Method setMethod = descriptor.getWriteMethod();
+                    if( setMethod != null ) {
+                        Type[] types = setMethod.getGenericParameterTypes();
+                        if( types.length == 1 ) {
+                            Type paramType = types[0];
+                            setMethod.invoke( objectStack.getLast(), convert( value, resolveParameterizedTypes( paramType, targetType ) ) );
+                        } else {
+                            throw new JSONException(currentPath + ":  Expected a single parameter for method " + target.getClass().getName() + "." + setMethod.getName() + " but got " + types.length );
+                        }
                     } else {
-                        field.set( target, convert( value, field.getGenericType() ) );
+                        try {
+                            Field field = target.getClass().getDeclaredField( descriptor.getName() );
+                            field.setAccessible( true );
+                            if( value instanceof Map ) {
+                                field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
+                            } else {
+                                field.set( target, convert( value, field.getGenericType() ) );
+                            }
+                        } catch (NoSuchFieldException e) {
+                            // ignore must not be there.
+                        }
                     }
                     currentPath.pop();
                 }
@@ -146,32 +160,21 @@ public class ObjectBinder {
             return objectStack.removeLast();
         } catch (IllegalAccessException e) {
             throw new JSONException(currentPath + ":  Could not access the no-arg constructor for " + target.getClass().getName(), e);
+        } catch (InvocationTargetException ex ) {
+            throw new JSONException(currentPath + ":  Exception while trying to invoke setter method.", ex );
+        } catch (IntrospectionException e) {
+            throw new JSONException(currentPath + ":  Could not inspect " + target.getClass().getName(), e );
         }
     }
 
     private Object convert(Object value, Type targetType) {
         Class targetClass = getTargetClass( targetType );
         ObjectFactory factory = findFactoryFor( targetClass );
-        if (factory == null) {
-            // try to find class
-            if (value instanceof Map) {
-                try {
-                    String className = (String)((Map)value).get("class");
-                    Class clazz = Class.forName(className);
-                    if (clazz != null) {
-                        targetClass = clazz;
-                    }
-                } catch (ClassNotFoundException e) {
-                    // None
-                }
-            }
-
-            factory = findFactoryFor( targetClass );
-            if (factory == null) {
-                throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
-            }
+        if( factory != null ) {
+            return factory.instantiate(this, value, targetType, targetClass);
+        } else {
+            throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
         }
-        return factory.instantiate(this, value, targetType, targetClass);
     }
 
     private Class getTargetClass(Type targetType) {
@@ -285,11 +288,13 @@ public class ObjectBinder {
         }
     }
 
-    private Object findFieldInJson( Map map, String descriptorName ) {
-        Object value = map.get( descriptorName );
+    private Object findFieldInJson( Map map, PropertyDescriptor descriptor ) {
+        Object value = map.get( descriptor.getName() );
         if( value == null ) {
-            value = map.get( upperCase(descriptorName) );
+            String field = descriptor.getName();
+            value = map.get( upperCase(field) );
         }
+
         return value;
     }
 

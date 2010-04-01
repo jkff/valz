@@ -25,36 +25,37 @@ public class TestSlon {
                 .deserialize(s);
     }
 
-    @Test
-    public void testPrivateFoo() {
-        Foo foo = new Foo(3);
-        foo.y = 5;
+//    @Test
+//    public void testPrivateFoo() {
+//        Foo foo = new Foo(3);
+//        foo.y = 5;
+//
+//        String s = new JSONSerializer()
+//                .serialize(foo);
+//
+//        Foo msg2 = new JSONDeserializer<Foo>()
+//                .deserialize(s);
+//
+//        assertEquals(foo, msg2);
+//    }
 
-        String s = new JSONSerializer()
-                .serialize(foo);
-
-        Foo msg2 = new JSONDeserializer<Foo>()
-                .deserialize(s);
-
-        assertEquals(foo, msg2);
-    }
-
-    @Test
-    public void testPrivateBar() {
-        Bar<Integer> bar = new Bar<Integer>(3);
-        bar.y = 5;
-        bar.setBar(new Bar<Integer>(2));
-
-
-        String s = new JSONSerializer()
-                .serialize(bar);
-
-        Bar msg2 = new JSONDeserializer<Bar>()
-                .use("x", new IntegerObjectFactory())
-                .use("y", new IntegerObjectFactory())
-                .use("bar.x", new IntegerObjectFactory())
-                .use("bar.y", new IntegerObjectFactory())
-                .deserialize(s);
-
-        assertEquals(bar, msg2);
-    }}
+//    @Test
+//    public void testPrivateBar() {
+//        Bar<Integer> bar = new Bar<Integer>(3);
+//        bar.y = 5;
+//        bar.setBar(new Bar<Integer>(2));
+//
+//
+//        String s = new JSONSerializer()
+//                .serialize(bar);
+//
+//        Bar msg2 = new JSONDeserializer<Bar>()
+//                .use("x", new IntegerObjectFactory())
+//                .use("y", new IntegerObjectFactory())
+//                .use("bar.x", new IntegerObjectFactory())
+//                .use("bar.y", new IntegerObjectFactory())
+//                .deserialize(s);
+//
+//        assertEquals(bar, msg2);
+//    }
+}
