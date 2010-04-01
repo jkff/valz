@@ -15,6 +15,7 @@
  */
 package flexjson;
 
+import java.beans.IntrospectionException;
 import java.util.*;
 import java.util.Date;
 import java.beans.BeanInfo;
@@ -175,8 +176,8 @@ import java.text.StringCharacterIterator;
  * </p>
  * <p>
  * JSONSerializer is safe to use the serialize() methods from two seperate
- * threads.  It is NOT safe to use combination of {@link flexjson.JSONSerializer#include(String[])}
- * {@link JSONSerializer#transform(Transformer, String[])}, or {@link flexjson.JSONSerializer#exclude(String[])}
+ * threads.  It is NOT safe to use combination of {@link flexjson.JSONSerializer#include(String...)}
+ * {@link JSONSerializer#transform(Transformer, String...)}, or {@link flexjson.JSONSerializer#exclude(String...)}
  * from multiple threads at the same time.  It is also NOT safe to use
  * {@link flexjson.JSONSerializer#serialize(String, Object)} and include/exclude/transform from
  * multiple threads.  The reason for not making them more thread safe is to boost performance.
@@ -203,7 +204,7 @@ public class JSONSerializer {
      * the resulting JSON in a javascript object that contains a single field
      * named rootName.  This is great to use in conjunction with other libraries
      * like EXTJS whose data models require them to be wrapped in a JSON object.
-     * 
+     *
      * @param rootName the name of the field to assign the resulting JSON.
      * @param target the instance to serialize to JSON.
      * @return the JSON object with one field named rootName and the value being the JSON of target.
@@ -307,7 +308,7 @@ public class JSONSerializer {
      * Fields can be in dot notation just like {@link JSONSerializer#include} and
      * {@link JSONSerializer#exclude } methods.  However, transform doesn't support wildcards.
      * Specifying more than one field allows you to add a single instance to multiple fields.
-     * It's there for handiness. :-) 
+     * It's there for handiness. :-)
      * @param transformer the instance used to transform values
      * @param fields the paths to the fields you want to transform.  They can be in dot notation.
      * @return Hit you back with the JSONSerializer for method chain goodness.
@@ -372,7 +373,7 @@ public class JSONSerializer {
      * This is just here so that JSONSerializer can be treated like a bean so it will
      * integrate with Spring or other frameworks.  <strong>This is not ment to be used
      * in code use exclude method for that.</strong>
-     * @param fields the list of fields to be excluded for serialization.  The fields arg should be a 
+     * @param fields the list of fields to be excluded for serialization.  The fields arg should be a
      * list of strings in dot notation.
      */
     public void setExcludes( List fields ) {
@@ -584,6 +585,23 @@ public class JSONSerializer {
                 visits = new ChainedSet( visits );
                 visits.add( object );
                 beginObject();
+//                try {
+//                    add("class", object.getClass(), true);
+//                    for( Class current = object.getClass(); current != null; current = current.getSuperclass() ) {
+//                        for (Field field : current.getDeclaredFields()) {
+//                            path.enqueue( field.getName() );
+//                            if (isValidField(field)) {
+//                                field.setAccessible(true);
+//                                if( !visits.contains( field.get(object) ) ) {
+//                                    add(field.getName(), field.get(object), false);
+//                                }
+//                            }
+//                            path.pop();
+//                        }
+//                    }
+//                } catch (IllegalAccessException e) {
+//                    throw new JSONException(e);
+//                }
                 try {
                     BeanInfo info = Introspector.getBeanInfo( findBeanClass( object ) );
                     PropertyDescriptor[] props = info.getPropertyDescriptors();
@@ -614,10 +632,12 @@ public class JSONSerializer {
                             path.pop();
                         }
                     }
-                } catch( JSONException e ) {
-                    throw e;
-                } catch( Exception e ) {
-                    throw new JSONException( "Error trying to serialize path: " + path.toString(), e );
+                } catch( IllegalAccessException e ) {
+                    throw new JSONException( e );
+                } catch (IntrospectionException e) {
+                    throw new JSONException( e );
+                } catch (InvocationTargetException e) {
+                    throw new JSONException( e );
                 }
                 endObject();
                 visits = (ChainedSet) visits.getParent();
@@ -652,7 +672,9 @@ public class JSONSerializer {
         protected abstract boolean isIncluded( PropertyDescriptor prop );
 
         protected boolean isValidField(Field field) {
-            return !Modifier.isStatic( field.getModifiers() ) && Modifier.isPublic( field.getModifiers() ) && !Modifier.isTransient( field.getModifiers() );
+            return !Modifier.isStatic( field.getModifiers() ) &&
+                    Modifier.isPublic( field.getModifiers() ) &&
+                    !Modifier.isTransient( field.getModifiers() );
         }
 
         protected boolean addComma(boolean firstField) {
