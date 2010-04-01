@@ -1,11 +1,9 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.protocol.Backend;
-import org.valz.util.protocol.RemoteReadException;
 
 import java.util.*;
 

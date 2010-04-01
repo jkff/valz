@@ -7,10 +7,6 @@ import java.util.Iterator;
 
 public class LongSum extends AbstractAggregate<Long> {
 
-    public static LongSum deserialize(Object object, AggregateRegistry registry) {
-        return new LongSum();
-    }
-
     @Override
     public Long reduce(@NotNull Iterator<Long> stream) {
         long res = 0;

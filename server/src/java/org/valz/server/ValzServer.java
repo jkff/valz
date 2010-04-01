@@ -24,7 +24,7 @@ public class ValzServer {
 
         backend.registerSupportedAggregate(LongSum.class);
         backend.registerSupportedAggregate(MinLong.class);
-        backend.registerSupportedAggregate(OrderedListMerge.class);
+        //backend.registerSupportedAggregate(OrderedListMerge.class);
         backend.registerSupportedAggregate(MapMerge.class);
 
         server.addHandler(new ValzHandler(backend));
