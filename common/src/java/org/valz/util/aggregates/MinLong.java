@@ -5,13 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 public class MinLong extends AbstractAggregate<Long> {
-
-    public static MinLong deserialize(Object object, AggregateRegistry registry) {
-        return new MinLong();
-    }
-
-
-
     @Override
     public Long reduce(@NotNull Iterator<Long> stream) {
         long res = stream.next();

@@ -28,7 +28,4 @@ public interface Aggregate<T> {
 
     @Nullable
     T reduce(T item1, T item2);
-
-    @Nullable
-    Object toSerialized();
 }

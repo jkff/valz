@@ -17,9 +17,4 @@ public abstract class AbstractAggregate<T> implements Aggregate<T> {
 
     @Nullable
     public abstract T reduce(T item1, T item2);
-
-    @Nullable
-    public Object toSerialized() {
-        return null;
-    }
 }

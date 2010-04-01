@@ -8,7 +8,7 @@ import org.valz.util.Pair;
 import java.util.*;
 import static org.valz.util.json.JSONBuilder.makeJson;
 
-public class OrderedListMerge extends AbstractAggregate<JSONArray> {
+public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
     private static <T> Iterator<T> reduce(final Comparator<T> comparator, Iterator<Iterator<T>> stream) {
         final PriorityQueue<Pair<T, Iterator<T>>> q = new PriorityQueue<Pair<T, Iterator<T>>>(
@@ -47,45 +47,29 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
         };
     }
 
-    public static OrderedListMerge deserialize(Object object, AggregateRegistry registry) {
-        return new OrderedListMerge((String) ((JSONObject) object).get("key"));
+
+    // TODO: make private final
+    public Comparator<T> comparator;
+
+
+
+    public OrderedListMerge(final Comparator<T> comparator) {
+        this.comparator = comparator;
     }
 
-
-
-    private final String key;
-
-
-
-    public OrderedListMerge(final String key) {
-        this.key = key;
-    }
 
 
 
     @Override
-    public Object toSerialized() {
-        return makeJson("key", key);
-    }
-
-    @Override
-    public JSONArray reduce(@NotNull Iterator<JSONArray> stream) {
-        // TODO: разобратсья с дублированием с private static <T> Iterator<T> reduce
-        List<Iterator<JSONObject>> iters = new ArrayList<Iterator<JSONObject>>();
-
+    public List<T> reduce(@NotNull Iterator<List<T>> stream) {
+        List<Iterator<T>> iters = new ArrayList<Iterator<T>>();
         while (stream.hasNext()) {
             iters.add(stream.next().iterator());
         }
 
-        Iterator<JSONObject> resIter = reduce(new Comparator<JSONObject>() {
-            public int compare(JSONObject o1, JSONObject o2) {
-                Comparable v1 = (Comparable) o1.get(key);
-                Comparable v2 = (Comparable) o2.get(key);
-                return v1.compareTo(v2);
-            }
-        }, iters.iterator());
+        Iterator<T> resIter = reduce(comparator, iters.iterator());
 
-        JSONArray res = new JSONArray();
+        ArrayList<T> res = new ArrayList<T>();
         while (resIter.hasNext()) {
             res.add(resIter.next());
         }
@@ -93,8 +77,8 @@ public class OrderedListMerge extends AbstractAggregate<JSONArray> {
     }
 
     @Override
-    public JSONArray reduce(JSONArray item1, JSONArray item2) {
-        List<JSONArray> iters = new ArrayList<JSONArray>();
+    public List<T> reduce(List<T> item1, List<T> item2) {
+        List<List<T>> iters = new ArrayList<List<T>>();
         iters.add(item1);
         iters.add(item2);
         return reduce(iters.iterator());

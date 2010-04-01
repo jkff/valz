@@ -33,7 +33,7 @@ public class AggregateRegistry {
 
     @NotNull
     public static JSONObject toJson(@NotNull Aggregate aggregate) {
-        return makeJson("method", aggregate.getClass().getName(), "param", aggregate.toSerialized());
+        return makeJson("method", aggregate.getClass().getName(), "param", aggregate);
     }
 
     private final Map<String, Class<? extends Aggregate<?>>> name2class = new HashMap<String, Class<? extends Aggregate<?>>>();
