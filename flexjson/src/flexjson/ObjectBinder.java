@@ -125,56 +125,20 @@ public class ObjectBinder {
     }
 
     public Object bindIntoObject(Map jsonOwner, Object target, Type targetType) {
-//        try {
-//            objectStack.add( target );
-//            for( Class current = target.getClass(); current != null; current = current.getSuperclass() ) {
-//                for (Field field : current.getDeclaredFields()) {
-//                    Object value = findFieldInJson( jsonOwner, field.getName() );
-//                    if( value == null ) {
-//                        continue;
-//                    }
-//                    currentPath.enqueue( field.getName() );
-//                    field.setAccessible( true );
-//                    if( value instanceof Map ) {
-//                        field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
-//                    } else {
-//                        field.set( target, convert( value, field.getGenericType() ) );
-//                    }
-//                    currentPath.pop();
-//                }
-//            }
-//            return objectStack.removeLast();
-//        } catch (IllegalAccessException e) {
-//            throw new JSONException(currentPath + ":  Could not access the no-arg constructor for " + target.getClass().getName(), e);
-//        }
         try {
             objectStack.add( target );
-            BeanInfo info = Introspector.getBeanInfo( target.getClass() );
-            for( PropertyDescriptor descriptor : info.getPropertyDescriptors() ) {
-                Object value = findFieldInJson( jsonOwner, descriptor.getName() );
-                if( value != null ) {
-                    currentPath.enqueue( descriptor.getName() );
-                    Method setMethod = descriptor.getWriteMethod();
-                    if( setMethod != null ) {
-                        Type[] types = setMethod.getGenericParameterTypes();
-                        if( types.length == 1 ) {
-                            Type paramType = types[0];
-                            setMethod.invoke( objectStack.getLast(), convert( value, resolveParameterizedTypes( paramType, targetType ) ) );
-                        } else {
-                            throw new JSONException(currentPath + ":  Expected a single parameter for method " + target.getClass().getName() + "." + setMethod.getName() + " but got " + types.length );
-                        }
+            for( Class current = target.getClass(); current != null; current = current.getSuperclass() ) {
+                for (Field field : current.getDeclaredFields()) {
+                    Object value = findFieldInJson( jsonOwner, field.getName() );
+                    if( value == null ) {
+                        continue;
+                    }
+                    currentPath.enqueue( field.getName() );
+                    field.setAccessible( true );
+                    if( value instanceof Map ) {
+                        field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
                     } else {
-                        try {
-                            Field field = target.getClass().getDeclaredField( descriptor.getName() );
-                            field.setAccessible( true );
-                            if( value instanceof Map ) {
-                                field.set( target, convert(value, findClassName( (Map)value, getTargetClass( field.getGenericType() ) ) ) );
-                            } else {
-                                field.set( target, convert( value, field.getGenericType() ) );
-                            }
-                        } catch (NoSuchFieldException e) {
-                            // ignore must not be there.
-                        }
+                        field.set( target, convert( value, field.getGenericType() ) );
                     }
                     currentPath.pop();
                 }
@@ -182,10 +146,6 @@ public class ObjectBinder {
             return objectStack.removeLast();
         } catch (IllegalAccessException e) {
             throw new JSONException(currentPath + ":  Could not access the no-arg constructor for " + target.getClass().getName(), e);
-        } catch (InvocationTargetException ex ) {
-            throw new JSONException(currentPath + ":  Exception while trying to invoke setter method.", ex );
-        } catch (IntrospectionException e) {
-            throw new JSONException(currentPath + ":  Could not inspect " + target.getClass().getName(), e );
         }
     }
 
