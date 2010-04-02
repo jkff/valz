@@ -137,11 +137,12 @@ public class ObjectBinder {
                         Type[] types = setMethod.getGenericParameterTypes();
                         if( types.length == 1 ) {
                             Type paramType = types[0];
-                            Type parameterizedType = resolveParameterizedTypes( paramType, targetType );
-                            if (parameterizedType == null) {
-                                parameterizedType = value.getClass();
+                            if( value instanceof Map ) {
+                                setMethod.invoke( target, convert( value, findClassName( (Map)value, getTargetClass( resolveParameterizedTypes( paramType, value.getClass())) ) ) );
+                            } else {
+                                setMethod.invoke( target, convert( value, resolveParameterizedTypes( paramType, value.getClass() ) ) );
                             }
-                            setMethod.invoke( objectStack.getLast(), convert( value, parameterizedType ) );
+
                         } else {
                             throw new JSONException(currentPath + ":  Expected a single parameter for method " + target.getClass().getName() + "." + setMethod.getName() + " but got " + types.length );
                         }
@@ -172,32 +173,13 @@ public class ObjectBinder {
     }
 
     private Object convert(Object value, Type targetType) {
-        if (value == null) {
-            return null;
-        }
-
         Class targetClass = getTargetClass( targetType );
         ObjectFactory factory = findFactoryFor( targetClass );
-        if (factory == null) {
-            // try to find class
-            if (value instanceof Map) {
-                try {
-                    String className = (String)((Map)value).get("class");
-                    Class clazz = Class.forName(className);
-                    if (clazz != null) {
-                        targetClass = clazz;
-                    }
-                } catch (ClassNotFoundException e) {
-                    // None
-                }
-            }
-
-            factory = findFactoryFor( targetClass );
-            if (factory == null) {
-                throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
-            }
+        if( factory != null ) {
+            return factory.instantiate(this, value, targetType, targetClass);
+        } else {
+            throw new JSONException( String.format( "%s:  Cannot instantiate abstract class or interface %s", currentPath, targetClass.getName() ) );
         }
-        return factory.instantiate(this, value, targetType, targetClass);
     }
 
     private Class getTargetClass(Type targetType) {
@@ -275,9 +257,7 @@ public class ObjectBinder {
     private ObjectFactory findFactoryFor(Class targetType) {
         ObjectFactory factory = pathFactories.get( currentPath );
         if( factory == null ) {
-            if ( targetType != null && targetType.isArray() ) {
-                return factories.get(Array.class);
-            }
+            if( targetType.isArray() ) return factories.get(Array.class);
             return findFactoryByTargetClass(targetType);
         }
         return factory;
@@ -286,14 +266,15 @@ public class ObjectBinder {
     private ObjectFactory findFactoryByTargetClass(Class targetType) {
         ObjectFactory factory;
         factory = factories.get( targetType );
-        if ( factory == null && targetType.getSuperclass() != null ) {
+        if( factory == null && targetType.getSuperclass() != null ) {
             for( Class intf : targetType.getInterfaces() ) {
                 factory = findFactoryByTargetClass( intf );
                 if( factory != null ) return factory;
             }
             return findFactoryByTargetClass( targetType.getSuperclass() );
+        } else {
+            return factory;
         }
-        return factory;
     }
 
     protected Object instantiate( Class clazz ) {
