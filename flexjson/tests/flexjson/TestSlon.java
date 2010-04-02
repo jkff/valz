@@ -1,10 +1,12 @@
 package flexjson;
 
-import flexjson.factories.IntegerObjectFactory;
 import flexjson.forInterface.MyClass;
 import flexjson.forInterface.MyContainer;
-import flexjson.forPrivateFields.Bar;
-import flexjson.forPrivateFields.Foo;
+import flexjson.forInterface.WithObjectField;
+import flexjson.valz.LongSum;
+import flexjson.valz.RequestMessage;
+import flexjson.valz.RequestType;
+import flexjson.valz.SubmitRequest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -23,6 +25,43 @@ public class TestSlon {
         MyContainer msg2 = new JSONDeserializer<MyContainer>()
                 .use("_interface", MyClass.class)
                 .deserialize(s);
+
+        assertEquals(myContainer, msg2);
+    }
+
+    @Test
+    public void testWithObjectField() {
+        // serialize and deserialize object type field with real class
+
+        WithObjectField withObjectField = new WithObjectField();
+        withObjectField.setObj(new MyClass());
+
+        String s = new JSONSerializer()
+                .serialize(withObjectField);
+
+        WithObjectField msg2 = new JSONDeserializer<WithObjectField>()
+                .use("obj", MyClass.class)
+                .deserialize(s);
+
+        assertEquals(withObjectField, msg2);
+    }
+
+
+    @Test
+    public void testValz() {
+        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
+        RequestMessage msg = new RequestMessage(RequestType.SUBMIT, submitRequest);
+
+
+        String s = new JSONSerializer()
+                .serialize(msg);
+
+        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
+                .use("data.class", SubmitRequest.class)
+                .use("data.aggregate.class", LongSum.class)
+                .deserialize(s);
+
+        assertEquals(msg, msg2);
     }
 
 //    @Test
