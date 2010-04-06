@@ -22,7 +22,6 @@ public class ValzServer {
 
         ValzBackend backend = new ValzBackend();
 
-
         server.addHandler(new ValzHandler(backend));
 
         try {

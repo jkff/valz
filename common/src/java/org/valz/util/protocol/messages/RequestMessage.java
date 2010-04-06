@@ -1,37 +1,24 @@
 package org.valz.util.protocol.messages;
 
-import org.valz.util.protocol.RequestType;
+import org.valz.util.protocol.InteractionType;
 
-public class RequestMessage {
-    private RequestType type;
-    private Object data;
-
-
+public class RequestMessage<T> {
+    private InteractionType<T,?> type;
+    private T data;
 
     public RequestMessage() {
     }
 
-    public RequestMessage(RequestType type, Object data) {
+    public RequestMessage(InteractionType type, T data) {
         this.type = type;
         this.data = data;
     }
 
-    
-
-    public RequestType getType() {
+    public InteractionType getType() {
         return type;
     }
 
-    public void setType(RequestType type) {
-        this.type = type;
-    }
-
-    public Object getData() {
+    public T getData() {
         return data;
     }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
-
 }

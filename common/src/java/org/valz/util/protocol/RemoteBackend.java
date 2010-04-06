@@ -1,6 +1,7 @@
 package org.valz.util.protocol;
 
 import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.messages.*;
 
@@ -15,33 +16,28 @@ public class RemoteBackend implements Backend {
         this.serverUrl = serverUrl;
     }
 
-    public void submit(String name, Aggregate<?> aggregate, Object value) throws RemoteException {
-        getDataResponse(RequestType.SUBMIT,
-                new SubmitRequest(name, aggregate, value));
+    public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteException {
+        getDataResponse(InteractionType.SUBMIT,
+                new SubmitRequest<T>(name, aggregate, value));
         // TODO: save val at exception to queue and try send later
     }
 
     public Aggregate<?> getAggregate(String name) throws RemoteException {
-        return (Aggregate<?>)getDataResponse(RequestType.GET_AGGREGATE, name);
+        return getDataResponse(InteractionType.GET_AGGREGATE, name);
     }
 
     public Object getValue(String name) throws RemoteException {
-        return getDataResponse(RequestType.GET_VALUE, name);
+        return getDataResponse(InteractionType.GET_VALUE, name);
     }
 
     public Collection<String> listVars() throws RemoteException {
-        return (Collection<String>)getDataResponse(RequestType.LIST_VARS, null);
+        return getDataResponse(InteractionType.LIST_VARS, null);
     }
 
-    private Object getDataResponse(RequestType requestType, Object data) throws RemoteException {
+    private <I,O> O getDataResponse(InteractionType<I,O> requestType, I request) throws RemoteException {
         try {
-            String response = HttpConnector.post(serverUrl,
-                        requestType,
-                        data);
-            ResponseMessage responseMessage = new JSONDeserializer<ResponseMessage>().deserialize(response);
-            if (responseMessage.type != requestType.getResponseType()) {
-                throw new RemoteException("Invalid requestMessage type.");
-            }
+            String response = HttpConnector.post(serverUrl, new JSONSerializer().serialize(new RequestMessage<I>(requestType, request)));
+            ResponseMessage<O> responseMessage = new JSONDeserializer<ResponseMessage<O>>().deserialize(response);
             return responseMessage.data;
         } catch (IOException e) {
             throw new RemoteException(e);
