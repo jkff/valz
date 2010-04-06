@@ -46,13 +46,6 @@ public class HttpConnector {
         }
     }
 
-    public static String post(@NotNull String serverURL, @NotNull RequestType messageType, Object data) throws
-            IOException {
-        return post(serverURL, new JSONSerializer().serialize(new RequestMessage(messageType, data)));
-    }
-
-
-    
     private HttpConnector() {
     }
 }

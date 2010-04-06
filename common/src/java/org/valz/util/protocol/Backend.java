@@ -14,5 +14,5 @@ public interface Backend {
 
     Collection<String> listVars() throws RemoteException;
 
-    void submit(String name, Aggregate<?> aggregate, Object value) throws RemoteException;
+    <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteException;
 }

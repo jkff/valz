@@ -3,11 +3,8 @@ package org.valz.viewer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.LongSum;
+import org.valz.util.protocol.Backend;
 import org.valz.util.protocol.ReadConfiguration;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.RemoteReadBackend;
 
 import java.util.Arrays;
 
@@ -28,9 +25,7 @@ public class ValzWebServer {
         // For now I'm too lazy to launch 2 distinct servers. Let's test the thing on 2 identical ones.
         conf.setServerUrls(Arrays.asList("http://localhost:8080", "http://localhost:8080"));
 
-        AggregateRegistry.INSTANCE.registerSupportedAggregate(LongSum.class);
-
-        ReadBackend backend = new RemoteReadBackend(conf, AggregateRegistry.INSTANCE);
+        Backend backend = null; //new RemoteBackend(conf);
 
         ValzWebHandler handler = new ValzWebHandler(backend);
         server.addHandler(handler);
