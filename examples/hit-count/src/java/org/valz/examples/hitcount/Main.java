@@ -13,17 +13,6 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-
-//        Class.forName("org.h2.Driver");
-//        Connection conn = DriverManager.getConnection("jdbc:h2:h2test", "sa", "");
-//        conn.createStatement().execute("CREATE TABLE Foo(id int);");
-//        conn.createStatement().execute("INSERT INTO Foo VALUES(1);");
-//        conn.createStatement().execute("INSERT INTO Foo VALUES(2);");
-//        ResultSet res = conn.createStatement().executeQuery("SELECT * FROM Foo;");
-//        // add application code here
-//        conn.close();
-
-
         WriteConfiguration conf = new WriteConfiguration();
         conf.setServerURL("http://localhost:8080");
 
