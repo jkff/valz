@@ -1,15 +1,11 @@
 package org.valz.examples.hitcount;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.*;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.SubmitRequest;
-
-import java.util.Arrays;
+import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.RemoteBackend;
+import org.valz.util.protocol.WriteConfiguration;
 
 public class Main {
     public static void main(String[] args) throws Exception {

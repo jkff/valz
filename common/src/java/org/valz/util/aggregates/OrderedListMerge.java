@@ -5,6 +5,7 @@ import org.valz.util.Pair;
 
 import java.util.*;
 
+
 public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
     private static <T> Iterator<T> reduce(final Comparator<T> comparator, Iterator<Iterator<T>> stream) {

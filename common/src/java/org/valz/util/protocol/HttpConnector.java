@@ -1,9 +1,7 @@
 package org.valz.util.protocol;
 
-import flexjson.JSONSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.io.IOUtils;
-import org.valz.util.protocol.messages.RequestMessage;
 
 import java.io.*;
 import java.net.HttpURLConnection;

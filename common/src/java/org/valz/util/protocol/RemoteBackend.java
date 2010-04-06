@@ -3,7 +3,9 @@ package org.valz.util.protocol;
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.messages.*;
+import org.valz.util.protocol.messages.RequestMessage;
+import org.valz.util.protocol.messages.ResponseMessage;
+import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.io.IOException;
 import java.util.Collection;
