@@ -7,7 +7,7 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.io.IOUtils;
 import org.valz.util.protocol.Backend;
-import org.valz.util.protocol.ResponseType;
+import org.valz.util.protocol.InteractionType;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.ResponseMessage;
 import org.valz.util.protocol.messages.SubmitRequest;
@@ -36,31 +36,20 @@ public class ValzHandler extends AbstractHandler {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
             RequestMessage requestMessage = new JSONDeserializer<RequestMessage>().deserialize(reqStr);
 
-            switch (requestMessage.getType()) {
-                case SUBMIT: {
-                    SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
-                    backend.submit(submitRequest.name, submitRequest.aggregate, submitRequest.value);
-                }
-                break;
-
-                case LIST_VARS: {
-                    answer(response.getOutputStream(), ResponseType.LIST_VARS, backend.listVars());
-                }
-                break;
-
-                case GET_VALUE: {
-                    String name = (String)requestMessage.getData();
-                    answer(response.getOutputStream(), ResponseType.GET_VALUE, backend.getValue(name));
-                }
-                break;
-
-                case GET_AGGREGATE: {
-                    String name = (String)requestMessage.getData();
-                    answer(response.getOutputStream(), ResponseType.GET_AGGREGATE, backend.getAggregate(name));
-                }
-                break;
-                default:
-                    throw new IllegalArgumentException("Can not serve this request.");
+            InteractionType t = requestMessage.getType();
+            if(InteractionType.SUBMIT.equals(t)) {
+                SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
+                backend.submit(submitRequest.name, submitRequest.aggregate, submitRequest.value);
+            } else if(InteractionType.LIST_VARS.equals(t)) {
+                answer(response.getOutputStream(), InteractionType.LIST_VARS, backend.listVars());
+            } else if(InteractionType.GET_VALUE.equals(t)) {
+                String name = (String)requestMessage.getData();
+                answer(response.getOutputStream(), InteractionType.GET_VALUE, backend.getValue(name));
+            } else if(InteractionType.GET_AGGREGATE.equals(t)) {
+                String name = (String)requestMessage.getData();
+                answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, backend.getAggregate(name));
+            } else {
+                throw new IllegalArgumentException("Unknown request type "+t);
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -72,7 +61,7 @@ public class ValzHandler extends AbstractHandler {
     }
 
 
-    private static void answer(OutputStream out, ResponseType messageType, Object data) throws IOException {
+    private static void answer(OutputStream out, InteractionType messageType, Object data) throws IOException {
         IOUtils.writeOutputStream(out, new JSONSerializer().serialize(new ResponseMessage(messageType, data)), "UTF-8");
     }
 }

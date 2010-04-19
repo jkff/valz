@@ -3,10 +3,6 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.aggregates.MapMerge;
-import org.valz.util.aggregates.MinLong;
-import org.valz.util.aggregates.OrderedListMerge;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -21,7 +17,6 @@ public class ValzServer {
         Server server = new Server(port);
 
         ValzBackend backend = new ValzBackend();
-
 
         server.addHandler(new ValzHandler(backend));
 

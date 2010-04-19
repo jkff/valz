@@ -15,7 +15,7 @@ public class ValzBackend implements Backend {
     public ValzBackend() {
     }
 
-    public synchronized void submit(String name, Aggregate aggregate, Object value) {
+    public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) {
         if (!name2val.containsKey(name)) {
             name2val.put(name, value);
             name2aggregate.put(name, aggregate);
@@ -24,8 +24,8 @@ public class ValzBackend implements Backend {
                 throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
             }
 
-            Object oldValue = name2val.get(name);
-            List<Object> list = Arrays.asList(oldValue, value);
+            T oldValue = (T) name2val.get(name);
+            List<T> list = Arrays.asList(oldValue, value);
             Object newValue = aggregate.reduce(list.iterator());
             name2val.put(name, newValue);
         }

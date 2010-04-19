@@ -10,6 +10,16 @@
     <orderEntry type="module" module-name="client" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="server" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
+      </library>
+    </orderEntry>
     <orderEntry type="module" module-name="flexjson" />
   </component>
 </module>

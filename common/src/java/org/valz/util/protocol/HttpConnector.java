@@ -1,9 +1,7 @@
 package org.valz.util.protocol;
 
-import flexjson.JSONSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.io.IOUtils;
-import org.valz.util.protocol.messages.RequestMessage;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -46,13 +44,6 @@ public class HttpConnector {
         }
     }
 
-    public static String post(@NotNull String serverURL, @NotNull RequestType messageType, Object data) throws
-            IOException {
-        return post(serverURL, new JSONSerializer().serialize(new RequestMessage(messageType, data)));
-    }
-
-
-    
     private HttpConnector() {
     }
 }
