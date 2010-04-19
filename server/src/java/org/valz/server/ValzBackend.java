@@ -2,11 +2,12 @@ package org.valz.server;
 
 import org.apache.log4j.Logger;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.ReadBackend;
+import org.valz.util.protocol.WriteBackend;
 
 import java.util.*;
 
-public class ValzBackend implements Backend {
+public class ValzBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
     private final Map<String, Object> name2val = new HashMap<String, Object>();

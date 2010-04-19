@@ -3,7 +3,7 @@ package org.valz.viewer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.ReadConfiguration;
 
 import java.util.Arrays;
@@ -25,9 +25,9 @@ public class ValzWebServer {
         // For now I'm too lazy to launch 2 distinct servers. Let's test the thing on 2 identical ones.
         conf.setServerUrls(Arrays.asList("http://localhost:8080", "http://localhost:8080"));
 
-        Backend backend = null; //new RemoteBackend(conf);
+        ReadBackend readBackend = null; //new RemoteReadBackend(conf);
 
-        ValzWebHandler handler = new ValzWebHandler(backend);
+        ValzWebHandler handler = new ValzWebHandler(readBackend);
         server.addHandler(handler);
 
         try {
