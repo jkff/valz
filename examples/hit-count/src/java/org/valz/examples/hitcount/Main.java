@@ -18,6 +18,7 @@ public class Main {
                 .serialize(msg);
 
         RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
+                .use("data.class", SubmitRequest.class)
                 .use("data.aggregate.class", LongSum.class)
                 .deserialize(s);
 
