@@ -1,0 +1,6 @@
+syntax: glob
+
+out/*
+server/build/*
+.idea/workspace.xml
+
