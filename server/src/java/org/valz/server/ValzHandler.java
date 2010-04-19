@@ -6,8 +6,9 @@ import org.apache.log4j.Logger;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.io.IOUtils;
-import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.InteractionType;
+import org.valz.util.protocol.WriteBackend;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.ResponseMessage;
 import org.valz.util.protocol.messages.SubmitRequest;
@@ -23,10 +24,12 @@ import static org.valz.util.io.IOUtils.readInputStream;
 public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
 
-    private final Backend backend;
+    private final ReadBackend readBackend;
+    private final WriteBackend writeBackend;
 
-    public ValzHandler(Backend backend) {
-        this.backend = backend;
+    public ValzHandler(ReadBackend readBackend, WriteBackend writeBackend) {
+        this.readBackend = readBackend;
+        this.writeBackend = writeBackend;
     }
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws
@@ -39,15 +42,15 @@ public class ValzHandler extends AbstractHandler {
             InteractionType t = requestMessage.getType();
             if(InteractionType.SUBMIT.equals(t)) {
                 SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
-                backend.submit(submitRequest.name, submitRequest.aggregate, submitRequest.value);
+                writeBackend.submit(submitRequest.name, submitRequest.aggregate, submitRequest.value);
             } else if(InteractionType.LIST_VARS.equals(t)) {
-                answer(response.getOutputStream(), InteractionType.LIST_VARS, backend.listVars());
+                answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
             } else if(InteractionType.GET_VALUE.equals(t)) {
                 String name = (String)requestMessage.getData();
-                answer(response.getOutputStream(), InteractionType.GET_VALUE, backend.getValue(name));
+                answer(response.getOutputStream(), InteractionType.GET_VALUE, readBackend.getValue(name));
             } else if(InteractionType.GET_AGGREGATE.equals(t)) {
                 String name = (String)requestMessage.getData();
-                answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, backend.getAggregate(name));
+                answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));
             } else {
                 throw new IllegalArgumentException("Unknown request type "+t);
             }

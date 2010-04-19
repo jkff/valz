@@ -1,28 +1,46 @@
 package org.valz.examples.hitcount;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import org.valz.client.Val;
+import org.valz.client.Valz;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.RequestType;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.SubmitRequest;
+import org.valz.util.protocol.ReadBackend;
+import org.valz.util.protocol.RemoteReadBackend;
+import org.valz.util.protocol.WriteConfiguration;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
-        RequestMessage msg = new RequestMessage(RequestType.SUBMIT, submitRequest);
+        WriteConfiguration conf = new WriteConfiguration();
+        conf.setServerURL("http://localhost:8081");
+
+        Valz.init(conf);
+
+        Val<Long> hitCount = Valz.register("org.valz.examples.hitcount.hitCount", new LongSum());
+
+        for(int i = 0; i < 10; ++i) {
+            hitCount.submit(1L);
+            Thread.sleep(50);
+        }
 
 
-        String s = new JSONSerializer()
-                .serialize(msg);
+        ReadBackend readBackend = new RemoteReadBackend("http://localhost:8081");
 
-        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
-                .use("data.class", SubmitRequest.class)
-                .use("data.aggregate.class", LongSum.class)
-                .deserialize(s);
+        System.out.println("Count of vars: " + readBackend.listVars().size());
 
-        int x = 0;
+
+//        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
+//        RequestMessage msg = new RequestMessage(InteractionType.SUBMIT, submitRequest);
+//
+//
+//        String s = new JSONSerializer()
+//                .serialize(msg);
+//
+//        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
+//                .use("data.class", SubmitRequest.class)
+//                .use("data.aggregate.class", LongSum.class)
+//                .deserialize(s);
+//
+//        int x = 0;
 
 //        Class.forName("org.h2.Driver");
 //        Connection conn = DriverManager.getConnection("jdbc:h2:h2test", "sa", "");
