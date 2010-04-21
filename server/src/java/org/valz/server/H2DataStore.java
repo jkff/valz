@@ -15,31 +15,18 @@ import java.util.Collection;
 
 public class H2DataStore implements DataStore {
 
-    private static H2DataStore instance = null;
-
-
-
-    public static synchronized H2DataStore getInstance() {
-        if (instance == null) {
-            instance = new H2DataStore();
-        }
-        return instance;
-    }
-
-
-
     private final Connection conn;
 
 
 
-    private H2DataStore() {
+    public H2DataStore(String filename) {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         try {
-            conn = DriverManager.getConnection("jdbc:h2:h2test", "sa", "");
+            conn = DriverManager.getConnection(String.format("jdbc:h2:%s", filename), "sa", "");
             conn.createStatement().execute("CREATE TABLE IF NOT EXISTS Aggregates ( name varchar PRIMARY KEY, aggregate varchar, value varchar);");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -152,7 +139,7 @@ public class H2DataStore implements DataStore {
     // Now without junit
     private static class Test {
         public void testBasics() {
-            H2DataStore dataStore = H2DataStore.getInstance();
+            H2DataStore dataStore = new H2DataStore("h2test");
 
             String varName = "var1";
 
@@ -163,6 +150,8 @@ public class H2DataStore implements DataStore {
             dataStore.setValue(varName, 2);
             Object value2 = dataStore.getValue(varName);
             Collection<String> list2 = dataStore.listVars();
+
+            int x = 0;
         }
     }
 }

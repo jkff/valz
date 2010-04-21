@@ -10,7 +10,7 @@ import java.util.*;
 public class ValzBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private final DataStore dataStore = MemoryDataStore.getInstance();
+    private final DataStore dataStore = new MemoryDataStore();
 
     public ValzBackend() {
     }
