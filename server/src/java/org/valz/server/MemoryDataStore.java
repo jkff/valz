@@ -9,25 +9,12 @@ import java.util.Map;
 
 public class MemoryDataStore implements DataStore {
 
-    private static MemoryDataStore instance = null;
-
-
-
-    public static synchronized MemoryDataStore getInstance() {
-        if (instance == null) {
-            instance = new MemoryDataStore();
-        }
-        return instance;
-    }
-
-
-
     private final Map<String, Object> name2val = new HashMap<String, Object>();
     private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
 
 
 
-    private MemoryDataStore() {}
+    public MemoryDataStore() {}
     
 
 
