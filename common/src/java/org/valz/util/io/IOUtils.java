@@ -3,6 +3,8 @@ package org.valz.util.io;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class IOUtils {
     public static void closeSilently(Closeable c) {
@@ -11,6 +13,16 @@ public class IOUtils {
                 c.close();
             }
         } catch(IOException e) {
+            // Ignore
+        }
+    }
+
+    public static void closeSilently(ResultSet c) {
+        try {
+            if (c != null) {
+                c.close();
+            }
+        } catch(SQLException e) {
             // Ignore
         }
     }
