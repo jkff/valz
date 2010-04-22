@@ -17,16 +17,6 @@ public class IOUtils {
         }
     }
 
-    public static void closeSilently(ResultSet c) {
-        try {
-            if (c != null) {
-                c.close();
-            }
-        } catch(SQLException e) {
-            // Ignore
-        }
-    }
-
     public static String readInputStream(InputStream stream, String encoding) throws IOException {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream(stream.available());
