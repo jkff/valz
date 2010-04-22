@@ -19,4 +19,15 @@ public class LongSum extends AbstractAggregate<Long> {
     public Long reduce(Long item1, Long item2) {
         return item1 + item2;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (o.getClass() != getClass())) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
