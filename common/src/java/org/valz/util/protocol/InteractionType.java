@@ -8,7 +8,7 @@ import java.util.Collection;
 public class InteractionType<I,O> {
     public static final InteractionType<String, Object> GET_VALUE = create("GET_VALUE");
     public static final InteractionType<String, Aggregate<?>> GET_AGGREGATE = create("GET_AGGREGATE");
-    public static final InteractionType<Void, Collection<String>> LIST_VARS = create("LIST_VARS");
+    public static final InteractionType<Void, ? extends Collection<String>> LIST_VARS = create("LIST_VARS");
     public static final InteractionType<SubmitRequest, Void> SUBMIT = create("SUBMIT");
 
     private final String code;

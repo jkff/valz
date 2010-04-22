@@ -4,7 +4,6 @@ import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.io.IOUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -127,7 +126,13 @@ public class H2DataStore implements DataStore {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            IOUtils.closeSilently(resultSet);
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+            } catch(SQLException e) {
+                // Ignore
+            }
         }
     }
 
