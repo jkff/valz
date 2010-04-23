@@ -1,0 +1,9 @@
+syntax: glob
+
+out/*
+server/build/*
+.idea/workspace.xml
+.idea/inspectionProfiles/*
+.idea/dictionaries/*
+.idea/projectCodeStyle.xml
+
