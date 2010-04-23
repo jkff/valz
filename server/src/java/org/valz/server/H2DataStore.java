@@ -11,6 +11,8 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.valz.util.aggregates.Aggregate;
 
 import javax.sql.DataSource;
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,9 +20,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class H2DataStore implements DataStore {
+public class H2DataStore implements DataStore, Closeable {
 
     private final DataSource dataSource;
+    private final ObjectPool connectionPool;
 
 
 
@@ -31,7 +34,7 @@ public class H2DataStore implements DataStore {
             throw new RuntimeException(e);
         }
 
-        ObjectPool connectionPool = new GenericObjectPool(null);
+        connectionPool = new GenericObjectPool(null);
         ConnectionFactory connectionFactory =
                 new DriverManagerConnectionFactory(String.format("jdbc:h2:%s", filename), null);
         PoolableConnectionFactory poolableConnectionFactory =
@@ -91,30 +94,34 @@ public class H2DataStore implements DataStore {
 
     private <T> T executeQuery(Function<T> func, String query, String... params) {
         Connection conn = null;
-        PreparedStatement statement = null;
+
         try {
             conn = dataSource.getConnection();
-            statement = conn.prepareStatement(query);
-            for (int i = 0; i < params.length; i++) {
-                statement.setString(i + 1, params[i]);
-            }
-            if (func == null) {
-                statement.execute();
-                return null;
-            } else {
-                ResultSet resultSet = statement.executeQuery();
-                return func.apply(resultSet);
+            PreparedStatement statement = null;
+            try {
+                statement = conn.prepareStatement(query);
+                for (int i = 0; i < params.length; i++) {
+                    statement.setString(i + 1, params[i]);
+                }
+                if (func == null) {
+                    statement.execute();
+                    return null;
+                } else {
+                    ResultSet resultSet = statement.executeQuery();
+                    return func.apply(resultSet);
+                }
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    // Ignore
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                // Ignore
-            }
             try {
                 if (conn != null) {
                     conn.close();
@@ -127,6 +134,14 @@ public class H2DataStore implements DataStore {
 
     private void execute(String query, String... params) {
         executeQuery(null, query, params);
+    }
+
+    public void close() throws IOException {
+        try {
+            connectionPool.close();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     private interface Function<T> {
