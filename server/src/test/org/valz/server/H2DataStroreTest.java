@@ -1,25 +1,40 @@
 package org.valz.server;
 
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.valz.util.aggregates.Aggregate;
+import org.junit.*;
 import org.valz.util.aggregates.LongSum;
+import org.valz.util.io.IOUtils;
 
 import java.io.File;
 import java.util.Collection;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 public class H2DataStroreTest {
+    private final String dbname = "h2test";
+
+
 
     private H2DataStore dataStore = null;
 
+    
+
+    private void removeFiles() {
+        new File(dbname + ".h2.db").delete();
+        new File(dbname + ".lock.db").delete();
+        new File(dbname + ".trace.db").delete();
+    }
+
     @Before
     public void setUp() {
-        String filename = "h2test";
-        new File(filename + ".h2.db").delete();
-        new File(filename + ".trace.db").delete();
-        dataStore = new H2DataStore(filename);
+        removeFiles();
+        dataStore = new H2DataStore(dbname);
+    }
+
+    @After
+    public void tearDown() {
+        IOUtils.closeSilently(dataStore);
+        removeFiles();
     }
 
     @Test
@@ -34,7 +49,16 @@ public class H2DataStroreTest {
 
         assertArrayEquals(new String[] {varName}, dataStore.listVars().toArray());
 
-        
+
+        dataStore.setValue(varName, 2);
+        assertEquals(2, dataStore.getValue(varName));
+    }
+
+    @Test
+    public void testSet() {
+        String varName = "var1";
+
+        dataStore.createAggregate(varName, new LongSum(), 1L);
         dataStore.setValue(varName, 2);
         assertEquals(2, dataStore.getValue(varName));
     }
