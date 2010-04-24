@@ -12,6 +12,7 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
@@ -51,15 +52,15 @@ public class H2DataStore implements DataStore, Closeable {
                 new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
         dataSource = new PoolingDataSource(connectionPool);
 
-        execute("CREATE TABLE IF NOT EXISTS Aggregates ( name varchar PRIMARY KEY, aggregate varchar, value varchar);");
+        execute("CREATE TABLE IF NOT EXISTS Valz ( name varchar PRIMARY KEY, aggregate varchar, value varchar);");
     }
 
 
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
-        execute("INSERT INTO Aggregates(name, aggregate, value) VALUES(?, ?, ?);",
+        execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);",
                 name,
-                registry.pickleAggregate(aggregate).render(false),
+                AggregateParser.toJson(aggregate).render(false),
                 aggregate.dataToJson(value).render(false));
     }
 
@@ -72,7 +73,7 @@ public class H2DataStore implements DataStore, Closeable {
                 }
                 return list;
             }
-        }, "SELECT name FROM Aggregates;");
+        }, "SELECT name FROM Valz;");
     }
 
     public <T> Aggregate<T> getAggregate(String name) {
@@ -91,12 +92,12 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return registry.unpickleAggregate(jsonValue);
+                    return AggregateParser.parse(registry, jsonValue);
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }
             }
-        }, "SELECT aggregate FROM Aggregates WHERE name = ?;", name);
+        }, "SELECT aggregate FROM Valz WHERE name = ?;", name);
     }
 
     public <T> T getValue(String name) {
@@ -121,13 +122,13 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
             }
-        }, "SELECT value FROM Aggregates WHERE name = ?;", name);
+        }, "SELECT value FROM Valz WHERE name = ?;", name);
     }
 
     public <T> void setValue(String name, T value) {
         Aggregate<T> aggregate = getAggregate(name);
         try {
-            execute("UPDATE Aggregates SET value = ? WHERE name = ?;",
+            execute("UPDATE Valz SET value = ? WHERE name = ?;",
                     JSONMapper.toJSON(aggregate.dataToJson(value)).render(false),
                     name);
         } catch (MapperException e) {

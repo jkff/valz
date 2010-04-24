@@ -18,15 +18,18 @@ public class RequestMessage<T> {
     public static RequestMessage parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         String strType = ((JSONString)jsonObject.get("type")).getValue();
+        JSONValue jsonData = jsonObject.get("data");
         InteractionType<?, ?> type = InteractionType.ALL_TYPES.get(strType);
         Object data = null;
 
-        if (InteractionType.GET_VALUE == type) {
-            data = ((JSONString)jsonObject.get("data")).getValue();
+        if (InteractionType.GET_VAL == type) {
+            data = ((JSONString)jsonData).getValue();
         } else if (InteractionType.GET_AGGREGATE == type) {
-            data = ((JSONString)jsonObject.get("data")).getValue();
+            data = ((JSONString)jsonData).getValue();
         } else if (InteractionType.SUBMIT == type) {
-            data = SubmitRequest.parse(registry, jsonObject.get("data"));
+            data = SubmitRequest.parse(registry, jsonData);
+        } else if (InteractionType.LIST_VARS == type) {
+            data = null;
         }
         
         return new RequestMessage(type, data);
@@ -49,12 +52,14 @@ public class RequestMessage<T> {
 
     public JSONValue toJson() {
         JSONValue jsonData = null;
-        if (InteractionType.GET_VALUE == type) {
+        if (InteractionType.GET_VAL == type) {
             jsonData = new JSONString((String)data);
         } else if (InteractionType.GET_AGGREGATE == type) {
             jsonData = new JSONString((String)data);
         } else if (InteractionType.SUBMIT == type) {
             jsonData = ((SubmitRequest)data).toJson();
+        } else if (InteractionType.LIST_VARS == type) {
+            jsonData = null;
         }
 
         return makeJson(

@@ -6,6 +6,7 @@ import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.ResponseMessage;
 import org.valz.util.protocol.messages.SubmitRequest;
@@ -38,11 +39,11 @@ public class RemoteWriteBackend implements WriteBackend {
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteWriteException(e);
-        } catch (MapperException e) {
-            throw new RemoteWriteException(e);
         } catch (RecognitionException e) {
             throw new RemoteWriteException(e);
         } catch (TokenStreamException e) {
+            throw new RemoteWriteException(e);
+        } catch (ParserException e) {
             throw new RemoteWriteException(e);
         }
     }

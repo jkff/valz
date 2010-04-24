@@ -7,11 +7,29 @@ import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.RemoteReadBackend;
 
 public final class Valz {
-    private static WriteBackend writeBackend;
-    public final static AggregateRegistry registry = new AggregateRegistry();
+    private static WriteBackend writeBackend = null;
+    private static AggregateRegistry registry = null;
 
-    private Valz() {
+
+
+    public static synchronized WriteBackend getWriteBackend() {
+        return writeBackend;
     }
+
+    public static synchronized void setWriteBackend(WriteBackend writeBackend) {
+        Valz.writeBackend = writeBackend;
+    }
+
+    public static synchronized AggregateRegistry getRegistry() {
+        return registry;
+    }
+
+    public static synchronized void setRegistry(AggregateRegistry registry) {
+        Valz.registry = registry;
+    }
+
+
+
 
     public static synchronized void init(WriteConfiguration conf) {
         Valz.writeBackend = new RemoteWriteBackend(conf.getServerURL(), registry);
@@ -30,4 +48,6 @@ public final class Valz {
         };
     }
 
+    private Valz() {
+    }
 }

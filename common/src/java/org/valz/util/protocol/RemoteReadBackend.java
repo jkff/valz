@@ -6,6 +6,7 @@ import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.ResponseMessage;
 
@@ -28,7 +29,7 @@ public class RemoteReadBackend implements ReadBackend {
     }
 
     public Object getValue(String name) throws RemoteReadException {
-        return getDataResponse(InteractionType.GET_VALUE, name);
+        return getDataResponse(InteractionType.GET_VAL, name);
     }
 
     public Collection<String> listVars() throws RemoteReadException {
@@ -43,7 +44,7 @@ public class RemoteReadBackend implements ReadBackend {
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteReadException(e);
-        } catch (MapperException e) {
+        } catch (ParserException e) {
             throw new RemoteReadException(e);
         } catch (RecognitionException e) {
             throw new RemoteReadException(e);
