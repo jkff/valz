@@ -26,14 +26,6 @@ public class MinLong extends AbstractAggregate<Long> {
         return Math.min(item1, item2);
     }
 
-    public String getName() {
-        return "MinLong";
-    }
-
-    public JSONValue toJson() {
-        return new JSONString("");
-    }
-
     public JSONValue dataToJson(Long item) {
         return new JSONInteger(new BigInteger(item.toString()));
     }
@@ -42,9 +34,17 @@ public class MinLong extends AbstractAggregate<Long> {
         return ((JSONInteger)json).getValue().longValue();
     }
 
+    public String getName() {
+        return "MinLong";
+    }
+
+    public JSONValue configToJson() {
+        return new JSONString("");
+    }
 
 
-    public static class Parser implements AggregateParser<Long> {
+    
+    public static class ConfigParser implements AggregateConfigParser<Long> {
         public MinLong parse(JSONValue json) {
             return new MinLong();
         }

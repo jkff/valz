@@ -5,9 +5,8 @@ import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.AggregateParser;
+import org.valz.util.aggregates.AggregateConfigParser;
 import org.valz.util.aggregates.ParserException;
-import org.valz.util.protocol.InteractionType;
 
 import static org.valz.util.Utils.makeJson;
 
@@ -16,8 +15,8 @@ public class SubmitRequest<T> {
     public static SubmitRequest parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         String name = ((JSONString)jsonObject.get("name")).getValue();
-        AggregateParser aggregateParser = registry.get(name);
-        Aggregate aggregate = aggregateParser.parse(jsonObject.get("aggregate"));
+        AggregateConfigParser configParser = registry.get(name);
+        Aggregate aggregate = configParser.parse(jsonObject.get("aggregate"));
         Object value = aggregate.parseData(jsonObject.get("value"));
 
         return new SubmitRequest(name, aggregate, value);
@@ -50,7 +49,7 @@ public class SubmitRequest<T> {
     public JSONValue toJson() {
         return makeJson(
                 "name", name,
-                "aggregate", aggregate.toJson(),
+                "aggregate", aggregate.configToJson(),
                 "value", aggregate.dataToJson(value));
     }
 }

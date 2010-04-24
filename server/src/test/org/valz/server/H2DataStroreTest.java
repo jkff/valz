@@ -6,7 +6,6 @@ import org.valz.util.aggregates.LongSum;
 import org.valz.util.io.IOUtils;
 
 import java.io.File;
-import java.util.Collection;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +30,7 @@ public class H2DataStroreTest {
     public void setUp() {
         removeFiles();
         registry = new AggregateRegistry();
-        registry.register("LongSum", new LongSum.Parser());
+        registry.register("LongSum", new LongSum.ConfigParser());
         dataStore = new H2DataStore(dbname, registry);
     }
 

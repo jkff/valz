@@ -12,7 +12,7 @@ public class Utils {
     private Utils() {}
 
     public static JSONValue makeJson(Object... collection) {
-        assert collection.length % 2 == 0;
+        if (collection.length % 2 != 0) throw new IllegalArgumentException("collection must have even size.");
         Map<String, Object> map = new HashMap<String, Object>();
         for (int i=0; i<collection.length; i+=2) {
             map.put((String)collection[i], collection[i+1]);
