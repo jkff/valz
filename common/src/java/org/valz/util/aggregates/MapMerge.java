@@ -64,10 +64,10 @@ public class MapMerge<K, V> extends AbstractAggregate<Map<K,V>> {
         return "MapMerge";
     }
 
-    public JSONValue toJson() {
+    public JSONValue configToJson() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", mergeConflictsAggregate.getName());
-        map.put("aggregate", mergeConflictsAggregate.toJson());
+        map.put("aggregate", mergeConflictsAggregate.configToJson());
         try {
             return JSONMapper.toJSON(map);
         } catch (MapperException e) {
@@ -77,19 +77,19 @@ public class MapMerge<K, V> extends AbstractAggregate<Map<K,V>> {
 
 
 
-    public static class Parser implements AggregateParser<Map> {
+    public static class ConfigParser implements AggregateConfigParser<Map> {
 
         private final AggregateRegistry registry;
 
-        public Parser(AggregateRegistry registry) {
+        public ConfigParser(AggregateRegistry registry) {
             this.registry = registry;
         }
 
         public MapMerge parse(JSONValue json) throws ParserException {
             JSONObject jsonObject = (JSONObject)json;
             String name = ((JSONString)jsonObject.get("name")).getValue();
-            AggregateParser aggregateParser = registry.get(name);
-            Aggregate aggregate = aggregateParser.parse(jsonObject.get("aggregate"));
+            AggregateConfigParser configParser = registry.get(name);
+            Aggregate aggregate = configParser.parse(jsonObject.get("aggregate"));
 
             return new MapMerge(aggregate);
         }

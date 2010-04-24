@@ -2,8 +2,6 @@ package org.valz.util.aggregates;
 
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
-import com.sdicons.json.model.JSONObject;
-import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.AggregateRegistry;
@@ -107,7 +105,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
         return "OrderedListMerge";
     }
 
-    public JSONValue toJson() {
+    public JSONValue configToJson() {
         try {
             return JSONMapper.toJSON(comparator);
         } catch (MapperException e) {
@@ -115,14 +113,13 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
         }
     }
 
-    
 
 
-    public static class Parser implements AggregateParser<List> {
+    public static class ConfigParser implements AggregateConfigParser<List> {
 
         private final AggregateRegistry registry;
 
-        public Parser(AggregateRegistry registry) {
+        public ConfigParser(AggregateRegistry registry) {
             this.registry = registry;
         }
 

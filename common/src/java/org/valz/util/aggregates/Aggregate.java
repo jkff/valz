@@ -31,5 +31,5 @@ public interface Aggregate<T> {
 
     String getName();
 
-    JSONValue toJson();
+    JSONValue configToJson();
 }
