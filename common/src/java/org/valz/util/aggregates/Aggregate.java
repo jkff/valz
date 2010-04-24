@@ -1,5 +1,6 @@
 package org.valz.util.aggregates;
 
+import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,4 +24,12 @@ public interface Aggregate<T> {
 
     @Nullable
     T reduce(T item1, T item2);
+
+    JSONValue dataToJson(T item);
+
+    T parseData(JSONValue json) throws ParserException;
+
+    String getName();
+
+    JSONValue toJson();
 }

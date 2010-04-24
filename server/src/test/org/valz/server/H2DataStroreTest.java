@@ -1,6 +1,7 @@
 package org.valz.server;
 
 import org.junit.*;
+import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.io.IOUtils;
 
@@ -15,6 +16,7 @@ public class H2DataStroreTest {
 
 
 
+    private AggregateRegistry registry = null;
     private H2DataStore dataStore = null;
 
     
@@ -28,7 +30,9 @@ public class H2DataStroreTest {
     @Before
     public void setUp() {
         removeFiles();
-        dataStore = new H2DataStore(dbname);
+        registry = new AggregateRegistry();
+        registry.register("LongSum", new LongSum.Parser());
+        dataStore = new H2DataStore(dbname, registry);
     }
 
     @After

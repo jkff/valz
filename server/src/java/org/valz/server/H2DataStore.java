@@ -1,18 +1,25 @@
 package org.valz.server;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
+import com.sdicons.json.mapper.JSONMapper;
+import com.sdicons.json.mapper.MapperException;
+import com.sdicons.json.model.JSONValue;
+import com.sdicons.json.parser.JSONParser;
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,10 +31,13 @@ public class H2DataStore implements DataStore, Closeable {
 
     private final DataSource dataSource;
     private final ObjectPool connectionPool;
+    private final AggregateRegistry registry;
 
 
 
-    public H2DataStore(String filename) {
+    public H2DataStore(String filename, AggregateRegistry registry) {
+
+        this.registry = registry;
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
@@ -46,9 +56,11 @@ public class H2DataStore implements DataStore, Closeable {
 
 
 
-    public void createAggregate(String name, Aggregate<?> aggregate, Object value) {
-        execute("INSERT INTO Aggregates(name, aggregate, value) VALUES(?, ?, ?);", name,
-                new JSONSerializer().serialize(aggregate), new JSONSerializer().serialize(value));
+    public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
+        execute("INSERT INTO Aggregates(name, aggregate, value) VALUES(?, ?, ?);",
+                name,
+                registry.pickleAggregate(aggregate).render(false),
+                aggregate.dataToJson(value).render(false));
     }
 
     public Collection<String> listVars() {
@@ -63,32 +75,64 @@ public class H2DataStore implements DataStore, Closeable {
         }, "SELECT name FROM Aggregates;");
     }
 
-    public Aggregate getAggregate(String name) {
-        return executeQuery(new Function<Aggregate>() {
-            public Aggregate apply(ResultSet resultSet) throws SQLException {
+    public <T> Aggregate<T> getAggregate(String name) {
+        return executeQuery(new Function<Aggregate<T>>() {
+            public Aggregate<T> apply(ResultSet resultSet) throws SQLException {
                 if (!resultSet.next()) {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                return new JSONDeserializer<Aggregate>().deserialize(str);
+                JSONValue jsonValue = null;
+                try {
+                    jsonValue = new JSONParser(new StringReader(str)).nextValue();
+                } catch (TokenStreamException e) {
+                    throw new RuntimeException(e);
+                } catch (RecognitionException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    return registry.unpickleAggregate(jsonValue);
+                } catch (ParserException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }, "SELECT aggregate FROM Aggregates WHERE name = ?;", name);
     }
 
-    public Object getValue(String name) {
-        return executeQuery(new Function<Object>() {
-            public Object apply(ResultSet resultSet) throws SQLException {
+    public <T> T getValue(String name) {
+        final Aggregate<T> aggregate = getAggregate(name);
+        return executeQuery(new Function<T>() {
+            public T apply(ResultSet resultSet) throws SQLException {
                 if (!resultSet.next()) {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                return new JSONDeserializer().deserialize(str);
+                JSONValue jsonValue = null;
+                try {
+                    jsonValue = new JSONParser(new StringReader(str)).nextValue();
+                } catch (TokenStreamException e) {
+                    throw new RuntimeException(e);
+                } catch (RecognitionException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    return (T)aggregate.parseData(jsonValue);
+                } catch (ParserException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }, "SELECT value FROM Aggregates WHERE name = ?;", name);
     }
 
-    public void setValue(String name, Object value) {
-        execute("UPDATE Aggregates SET value = ? WHERE name = ?;", new JSONSerializer().serialize(value), name);
+    public <T> void setValue(String name, T value) {
+        Aggregate<T> aggregate = getAggregate(name);
+        try {
+            execute("UPDATE Aggregates SET value = ? WHERE name = ?;",
+                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false),
+                    name);
+        } catch (MapperException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
