@@ -94,34 +94,31 @@ public class H2DataStore implements DataStore, Closeable {
 
     private <T> T executeQuery(Function<T> func, String query, String... params) {
         Connection conn = null;
-
+        PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            PreparedStatement statement = null;
-            try {
-                statement = conn.prepareStatement(query);
-                for (int i = 0; i < params.length; i++) {
-                    statement.setString(i + 1, params[i]);
-                }
-                if (func == null) {
-                    statement.execute();
-                    return null;
-                } else {
-                    ResultSet resultSet = statement.executeQuery();
-                    return func.apply(resultSet);
-                }
-            } finally {
-                try {
-                    if (statement != null) {
-                        statement.close();
-                    }
-                } catch (SQLException e) {
-                    // Ignore
-                }
+
+            statement = conn.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                statement.setString(i + 1, params[i]);
+            }
+            if (func == null) {
+                statement.execute();
+                return null;
+            } else {
+                ResultSet resultSet = statement.executeQuery();
+                return func.apply(resultSet);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                // Ignore
+            }
             try {
                 if (conn != null) {
                     conn.close();
