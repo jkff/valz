@@ -18,7 +18,7 @@ public class MemoryDataStore implements DataStore {
     
 
 
-    public void createAggregate(String name, Aggregate<?> aggregate, Object value) {
+    public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
         name2aggregate.put(name, aggregate);
         name2val.put(name, value);
     }
@@ -27,15 +27,15 @@ public class MemoryDataStore implements DataStore {
         return new ArrayList<String>(name2val.keySet());
     }
 
-    public Aggregate getAggregate(String name) {
-        return name2aggregate.get(name);
+    public <T> Aggregate<T> getAggregate(String name) {
+        return (Aggregate<T>)name2aggregate.get(name);
     }
 
-    public Object getValue(String name) {
-        return name2val.get(name);
+    public <T> T getValue(String name) {
+        return (T)name2val.get(name);
     }
 
-    public void setValue(String name, Object value) {
+    public <T> void setValue(String name, T value) {
         name2val.put(name, value);
     }
 }

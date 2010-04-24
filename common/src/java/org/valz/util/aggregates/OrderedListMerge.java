@@ -1,6 +1,12 @@
 package org.valz.util.aggregates;
 
+import com.sdicons.json.mapper.JSONMapper;
+import com.sdicons.json.mapper.MapperException;
+import com.sdicons.json.model.JSONObject;
+import com.sdicons.json.model.JSONString;
+import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
+import org.valz.util.AggregateRegistry;
 import org.valz.util.Pair;
 
 import java.util.*;
@@ -51,10 +57,9 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
 
 
-    public OrderedListMerge(final Comparator<T> comparator) {
+    public OrderedListMerge(Comparator<T> comparator) {
         this.comparator = comparator;
     }
-
 
 
 
@@ -80,5 +85,55 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
         iters.add(item1);
         iters.add(item2);
         return reduce(iters.iterator());
+    }
+
+    public JSONValue dataToJson(List<T> item) {
+        try {
+            return JSONMapper.toJSON(item);
+        } catch (MapperException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<T> parseData(JSONValue json) throws ParserException {
+        try {
+            return (List<T>)JSONMapper.toJava(json, ArrayList.class);
+        } catch (MapperException e) {
+            throw new ParserException(e);
+        }
+    }
+
+    public String getName() {
+        return "OrderedListMerge";
+    }
+
+    public JSONValue toJson() {
+        try {
+            return JSONMapper.toJSON(comparator);
+        } catch (MapperException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
+
+
+    public static class Parser implements AggregateParser<List> {
+
+        private final AggregateRegistry registry;
+
+        public Parser(AggregateRegistry registry) {
+            this.registry = registry;
+        }
+
+        public OrderedListMerge parse(JSONValue json) throws ParserException {
+            Comparator comparator = null;
+            try {
+                comparator = (Comparator)JSONMapper.toJava(json);
+            } catch (MapperException e) {
+                throw new ParserException(e);
+            }
+            return new OrderedListMerge(comparator);
+        }
     }
 }

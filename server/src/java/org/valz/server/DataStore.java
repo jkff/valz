@@ -7,10 +7,10 @@ import java.util.Map;
 
 public interface DataStore {
 
-    void createAggregate(String name, Aggregate<?> aggregate, Object value);
+    <T> void createAggregate(String name, Aggregate<T> aggregate, T value);
     Collection<String> listVars();
-    Aggregate getAggregate(String name);
+    <T> Aggregate<T> getAggregate(String name);
 
-    Object getValue(String name);
-    void setValue(String name, Object value);
+    <T> T getValue(String name);
+    <T> void setValue(String name, T value);
 }

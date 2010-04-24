@@ -3,6 +3,7 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
+import org.valz.util.AggregateRegistry;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -17,8 +18,9 @@ public class ValzServer {
         Server server = new Server(port);
 
         ValzBackend backend = new ValzBackend();
+        AggregateRegistry registry = new AggregateRegistry();
 
-        server.addHandler(new ValzHandler(backend, backend));
+        server.addHandler(new ValzHandler(backend, backend, registry));
 
         try {
             server.start();
