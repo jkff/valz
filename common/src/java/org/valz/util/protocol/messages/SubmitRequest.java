@@ -3,6 +3,7 @@ package org.valz.util.protocol.messages;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
+import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateConfigParser;
@@ -15,8 +16,7 @@ public class SubmitRequest<T> {
     public static SubmitRequest parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         String name = ((JSONString)jsonObject.get("name")).getValue();
-        AggregateConfigParser configParser = registry.get(name);
-        Aggregate aggregate = configParser.parse(jsonObject.get("aggregate"));
+        Aggregate aggregate = AggregateParser.parse(registry, jsonObject.get("aggregate"));
         Object value = aggregate.parseData(jsonObject.get("value"));
 
         return new SubmitRequest(name, aggregate, value);
@@ -35,9 +35,9 @@ public class SubmitRequest<T> {
         return value;
     }
 
-    private String name;
-    private Aggregate<T> aggregate;
-    private T value;
+    private final String name;
+    private final Aggregate<T> aggregate;
+    private final T value;
 
 
     public SubmitRequest(String name, Aggregate<T> aggregate, T value) {
@@ -49,7 +49,7 @@ public class SubmitRequest<T> {
     public JSONValue toJson() {
         return makeJson(
                 "name", name,
-                "aggregate", aggregate.configToJson(),
+                "aggregate", AggregateParser.toJson(aggregate),
                 "value", aggregate.dataToJson(value));
     }
 }

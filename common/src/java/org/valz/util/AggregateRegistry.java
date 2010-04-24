@@ -17,6 +17,10 @@ import static org.valz.util.Utils.makeJson;
 public class AggregateRegistry {
     private final Map<String, AggregateConfigParser<?>> name2agg = new HashMap<String, AggregateConfigParser<?>>();
 
+    public AggregateRegistry() {
+
+    }
+
     public void register(String name, AggregateConfigParser<?> configParser) {
         if (name2agg.containsKey(name)) {
             throw new IllegalArgumentException("Aggregate with this name already registered.");
@@ -34,23 +38,5 @@ public class AggregateRegistry {
 
     public Collection<String> listNames() {
         return new ArrayList<String>(name2agg.keySet());
-    }
-
-
-
-
-    public JSONValue pickleAggregate(Aggregate<?> aggregate) {
-        return makeJson(
-                "name", aggregate.getName(),
-                "aggregate", aggregate.configToJson());
-    }
-
-    public <T> Aggregate<T> unpickleAggregate(JSONValue jsonValue) throws ParserException {
-        // TODO: lots of checks
-        JSONObject jsonObject = (JSONObject)jsonValue;
-        String name = ((JSONString)jsonObject.get("name")).getValue();
-        AggregateConfigParser<T> configParser = (AggregateConfigParser<T>)get(name);
-        Aggregate<T> aggregate = configParser.parse(jsonObject.get("aggregate"));
-        return aggregate;
     }
 }

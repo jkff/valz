@@ -2,39 +2,54 @@ package org.valz.util.protocol.messages;
 
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
+import com.sdicons.json.model.JSONObject;
+import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
+import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
+import org.valz.util.Val;
+import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.InteractionType;
+
+import static org.valz.util.Utils.makeJson;
 
 public class ResponseMessage<T> {
 
-    public static <T> ResponseMessage<T> parse(AggregateRegistry registry, JSONValue json) throws MapperException {
+    public static ResponseMessage parse(AggregateRegistry registry, JSONValue json) throws ParserException {
+        JSONObject jsonObject = (JSONObject)json;
+        String strType = ((JSONString)jsonObject.get("type")).getValue();
+        JSONValue jsonData = jsonObject.get("data");
+        InteractionType<?, ?> type = InteractionType.ALL_TYPES.get(strType);
+        Object data = null;
 
-        // TODO: write it correctly
+        if (InteractionType.GET_VAL == type) {
+            data = Val.parse(registry, jsonData);
+        } else if (InteractionType.GET_AGGREGATE == type) {
+            data = AggregateParser.parse(registry, jsonData);
+        } else if (InteractionType.SUBMIT == type) {
+            data = null;
+        } else if (InteractionType.LIST_VARS == type) {
+            try {
+                data = JSONMapper.toJava(jsonData);
+            } catch (MapperException e) {
+                throw new ParserException(e);
+            }
+        }
 
-        return (ResponseMessage<T>)JSONMapper.toJava(json, ResponseMessage.class);
+        return new ResponseMessage(type, data);
     }
 
 
 
-    private final InteractionType<?,T> type;
+    private final InteractionType<?, T> type;
     private final T data;
 
 
 
-    public ResponseMessage(InteractionType<?,T> type, T data) {
+    public ResponseMessage(InteractionType<?, T> type, T data) {
         this.type = type;
         this.data = data;
-    }
-
-    public JSONValue toJson() {
-        // TODO: write it correctly
-
-        try {
-            return JSONMapper.toJSON(this);
-        } catch (MapperException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public T getData() {
@@ -43,5 +58,26 @@ public class ResponseMessage<T> {
 
     public InteractionType<?, T> getType() {
         return type;
+    }
+
+    public JSONValue toJson() {
+        JSONValue jsonData = null;
+        if (InteractionType.GET_VAL == type) {
+            jsonData = ((Val)data).toJson();
+        } else if (InteractionType.GET_AGGREGATE == type) {
+            jsonData = AggregateParser.toJson((Aggregate<?>)data);
+        } else if (InteractionType.SUBMIT == type) {
+            jsonData = null;
+        } else if (InteractionType.LIST_VARS == type) {
+            try {
+                jsonData = JSONMapper.toJSON(data);
+            } catch (MapperException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return makeJson(
+                "type", type,
+                "data", jsonData);
     }
 }

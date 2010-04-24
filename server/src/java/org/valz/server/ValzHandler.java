@@ -49,9 +49,9 @@ public class ValzHandler extends AbstractHandler {
                 writeBackend.submit(submitRequest.getName(), submitRequest.getAggregate(), submitRequest.getValue());
             } else if(InteractionType.LIST_VARS.equals(t)) {
                 answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
-            } else if(InteractionType.GET_VALUE.equals(t)) {
+            } else if(InteractionType.GET_VAL.equals(t)) {
                 String name = (String)requestMessage.getData();
-                answer(response.getOutputStream(), InteractionType.GET_VALUE, readBackend.getValue(name));
+                answer(response.getOutputStream(), InteractionType.GET_VAL, readBackend.getValue(name));
             } else if(InteractionType.GET_AGGREGATE.equals(t)) {
                 String name = (String)requestMessage.getData();
                 answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));

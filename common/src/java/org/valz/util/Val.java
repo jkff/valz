@@ -1,13 +1,23 @@
 package org.valz.util;
 
+import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 
 import static org.valz.util.Utils.makeJson;
 
 public class Val<T> {
-    private Aggregate<T> aggregate;
-    private T value;
+
+    public static Val parse(AggregateRegistry registry, JSONValue json) throws ParserException {
+        JSONObject jsonObject = (JSONObject)json;
+        Aggregate aggregate = AggregateParser.parse(registry, jsonObject.get("aggregate"));
+        Object value = aggregate.parseData(jsonObject.get("value"));
+        return new Val(aggregate, value);
+    }
+
+    private final Aggregate<T> aggregate;
+    private final T value;
 
 
 
@@ -17,7 +27,7 @@ public class Val<T> {
     }
 
 
-    
+
     public Aggregate<T> getAggregate() {
         return aggregate;
     }
