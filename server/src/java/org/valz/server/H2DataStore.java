@@ -83,7 +83,7 @@ public class H2DataStore implements DataStore, Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                JSONValue jsonValue = null;
+                JSONValue jsonValue  ;
                 try {
                     jsonValue = new JSONParser(new StringReader(str)).nextValue();
                 } catch (TokenStreamException e) {
@@ -108,7 +108,7 @@ public class H2DataStore implements DataStore, Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                JSONValue jsonValue = null;
+                JSONValue jsonValue  ;
                 try {
                     jsonValue = new JSONParser(new StringReader(str)).nextValue();
                 } catch (TokenStreamException e) {

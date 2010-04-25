@@ -7,7 +7,7 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.io.IOUtils;
 import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.InteractionType;
+import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.WriteBackend;
 import org.valz.util.protocol.messages.RequestMessage;
 import org.valz.util.protocol.messages.ResponseMessage;
@@ -49,9 +49,9 @@ public class ValzHandler extends AbstractHandler {
                 writeBackend.submit(submitRequest.getName(), submitRequest.getAggregate(), submitRequest.getValue());
             } else if(InteractionType.LIST_VARS.equals(t)) {
                 answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
-            } else if(InteractionType.GET_VAL.equals(t)) {
+            } else if(InteractionType.GET_VALUE.equals(t)) {
                 String name = (String)requestMessage.getData();
-                answer(response.getOutputStream(), InteractionType.GET_VAL, readBackend.getValue(name));
+                answer(response.getOutputStream(), InteractionType.GET_VALUE, readBackend.getValue(name));
             } else if(InteractionType.GET_AGGREGATE.equals(t)) {
                 String name = (String)requestMessage.getData();
                 answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));

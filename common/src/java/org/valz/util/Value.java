@@ -7,13 +7,13 @@ import org.valz.util.aggregates.ParserException;
 
 import static org.valz.util.Utils.makeJson;
 
-public class Val<T> {
+public class Value<T> {
 
-    public static Val parse(AggregateRegistry registry, JSONValue json) throws ParserException {
+    public static Value parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         Aggregate aggregate = AggregateParser.parse(registry, jsonObject.get("aggregate"));
         Object value = aggregate.parseData(jsonObject.get("value"));
-        return new Val(aggregate, value);
+        return new Value(aggregate, value);
     }
 
     private final Aggregate<T> aggregate;
@@ -21,7 +21,7 @@ public class Val<T> {
 
 
 
-    public Val(Aggregate<T> aggregate, T value) {
+    public Value(Aggregate<T> aggregate, T value) {
         this.aggregate = aggregate;
         this.value = value;
     }

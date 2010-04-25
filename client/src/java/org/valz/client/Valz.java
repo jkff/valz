@@ -3,8 +3,6 @@ package org.valz.client;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.*;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.RemoteReadBackend;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
@@ -32,7 +30,7 @@ public final class Valz {
 
 
     public static synchronized void init(WriteConfiguration conf) {
-        Valz.writeBackend = new RemoteWriteBackend(conf.getServerURL(), registry);
+        Valz.writeBackend = new RemoteWriteBackend(conf, registry);
     }
 
     public static synchronized <T> Val<T> register(

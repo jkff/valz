@@ -9,9 +9,9 @@ import java.util.List;
 class HtmlBuilder {
     private String tag;
     private String text;
-    private List<String> attNames = new ArrayList<String>();
-    private List<String> attValues = new ArrayList<String>();
-    private List<HtmlBuilder> children = new ArrayList<HtmlBuilder>();
+    private final List<String> attNames = new ArrayList<String>();
+    private final List<String> attValues = new ArrayList<String>();
+    private final List<HtmlBuilder> children = new ArrayList<HtmlBuilder>();
 
     private HtmlBuilder() {
     }
@@ -37,17 +37,22 @@ class HtmlBuilder {
     }
 
     public HtmlBuilder children(HtmlBuilder... children) {
-        for (HtmlBuilder child : children) addChild(child);
+        for (HtmlBuilder child : children) {
+            addChild(child);
+        }
         return this;
     }
 
     public StringBuilder toString(StringBuilder sb) {
         if (tag != null) {
             sb.append("<" + tag + " ");
-            for (int i = 0; i < attNames.size(); ++i)
+            for (int i = 0; i < attNames.size(); ++i) {
                 sb.append(attNames.get(i) + "=\"" + attValues.get(i) + "\"");
+            }
             sb.append(">\n");
-            for (HtmlBuilder c : children) c.toString(sb);
+            for (HtmlBuilder child : children) {
+                child.toString(sb);
+            }
             sb.append("</" + tag + ">");
         } else {
             sb.append(text);

@@ -1,4 +1,4 @@
-package org.valz.util;
+package org.valz.util.aggregates;
 
 public class Pair<A,B> {
     public final A first;
