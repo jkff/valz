@@ -6,11 +6,10 @@ import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.AggregateParser;
+import org.valz.util.Value;
 import org.valz.util.AggregateRegistry;
-import org.valz.util.Val;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
-import org.valz.util.protocol.InteractionType;
 
 import static org.valz.util.Utils.makeJson;
 
@@ -23,8 +22,8 @@ public class ResponseMessage<T> {
         InteractionType<?, ?> type = InteractionType.ALL_TYPES.get(strType);
         Object data = null;
 
-        if (InteractionType.GET_VAL == type) {
-            data = Val.parse(registry, jsonData);
+        if (InteractionType.GET_VALUE == type) {
+            data = Value.parse(registry, jsonData);
         } else if (InteractionType.GET_AGGREGATE == type) {
             data = AggregateParser.parse(registry, jsonData);
         } else if (InteractionType.SUBMIT == type) {
@@ -62,8 +61,8 @@ public class ResponseMessage<T> {
 
     public JSONValue toJson() {
         JSONValue jsonData = null;
-        if (InteractionType.GET_VAL == type) {
-            jsonData = ((Val)data).toJson();
+        if (InteractionType.GET_VALUE == type) {
+            jsonData = ((Value)data).toJson();
         } else if (InteractionType.GET_AGGREGATE == type) {
             jsonData = AggregateParser.toJson((Aggregate<?>)data);
         } else if (InteractionType.SUBMIT == type) {

@@ -5,7 +5,7 @@ import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.AggregateRegistry;
-import org.valz.util.Pair;
+import org.valz.util.aggregates.Pair;
 
 import java.util.*;
 
@@ -50,8 +50,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
     }
 
 
-    // TODO: make private final
-    public Comparator<T> comparator;
+    private final Comparator<T> comparator;
 
 
 
@@ -70,7 +69,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
         Iterator<T> resIter = reduce(comparator, iters.iterator());
 
-        ArrayList<T> res = new ArrayList<T>();
+        List<T> res = new ArrayList<T>();
         while (resIter.hasNext()) {
             res.add(resIter.next());
         }
@@ -95,7 +94,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
     public List<T> parseData(JSONValue json) throws ParserException {
         try {
-            return (List<T>)JSONMapper.toJava(json, ArrayList.class);
+            return (List<T>)JSONMapper.toJava(json);
         } catch (MapperException e) {
             throw new ParserException(e);
         }
@@ -107,6 +106,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
 
     public JSONValue configToJson() {
         try {
+            // TODO: invent comparator mapping and parsing
             return JSONMapper.toJSON(comparator);
         } catch (MapperException e) {
             throw new RuntimeException(e);
@@ -124,7 +124,7 @@ public class OrderedListMerge<T> extends AbstractAggregate<List<T>> {
         }
 
         public OrderedListMerge parse(JSONValue json) throws ParserException {
-            Comparator comparator = null;
+            Comparator comparator  ;
             try {
                 comparator = (Comparator)JSONMapper.toJava(json);
             } catch (MapperException e) {

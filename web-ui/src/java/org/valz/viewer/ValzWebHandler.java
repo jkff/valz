@@ -17,7 +17,7 @@ import static org.valz.viewer.HtmlBuilder.text;
  * Created on: 27.03.2010 23:57:37
  */
 public class ValzWebHandler extends AbstractHandler {
-    private ReadBackend readBackend;
+    private final ReadBackend readBackend;
 
     public ValzWebHandler(ReadBackend readBackend) {
         this.readBackend = readBackend;
