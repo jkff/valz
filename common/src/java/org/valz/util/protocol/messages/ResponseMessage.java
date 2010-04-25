@@ -1,20 +1,17 @@
 package org.valz.util.protocol.messages;
 
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.model.JSONArray;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.AggregateParser;
-import org.valz.util.Value;
 import org.valz.util.AggregateRegistry;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.valz.util.Utils.makeJson;
 
@@ -76,8 +73,6 @@ public class ResponseMessage<T> {
             jsonData = data;
         }
 
-        return makeJson(
-                "type", type.getCode(),
-                "data", jsonData);
+        return makeJson("type", type.getCode(), "data", jsonData);
     }
 }

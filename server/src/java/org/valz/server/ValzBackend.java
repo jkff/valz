@@ -6,7 +6,9 @@ import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.WriteBackend;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ValzBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);

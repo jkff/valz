@@ -3,7 +3,7 @@ package org.valz.util.protocol;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.io.IOUtils;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -13,7 +13,7 @@ public class HttpConnector {
         HttpURLConnection connection = null;
 
         try {
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection)url.openConnection();
 
             connection.setRequestMethod("POST");
             connection.setDoInput(true);

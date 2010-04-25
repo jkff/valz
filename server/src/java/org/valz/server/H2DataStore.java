@@ -60,8 +60,7 @@ public class H2DataStore implements DataStore, Closeable {
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
         try {
-            execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);",
-                    name,
+            execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);", name,
                     JSONMapper.toJSON(AggregateParser.toJson(aggregate)).render(false),
                     JSONMapper.toJSON(aggregate.dataToJson(value)).render(false));
         } catch (MapperException e) {
@@ -113,7 +112,7 @@ public class H2DataStore implements DataStore, Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                JSONValue jsonValue  ;
+                JSONValue jsonValue;
                 try {
                     jsonValue = new JSONParser(new StringReader(str)).nextValue();
                 } catch (TokenStreamException e) {
@@ -134,8 +133,7 @@ public class H2DataStore implements DataStore, Closeable {
         Aggregate<T> aggregate = getAggregate(name);
         try {
             execute("UPDATE Valz SET value = ? WHERE name = ?;",
-                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false),
-                    name);
+                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false), name);
         } catch (MapperException e) {
             throw new RuntimeException(e);
         }

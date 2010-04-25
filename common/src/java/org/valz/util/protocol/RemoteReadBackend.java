@@ -41,11 +41,10 @@ public class RemoteReadBackend implements ReadBackend {
 
     private <I, O> O getDataResponse(InteractionType<I, O> requestType, I request) throws RemoteReadException {
         try {
-            String response =
-                    HttpConnector.post(
-                            conf.getServerUrls().get(0),
-                            JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
-            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
+            String response = HttpConnector.post(conf.getServerUrls().get(0),
+                    JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
+            ResponseMessage<O> responseMessage =
+                    ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteReadException(e);

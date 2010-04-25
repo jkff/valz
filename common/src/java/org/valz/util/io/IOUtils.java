@@ -3,8 +3,6 @@ package org.valz.util.io;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class IOUtils {
     public static void closeSilently(Closeable c) {
@@ -12,7 +10,7 @@ public class IOUtils {
             if (c != null) {
                 c.close();
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             // Ignore
         }
     }
@@ -31,7 +29,8 @@ public class IOUtils {
         }
     }
 
-    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws IOException {
+    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws
+            IOException {
         Writer w = null;
         try {
             w = new OutputStreamWriter(stream, encoding);

@@ -14,9 +14,7 @@ import static org.valz.util.Utils.makeJson;
 public class AggregateParser {
 
     public static Object toJson(Aggregate<?> aggregate) {
-        return makeJson(
-                "name", aggregate.getName(),
-                "config", aggregate.configToJson());
+        return makeJson("name", aggregate.getName(), "config", aggregate.configToJson());
     }
 
     public static Aggregate parse(AggregateRegistry registry, JSONValue jsonValue) throws ParserException {
@@ -27,5 +25,6 @@ public class AggregateParser {
         return configParser.parse(map.get("config"));
     }
 
-    private AggregateParser() {}
+    private AggregateParser() {
+    }
 }

@@ -27,16 +27,16 @@ public class RemoteWriteBackend implements WriteBackend {
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
-        getDataResponse(InteractionType.SUBMIT,
-                new SubmitRequest<T>(name, aggregate, value));
+        getDataResponse(InteractionType.SUBMIT, new SubmitRequest<T>(name, aggregate, value));
         // TODO: save val at exception to queue and try send later
     }
 
-    private <I,O> O getDataResponse(InteractionType<I,O> requestType, I request) throws RemoteWriteException {
+    private <I, O> O getDataResponse(InteractionType<I, O> requestType, I request) throws RemoteWriteException {
         try {
             String response = HttpConnector.post(conf.getServerURL(),
-                            JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
-            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
+                    JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
+            ResponseMessage<O> responseMessage =
+                    ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteWriteException(e);

@@ -2,9 +2,6 @@ package org.valz.util.protocol;
 
 import java.util.List;
 
-/**
- * Created on: 28.03.2010 11:35:53
- */
 public class ReadConfiguration {
     private List<String> serverUrls;
 
