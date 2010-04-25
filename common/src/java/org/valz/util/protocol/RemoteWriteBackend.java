@@ -2,6 +2,8 @@ package org.valz.util.protocol;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
+import com.sdicons.json.mapper.JSONMapper;
+import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
@@ -32,12 +34,9 @@ public class RemoteWriteBackend implements WriteBackend {
 
     private <I,O> O getDataResponse(InteractionType<I,O> requestType, I request) throws RemoteWriteException {
         try {
-            String requestStr = new RequestMessage<I>(requestType, request).toJson().render(true);
-            System.out.println(requestStr);
-            String response =
-                    HttpConnector.post(conf.getServerURL(),
-                            new RequestMessage<I>(requestType, request).toJson().render(false));
-            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)) .nextValue());
+            String response = HttpConnector.post(conf.getServerURL(),
+                            JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
+            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteWriteException(e);
@@ -46,6 +45,8 @@ public class RemoteWriteBackend implements WriteBackend {
         } catch (TokenStreamException e) {
             throw new RemoteWriteException(e);
         } catch (ParserException e) {
+            throw new RemoteWriteException(e);
+        } catch (MapperException e) {
             throw new RemoteWriteException(e);
         }
     }

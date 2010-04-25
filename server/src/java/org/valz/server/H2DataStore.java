@@ -14,6 +14,7 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
 
@@ -58,10 +59,14 @@ public class H2DataStore implements DataStore, Closeable {
 
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
-        execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);",
-                name,
-                AggregateParser.toJson(aggregate).render(false),
-                aggregate.dataToJson(value).render(false));
+        try {
+            execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);",
+                    name,
+                    JSONMapper.toJSON(AggregateParser.toJson(aggregate)).render(false),
+                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false));
+        } catch (MapperException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Collection<String> listVars() {
@@ -83,7 +88,7 @@ public class H2DataStore implements DataStore, Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                JSONValue jsonValue  ;
+                JSONValue jsonValue;
                 try {
                     jsonValue = new JSONParser(new StringReader(str)).nextValue();
                 } catch (TokenStreamException e) {
@@ -100,10 +105,10 @@ public class H2DataStore implements DataStore, Closeable {
         }, "SELECT aggregate FROM Valz WHERE name = ?;", name);
     }
 
-    public <T> T getValue(String name) {
+    public <T> Value<T> getValue(String name) {
         final Aggregate<T> aggregate = getAggregate(name);
-        return executeQuery(new Function<T>() {
-            public T apply(ResultSet resultSet) throws SQLException {
+        return executeQuery(new Function<Value<T>>() {
+            public Value<T> apply(ResultSet resultSet) throws SQLException {
                 if (!resultSet.next()) {
                     return null;
                 }
@@ -117,7 +122,7 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return (T)aggregate.parseData(jsonValue);
+                    return new Value<T>(aggregate, (T)aggregate.parseData(jsonValue));
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }

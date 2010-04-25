@@ -28,22 +28,22 @@ public class LongSum extends AbstractAggregate<Long> {
         return "LongSum";
     }
 
-    public JSONValue configToJson() {
-        return new JSONString("");
+    public Object configToJson() {
+        return null;
     }
 
-    public JSONValue dataToJson(Long item) {
-        return new JSONInteger(new BigInteger(item.toString()));
+    public Object dataToJson(Long item) {
+        return item;
     }
 
-    public Long parseData(JSONValue json) throws ParserException {
-        return ((JSONInteger)json).getValue().longValue();
+    public Long parseData(JSONValue jsonValue) throws ParserException {
+        return ((JSONInteger)jsonValue).getValue().longValue();
     }
 
 
 
     public static class ConfigParser implements AggregateConfigParser<Long> {
-        public LongSum parse(JSONValue json) {
+        public LongSum parse(JSONValue jsonValue) {
             return new LongSum();
         }
     }

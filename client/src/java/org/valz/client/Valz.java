@@ -6,30 +6,11 @@ import org.valz.util.protocol.*;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
-    private static AggregateRegistry registry = null;
-
-
-
-    public static synchronized WriteBackend getWriteBackend() {
-        return writeBackend;
-    }
-
-    public static synchronized void setWriteBackend(WriteBackend writeBackend) {
-        Valz.writeBackend = writeBackend;
-    }
-
-    public static synchronized AggregateRegistry getRegistry() {
-        return registry;
-    }
-
-    public static synchronized void setRegistry(AggregateRegistry registry) {
-        Valz.registry = registry;
-    }
 
 
 
 
-    public static synchronized void init(WriteConfiguration conf) {
+    public static synchronized void init(WriteConfiguration conf, AggregateRegistry registry) {
         Valz.writeBackend = new RemoteWriteBackend(conf, registry);
     }
 
