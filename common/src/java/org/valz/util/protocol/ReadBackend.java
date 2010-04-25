@@ -1,5 +1,6 @@
 package org.valz.util.protocol;
 
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 
 import java.util.Collection;
@@ -10,7 +11,7 @@ import java.util.Collection;
 public interface ReadBackend {
     Aggregate<?> getAggregate(String name) throws RemoteReadException;
 
-    Object getValue(String name) throws RemoteReadException;
+    Value getValue(String name) throws RemoteReadException;
 
     Collection<String> listVars() throws RemoteReadException;
 }

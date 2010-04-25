@@ -7,6 +7,8 @@ import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.messages.InteractionType;
 
+import java.util.Map;
+
 import static org.valz.util.Utils.makeJson;
 
 public class RequestMessage<T> {
@@ -15,10 +17,11 @@ public class RequestMessage<T> {
 
 
 
-    public static RequestMessage parse(AggregateRegistry registry, JSONValue json) throws ParserException {
-        JSONObject jsonObject = (JSONObject)json;
-        String strType = ((JSONString)jsonObject.get("type")).getValue();
-        JSONValue jsonData = jsonObject.get("data");
+    public static RequestMessage parse(AggregateRegistry registry, JSONValue jsonValue) throws ParserException {
+        JSONObject jsonObject = (JSONObject)jsonValue;
+        Map<String, JSONValue> map = jsonObject.getValue();
+        String strType = ((JSONString)map.get("type")).getValue();
+        JSONValue jsonData = map.get("data");
         InteractionType<?, ?> type = InteractionType.ALL_TYPES.get(strType);
         Object data = null;
 
@@ -50,12 +53,12 @@ public class RequestMessage<T> {
         return data;
     }
 
-    public JSONValue toJson() {
-        JSONValue jsonData = null;
+    public Object toJson() {
+        Object jsonData = null;
         if (InteractionType.GET_VALUE == type) {
-            jsonData = new JSONString((String)data);
+            jsonData = data;
         } else if (InteractionType.GET_AGGREGATE == type) {
-            jsonData = new JSONString((String)data);
+            jsonData = data;
         } else if (InteractionType.SUBMIT == type) {
             jsonData = ((SubmitRequest)data).toJson();
         } else if (InteractionType.LIST_VARS == type) {
@@ -63,7 +66,7 @@ public class RequestMessage<T> {
         }
 
         return makeJson(
-                "type", type,
+                "type", type.getCode(),
                 "data", jsonData);
     }
 }

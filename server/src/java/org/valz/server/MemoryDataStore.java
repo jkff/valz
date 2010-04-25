@@ -1,5 +1,6 @@
 package org.valz.server;
 
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public class MemoryDataStore implements DataStore {
         return (Aggregate<T>)name2aggregate.get(name);
     }
 
-    public <T> T getValue(String name) {
-        return (T)name2val.get(name);
+    public <T> Value<T> getValue(String name) {
+        return new Value(name2aggregate.get(name), name2val.get(name));
     }
 
     public <T> void setValue(String name, T value) {

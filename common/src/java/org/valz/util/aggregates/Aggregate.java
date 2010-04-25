@@ -25,11 +25,11 @@ public interface Aggregate<T> {
     @Nullable
     T reduce(T item1, T item2);
 
-    JSONValue dataToJson(T item);
+    Object dataToJson(T item);
 
-    T parseData(JSONValue json) throws ParserException;
+    T parseData(JSONValue jsonValue) throws ParserException;
 
     String getName();
 
-    JSONValue configToJson();
+    Object configToJson();
 }

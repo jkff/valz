@@ -2,6 +2,7 @@ package org.valz.util.protocol.messages;
 
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
+import com.sdicons.json.model.JSONArray;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
@@ -11,29 +12,33 @@ import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.valz.util.Utils.makeJson;
 
 public class ResponseMessage<T> {
 
-    public static ResponseMessage parse(AggregateRegistry registry, JSONValue json) throws ParserException {
-        JSONObject jsonObject = (JSONObject)json;
+    public static ResponseMessage parse(AggregateRegistry registry, JSONValue jsonValue) throws ParserException {
+        JSONObject jsonObject = (JSONObject)jsonValue;
         String strType = ((JSONString)jsonObject.get("type")).getValue();
         JSONValue jsonData = jsonObject.get("data");
         InteractionType<?, ?> type = InteractionType.ALL_TYPES.get(strType);
         Object data = null;
 
-        if (InteractionType.GET_VALUE == type) {
+        if (InteractionType.GET_VALUE.equals(type)) {
             data = Value.parse(registry, jsonData);
-        } else if (InteractionType.GET_AGGREGATE == type) {
+        } else if (InteractionType.GET_AGGREGATE.equals(type)) {
             data = AggregateParser.parse(registry, jsonData);
-        } else if (InteractionType.SUBMIT == type) {
+        } else if (InteractionType.SUBMIT.equals(type)) {
             data = null;
-        } else if (InteractionType.LIST_VARS == type) {
-            try {
-                data = JSONMapper.toJava(jsonData);
-            } catch (MapperException e) {
-                throw new ParserException(e);
+        } else if (InteractionType.LIST_VARS.equals(type)) {
+            Collection<String> list = new ArrayList<String>();
+            for (JSONValue item : ((JSONArray)jsonData).getValue()) {
+                list.add(((JSONString)item).getValue());
             }
+            data = list;
         }
 
         return new ResponseMessage(type, data);
@@ -59,8 +64,8 @@ public class ResponseMessage<T> {
         return type;
     }
 
-    public JSONValue toJson() {
-        JSONValue jsonData = null;
+    public Object toJson() {
+        Object jsonData = null;
         if (InteractionType.GET_VALUE == type) {
             jsonData = ((Value)data).toJson();
         } else if (InteractionType.GET_AGGREGATE == type) {
@@ -68,15 +73,11 @@ public class ResponseMessage<T> {
         } else if (InteractionType.SUBMIT == type) {
             jsonData = null;
         } else if (InteractionType.LIST_VARS == type) {
-            try {
-                jsonData = JSONMapper.toJSON(data);
-            } catch (MapperException e) {
-                throw new RuntimeException(e);
-            }
+            jsonData = data;
         }
 
         return makeJson(
-                "type", type,
+                "type", type.getCode(),
                 "data", jsonData);
     }
 }

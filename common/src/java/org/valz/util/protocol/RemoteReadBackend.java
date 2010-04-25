@@ -2,8 +2,11 @@ package org.valz.util.protocol;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
+import com.sdicons.json.mapper.JSONMapper;
+import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.messages.InteractionType;
@@ -28,7 +31,7 @@ public class RemoteReadBackend implements ReadBackend {
         return getDataResponse(InteractionType.GET_AGGREGATE, name);
     }
 
-    public Object getValue(String name) throws RemoteReadException {
+    public Value getValue(String name) throws RemoteReadException {
         return getDataResponse(InteractionType.GET_VALUE, name);
     }
 
@@ -39,8 +42,10 @@ public class RemoteReadBackend implements ReadBackend {
     private <I, O> O getDataResponse(InteractionType<I, O> requestType, I request) throws RemoteReadException {
         try {
             String response =
-                    HttpConnector.post(conf.getServerUrls().get(0), new RequestMessage<I>(requestType, request).toJson().render(false));
-            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)) .nextValue());
+                    HttpConnector.post(
+                            conf.getServerUrls().get(0),
+                            JSONMapper.toJSON(new RequestMessage<I>(requestType, request).toJson()).render(false));
+            ResponseMessage<O> responseMessage = ResponseMessage.parse(registry, new JSONParser(new StringReader(response)).nextValue());
             return responseMessage.getData();
         } catch (IOException e) {
             throw new RemoteReadException(e);
@@ -49,6 +54,8 @@ public class RemoteReadBackend implements ReadBackend {
         } catch (RecognitionException e) {
             throw new RemoteReadException(e);
         } catch (TokenStreamException e) {
+            throw new RemoteReadException(e);
+        } catch (MapperException e) {
             throw new RemoteReadException(e);
         }
     }

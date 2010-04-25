@@ -7,15 +7,18 @@ import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.*;
 
+import java.util.Map;
+
 import static org.valz.util.Utils.makeJson;
 
 public class SubmitRequest<T> {
 
-    public static SubmitRequest parse(AggregateRegistry registry, JSONValue json) throws ParserException {
-        JSONObject jsonObject = (JSONObject)json;
-        String name = ((JSONString)jsonObject.get("name")).getValue();
-        Aggregate aggregate = AggregateParser.parse(registry, jsonObject.get("aggregate"));
-        Object value = aggregate.parseData(jsonObject.get("value"));
+    public static SubmitRequest parse(AggregateRegistry registry, JSONValue jsonValue) throws ParserException {
+        JSONObject jsonObject = (JSONObject)jsonValue;
+        Map<String, JSONValue> map = jsonObject.getValue();
+        String name = ((JSONString)map.get("name")).getValue();
+        Aggregate aggregate = AggregateParser.parse(registry, map.get("aggregate"));
+        Object value = aggregate.parseData(map.get("value"));
 
         return new SubmitRequest(name, aggregate, value);
     }
@@ -44,7 +47,7 @@ public class SubmitRequest<T> {
         this.value = value;
     }
 
-    public JSONValue toJson() {
+    public Object toJson() {
         return makeJson(
                 "name", name,
                 "aggregate", AggregateParser.toJson(aggregate),

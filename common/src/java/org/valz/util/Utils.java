@@ -12,23 +12,21 @@ import java.util.Map;
 public class Utils {
     private Utils() {}
 
-    public static JSONValue makeJson(Object... collection) {
+    public static Object makeJson(Object... collection) {
         if (collection.length % 2 != 0) {
             throw new IllegalArgumentException("collection must have even size.");
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         for (int i=0; i<collection.length; i+=2) {
-            Object item = collection[i+1];
-            if (collection[i+1] instanceof JSONValue) {
-                item = ((JSONValue)collection[i+1]).render(false);
+            if (!(collection[i] instanceof String)) {
+                throw new IllegalArgumentException("key must be String.");
             }
-            map.put((String)collection[i], item);
+            if (map.containsKey((String)collection[i])) {
+                throw new IllegalArgumentException("key must be unique.");
+            }
+            map.put((String)collection[i], collection[i+1]);
         }
-        try {
-            return JSONMapper.toJSON(map);
-        } catch (MapperException e) {
-            throw new RuntimeException(e);
-        }
+        return map;
     }
 }

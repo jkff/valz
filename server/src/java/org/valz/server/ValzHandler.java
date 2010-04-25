@@ -1,5 +1,7 @@
 package org.valz.server;
 
+import com.sdicons.json.mapper.JSONMapper;
+import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.parser.JSONParser;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Request;
@@ -47,6 +49,7 @@ public class ValzHandler extends AbstractHandler {
             if(InteractionType.SUBMIT.equals(t)) {
                 SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
                 writeBackend.submit(submitRequest.getName(), submitRequest.getAggregate(), submitRequest.getValue());
+                answer(response.getOutputStream(), InteractionType.SUBMIT, null);
             } else if(InteractionType.LIST_VARS.equals(t)) {
                 answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
             } else if(InteractionType.GET_VALUE.equals(t)) {
@@ -69,6 +72,10 @@ public class ValzHandler extends AbstractHandler {
 
 
     private static void answer(OutputStream out, InteractionType messageType, Object data) throws IOException {
-        IOUtils.writeOutputStream(out, new ResponseMessage(messageType, data).toJson().render(false), "UTF-8");
+        try {
+            IOUtils.writeOutputStream(out, JSONMapper.toJSON(new ResponseMessage(messageType, data).toJson()).render(false), "UTF-8");
+        } catch (MapperException e) {
+            throw new IOException(e);
+        }
     }
 }
