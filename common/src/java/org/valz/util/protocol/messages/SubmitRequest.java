@@ -5,7 +5,8 @@ import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.AggregateParser;
 import org.valz.util.AggregateRegistry;
-import org.valz.util.aggregates.*;
+import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 
 import java.util.Map;
 
@@ -48,9 +49,7 @@ public class SubmitRequest<T> {
     }
 
     public Object toJson() {
-        return makeJson(
-                "name", name,
-                "aggregate", AggregateParser.toJson(aggregate),
-                "value", aggregate.dataToJson(value));
+        return makeJson("name", name, "aggregate", AggregateParser.toJson(aggregate), "value",
+                aggregate.dataToJson(value));
     }
 }

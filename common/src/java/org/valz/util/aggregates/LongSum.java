@@ -1,11 +1,9 @@
 package org.valz.util.aggregates;
 
 import com.sdicons.json.model.JSONInteger;
-import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigInteger;
 import java.util.Iterator;
 
 public class LongSum extends AbstractAggregate<Long> {

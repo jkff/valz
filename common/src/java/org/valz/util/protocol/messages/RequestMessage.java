@@ -5,14 +5,13 @@ import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.ParserException;
-import org.valz.util.protocol.messages.InteractionType;
 
 import java.util.Map;
 
 import static org.valz.util.Utils.makeJson;
 
 public class RequestMessage<T> {
-    private InteractionType<T,?> type = null;
+    private InteractionType<T, ?> type = null;
     private T data = null;
 
 
@@ -34,7 +33,7 @@ public class RequestMessage<T> {
         } else if (InteractionType.LIST_VARS == type) {
             data = null;
         }
-        
+
         return new RequestMessage(type, data);
     }
 
@@ -65,8 +64,6 @@ public class RequestMessage<T> {
             jsonData = null;
         }
 
-        return makeJson(
-                "type", type.getCode(),
-                "data", jsonData);
+        return makeJson("type", type.getCode(), "data", jsonData);
     }
 }

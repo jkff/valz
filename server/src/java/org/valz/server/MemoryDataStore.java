@@ -15,8 +15,9 @@ public class MemoryDataStore implements DataStore {
 
 
 
-    public MemoryDataStore() {}
-    
+    public MemoryDataStore() {
+    }
+
 
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {

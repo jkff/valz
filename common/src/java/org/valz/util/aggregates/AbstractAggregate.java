@@ -21,7 +21,9 @@ public abstract class AbstractAggregate<T> implements Aggregate<T> {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (o.getClass() != getClass())) return false;
+        if ((o == null) || (o.getClass() != getClass())) {
+            return false;
+        }
         return true;
     }
 

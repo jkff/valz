@@ -1,6 +1,6 @@
 package org.valz.util.aggregates;
 
-public class Pair<A,B> {
+public class Pair<A, B> {
     public final A first;
     public final B second;
 

@@ -1,7 +1,6 @@
 package org.valz.util;
 
 import com.sdicons.json.model.JSONObject;
-import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
@@ -41,8 +40,6 @@ public class Value<T> {
     }
 
     public Object toJson() {
-        return makeJson(
-                "aggregate", AggregateParser.toJson(aggregate),
-                "value", aggregate.dataToJson(value));
+        return makeJson("aggregate", AggregateParser.toJson(aggregate), "value", aggregate.dataToJson(value));
     }
 }

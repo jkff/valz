@@ -3,9 +3,11 @@ package org.valz.util.protocol.messages;
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-public class InteractionType<I,O> {
+public class InteractionType<I, O> {
     public static final InteractionType<String, Value<?>> GET_VALUE = create("GET_VALUE");
     public static final InteractionType<String, Aggregate<?>> GET_AGGREGATE = create("GET_AGGREGATE");
     public static final InteractionType<Void, Collection<String>> LIST_VARS = create("LIST_VARS");
@@ -20,14 +22,17 @@ public class InteractionType<I,O> {
 
 
 
-    private static <I,O> InteractionType<I,O> create(String code) {
-        return new InteractionType<I,O>(code);
+    private static <I, O> InteractionType<I, O> create(String code) {
+        return new InteractionType<I, O>(code);
     }
 
 
 
     private final String code;
-    private InteractionType(String code) { this.code = code; }
+
+    private InteractionType(String code) {
+        this.code = code;
+    }
 
 
 
@@ -37,12 +42,18 @@ public class InteractionType<I,O> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        InteractionType that = (InteractionType) o;
+        InteractionType that = (InteractionType)o;
 
-        if (code != null ? !code.equals(that.code) : that.code != null) return false;
+        if (code != null ? !code.equals(that.code) : that.code != null) {
+            return false;
+        }
 
         return true;
     }
