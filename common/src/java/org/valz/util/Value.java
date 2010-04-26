@@ -7,39 +7,30 @@ import org.valz.util.aggregates.ParserException;
 
 import java.util.Map;
 
-import static org.valz.util.Utils.makeJson;
+import static org.valz.util.JsonUtils.makeJson;
 
 public class Value<T> {
-
-    public static Value parse(AggregateRegistry registry, Object json) throws ParserException {
+    public static Value parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         Map<String, JSONValue> map = jsonObject.getValue();
         Aggregate aggregate = AggregateParser.parse(registry, map.get("aggregate"));
-        Object value = aggregate.parseData(map.get("value"));
+        Object value = aggregate.dataFromJson(map.get("value"));
         return new Value(aggregate, value);
     }
 
     private final Aggregate<T> aggregate;
     private final T value;
 
-
-
     public Value(Aggregate<T> aggregate, T value) {
         this.aggregate = aggregate;
         this.value = value;
-    }
-
-
-
-    public Aggregate<T> getAggregate() {
-        return aggregate;
     }
 
     public T getValue() {
         return value;
     }
 
-    public Object toJson() {
-        return makeJson("aggregate", AggregateParser.toJson(aggregate), "value", aggregate.dataToJson(value));
+    public JSONValue toJson(AggregateRegistry registry) {
+        return makeJson("aggregate", AggregateParser.toJson(registry, aggregate), "value", aggregate.dataToJson(value));
     }
 }

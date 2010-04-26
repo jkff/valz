@@ -25,11 +25,15 @@ public interface Aggregate<T> {
     @Nullable
     T reduce(T item1, T item2);
 
-    Object dataToJson(T item);
+    JSONValue dataToJson(T item);
 
-    T parseData(JSONValue jsonValue) throws ParserException;
+    T dataFromJson(JSONValue jsonValue) throws ParserException;
 
     String getName();
 
-    Object configToJson();
+    /**
+     * Will be used if a val is registered several times, to check
+     * if it is registered with the same aggregate. 
+     */
+    boolean equals(Object other);
 }

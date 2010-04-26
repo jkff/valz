@@ -9,12 +9,12 @@ import org.valz.util.aggregates.ParserException;
 
 import java.util.Map;
 
-import static org.valz.util.Utils.makeJson;
+import static org.valz.util.JsonUtils.makeJson;
 
 public class AggregateParser {
-
-    public static Object toJson(Aggregate<?> aggregate) {
-        return makeJson("name", aggregate.getName(), "config", aggregate.configToJson());
+    public static JSONValue toJson(AggregateRegistry registry, Aggregate<?> aggregate) {
+        AggregateConfigParser parser = registry.get(aggregate.getName());
+        return makeJson("name", aggregate.getName(), "config", parser.configToJson(aggregate));
     }
 
     public static Aggregate parse(AggregateRegistry registry, JSONValue jsonValue) throws ParserException {

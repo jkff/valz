@@ -1,52 +1,7 @@
 package org.valz.examples.hitcount;
 
-import org.h2.jdbc.JdbcSQLException;
-import org.valz.client.Val;
-import org.valz.client.Valz;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.InteractionType;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.RemoteReadBackend;
-import org.valz.util.protocol.WriteConfiguration;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.SubmitRequest;
-
-import java.io.StringReader;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.util.HashMap;
-
-import com.sdicons.json.model.*;
-import com.sdicons.json.parser.*;
-import com.sdicons.json.mapper.*;
-
 public class Main {
     public static void main(String[] args) throws Exception {
-
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("x", 1);
-        map.put("s", "Hello");
-
-        JSONValue jsonValue = JSONMapper.toJSON(map);
-        String s = jsonValue.render(true);
-
-
-        JSONParser parser = new JSONParser(new StringReader(s));
-        JSONObject jsonObject = (JSONObject)parser.nextValue();
-        HashMap<String, JSONValue> map2 = jsonObject.getValue();
-
-//        int val = 5;
-//        JSONNumber jsonNum = new JSONInteger(new BigInteger(new Integer(val).toString()));
-//        String s2 = jsonNum.render(true);
-//        JSONParser parser = new JSONParser(new StringReader(s2));
-//        JSONValue jsonValue = parser.nextValue();
-//        JSONInteger jsonNum2 = (JSONInteger)jsonValue;
-//        int val2 = jsonNum2.getValue().intValue();
-
-//        int x = 0;
-
 //        WriteConfiguration conf = new WriteConfiguration();
 //        conf.setServerURL("http://localhost:8081");
 //

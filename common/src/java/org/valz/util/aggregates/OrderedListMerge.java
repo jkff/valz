@@ -92,7 +92,7 @@
 //        }
 //    }
 //
-//    public List<T> parseData(JSONValue json) throws ParserException {
+//    public List<T> dataFromJson(JSONValue json) throws ParserException {
 //        try {
 //            return (List<T>)JSONMapper.toJava(json);
 //        } catch (MapperException e) {

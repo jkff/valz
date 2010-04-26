@@ -13,7 +13,7 @@
 //import java.util.Iterator;
 //import java.util.Map;
 //
-//import static org.valz.util.Utils.makeJson;
+//import static org.valz.util.JsonUtils.makeJson;
 //
 //
 //public class MapMerge<K, V> extends AbstractAggregate<Map<K,V>> {
@@ -51,7 +51,7 @@
 //        return item;
 //    }
 //
-//    public Map<K, V> parseData(JSONValue jsonValue) throws ParserException {
+//    public Map<K, V> dataFromJson(JSONValue jsonValue) throws ParserException {
 //
 //    }
 //
