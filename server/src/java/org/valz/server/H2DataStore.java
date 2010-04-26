@@ -2,8 +2,6 @@ package org.valz.server;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.apache.commons.dbcp.ConnectionFactory;
@@ -59,13 +57,9 @@ public class H2DataStore implements DataStore, Closeable {
 
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
-        try {
-            execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);", name,
-                    JSONMapper.toJSON(AggregateParser.toJson(aggregate)).render(false),
-                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false));
-        } catch (MapperException e) {
-            throw new RuntimeException(e);
-        }
+        execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);", name,
+                AggregateParser.toJson(registry, aggregate).render(false),
+                aggregate.dataToJson(value).render(false));
     }
 
     public Collection<String> listVars() {
@@ -121,7 +115,7 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return new Value<T>(aggregate, (T)aggregate.parseData(jsonValue));
+                    return new Value<T>(aggregate, (T)aggregate.dataFromJson(jsonValue));
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }
@@ -131,12 +125,8 @@ public class H2DataStore implements DataStore, Closeable {
 
     public <T> void setValue(String name, T value) {
         Aggregate<T> aggregate = getAggregate(name);
-        try {
-            execute("UPDATE Valz SET value = ? WHERE name = ?;",
-                    JSONMapper.toJSON(aggregate.dataToJson(value)).render(false), name);
-        } catch (MapperException e) {
-            throw new RuntimeException(e);
-        }
+        execute("UPDATE Valz SET value = ? WHERE name = ?;",
+                aggregate.dataToJson(value).render(false), name);
     }
 
 

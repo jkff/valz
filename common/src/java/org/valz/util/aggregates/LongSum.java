@@ -4,9 +4,11 @@ import com.sdicons.json.model.JSONInteger;
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 
-public class LongSum extends AbstractAggregate<Long> {
+public class LongSum extends AbstractAggregate<Long, LongSum> {
+    public static final String NAME = "LongSum";
 
     @Override
     public Long reduce(@NotNull Iterator<Long> stream) {
@@ -23,26 +25,31 @@ public class LongSum extends AbstractAggregate<Long> {
     }
 
     public String getName() {
-        return "LongSum";
+        return NAME;
     }
 
-    public Object configToJson() {
-        return null;
+    public JSONValue dataToJson(Long item) {
+        return new JSONInteger(new BigInteger(item.toString()));
     }
 
-    public Object dataToJson(Long item) {
-        return item;
-    }
-
-    public Long parseData(JSONValue jsonValue) throws ParserException {
+    public Long dataFromJson(JSONValue jsonValue) throws ParserException {
         return ((JSONInteger)jsonValue).getValue().longValue();
     }
 
+    public boolean equals(Object other) {
+        return (other instanceof LongSum);
+    }
+    public int hashCode() {
+        return 0;
+    }
 
-
-    public static class ConfigParser implements AggregateConfigParser<Long> {
+    public static class ConfigParser implements AggregateConfigParser<LongSum> {
         public LongSum parse(JSONValue jsonValue) {
             return new LongSum();
+        }
+
+        public JSONValue configToJson(LongSum aggregate) {
+            return null;
         }
     }
 }

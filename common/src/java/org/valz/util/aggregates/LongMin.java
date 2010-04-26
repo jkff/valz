@@ -30,7 +30,7 @@
 //        return new JSONInteger(new BigInteger(item.toString()));
 //    }
 //
-//    public Long parseData(JSONValue json) {
+//    public Long dataFromJson(JSONValue json) {
 //        return ((JSONInteger)json).getValue().longValue();
 //    }
 //

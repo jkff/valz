@@ -11,7 +11,6 @@ public class AggregateRegistry {
     private final Map<String, AggregateConfigParser<?>> name2agg = new HashMap<String, AggregateConfigParser<?>>();
 
     public AggregateRegistry() {
-
     }
 
     public void register(String name, AggregateConfigParser<?> configParser) {
@@ -19,10 +18,6 @@ public class AggregateRegistry {
             throw new IllegalArgumentException("Aggregate with this name already registered.");
         }
         name2agg.put(name, configParser);
-    }
-
-    public void unregister(String name) {
-        name2agg.remove(name);
     }
 
     public AggregateConfigParser<?> get(String name) {

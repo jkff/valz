@@ -1,18 +1,17 @@
 package org.valz.server;
 
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.mapper.MapperException;
+import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.AggregateRegistry;
+import org.valz.util.Pair;
+import org.valz.util.Value;
 import org.valz.util.io.IOUtils;
 import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.WriteBackend;
 import org.valz.util.protocol.messages.InteractionType;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.ResponseMessage;
 import org.valz.util.protocol.messages.SubmitRequest;
 
 import javax.servlet.ServletException;
@@ -43,21 +42,23 @@ public class ValzHandler extends AbstractHandler {
         try {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
 
-            RequestMessage requestMessage =
-                    RequestMessage.parse(registry, new JSONParser(new StringReader(reqStr)).nextValue());
+            JSONValue requestJson = new JSONParser(new StringReader(reqStr)).nextValue();
+            Pair<InteractionType,Object> typeAndData = InteractionType.requestFromJson(requestJson, registry);
 
-            InteractionType t = requestMessage.getType();
-            if (InteractionType.SUBMIT.equals(t)) {
-                SubmitRequest submitRequest = (SubmitRequest)requestMessage.getData();
+            InteractionType t = typeAndData.first;
+            Object data = typeAndData.second;
+
+            if (t == InteractionType.SUBMIT) {
+                SubmitRequest submitRequest = (SubmitRequest)data;
                 writeBackend.submit(submitRequest.getName(), submitRequest.getAggregate(), submitRequest.getValue());
                 answer(response.getOutputStream(), InteractionType.SUBMIT, null);
             } else if (InteractionType.LIST_VARS.equals(t)) {
                 answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
             } else if (InteractionType.GET_VALUE.equals(t)) {
-                String name = (String)requestMessage.getData();
-                answer(response.getOutputStream(), InteractionType.GET_VALUE, readBackend.getValue(name));
+                String name = (String)data;
+                answer(response.getOutputStream(), InteractionType.GET_VALUE, ((Value<?>) readBackend.getValue(name)));
             } else if (InteractionType.GET_AGGREGATE.equals(t)) {
-                String name = (String)requestMessage.getData();
+                String name = (String)data;
                 answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));
             } else {
                 throw new IllegalArgumentException("Unknown request type " + t);
@@ -72,12 +73,9 @@ public class ValzHandler extends AbstractHandler {
     }
 
 
-    private static void answer(OutputStream out, InteractionType messageType, Object data) throws IOException {
-        try {
-            IOUtils.writeOutputStream(out,
-                    JSONMapper.toJSON(new ResponseMessage(messageType, data).toJson()).render(false), "UTF-8");
-        } catch (MapperException e) {
-            throw new IOException(e);
-        }
+    private <T> void answer(OutputStream out, InteractionType<?,T> messageType, T data) throws IOException {
+        IOUtils.writeOutputStream(out,
+                InteractionType.responseToJson(messageType, data, registry).render(false),
+                "utf-8");
     }
 }
