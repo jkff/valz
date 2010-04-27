@@ -1,11 +1,11 @@
 package org.valz.server;
 
 import org.junit.*;
+import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.io.IOUtils;
 
 import java.io.File;
-import java.util.Collection;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +15,7 @@ public class H2DataStroreTest {
 
 
 
+    private AggregateRegistry registry = null;
     private H2DataStore dataStore = null;
 
     
@@ -28,7 +29,9 @@ public class H2DataStroreTest {
     @Before
     public void setUp() {
         removeFiles();
-        dataStore = new H2DataStore(dbname);
+        registry = new AggregateRegistry();
+        registry.register(LongSum.NAME, new LongSum.ConfigParser());
+        dataStore = new H2DataStore(dbname, registry);
     }
 
     @After

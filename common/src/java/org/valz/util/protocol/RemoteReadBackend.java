@@ -1,28 +1,29 @@
 package org.valz.util.protocol;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.sdicons.json.model.JSONValue;
+import com.sdicons.json.parser.JSONParser;
+import org.valz.util.AggregateRegistry;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.ResponseMessage;
-import org.valz.util.protocol.messages.SubmitRequest;
+import org.valz.util.protocol.messages.InteractionType;
 
-import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collection;
 
 public class RemoteReadBackend implements ReadBackend {
-    private final String serverUrl;
+    private final ReadConfiguration conf;
+    private final AggregateRegistry registry;
 
-
-    public RemoteReadBackend(String serverUrl) {
-        this.serverUrl = serverUrl;
+    public RemoteReadBackend(ReadConfiguration conf, AggregateRegistry registry) {
+        this.conf = conf;
+        this.registry = registry;
     }
 
     public Aggregate<?> getAggregate(String name) throws RemoteReadException {
         return getDataResponse(InteractionType.GET_AGGREGATE, name);
     }
 
-    public Object getValue(String name) throws RemoteReadException {
+    public Value getValue(String name) throws RemoteReadException {
         return getDataResponse(InteractionType.GET_VALUE, name);
     }
 
@@ -30,13 +31,15 @@ public class RemoteReadBackend implements ReadBackend {
         return getDataResponse(InteractionType.LIST_VARS, null);
     }
 
-    private <I,O> O getDataResponse(InteractionType<I,O> requestType, I request) throws RemoteReadException {
+    private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteReadException {
         try {
-            String response = HttpConnector.post(serverUrl, new JSONSerializer().serialize(new RequestMessage<I>(requestType, request)));
-            ResponseMessage<O> responseMessage = new JSONDeserializer<ResponseMessage<O>>().deserialize(response);
-            return responseMessage.data;
-        } catch (IOException e) {
+            String response = HttpConnector.post(
+                    conf.getServerUrls().get(0),
+                    InteractionType.requestToJson(type, request, registry).render(false));
+            JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
+            return (O) InteractionType.responseFromJson(responseJson, registry).second;
+        } catch (Exception e) {
             throw new RemoteReadException(e);
-        }
+        } 
     }
 }

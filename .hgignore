@@ -7,3 +7,4 @@ server/build/*
 .idea/dictionaries/*
 .idea/projectCodeStyle.xml
 
+glob:h2store.h2.db

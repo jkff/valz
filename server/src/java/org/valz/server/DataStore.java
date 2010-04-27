@@ -1,16 +1,19 @@
 package org.valz.server;
 
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 
 import java.util.Collection;
-import java.util.Map;
 
 public interface DataStore {
 
-    void createAggregate(String name, Aggregate<?> aggregate, Object value);
-    Collection<String> listVars();
-    Aggregate getAggregate(String name);
+    <T> void createAggregate(String name, Aggregate<T> aggregate, T value);
 
-    Object getValue(String name);
-    void setValue(String name, Object value);
+    Collection<String> listVars();
+
+    <T> Aggregate<T> getAggregate(String name);
+
+    <T> Value<T> getValue(String name);
+
+    <T> void setValue(String name, T value);
 }

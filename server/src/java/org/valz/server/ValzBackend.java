@@ -1,18 +1,22 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.ReadBackend;
 import org.valz.util.protocol.WriteBackend;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ValzBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private final DataStore dataStore = new MemoryDataStore();
+    private final DataStore dataStore;
 
-    public ValzBackend() {
+    public ValzBackend(DataStore dataStore) {
+        this.dataStore = dataStore;
     }
 
     public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) {
@@ -24,7 +28,7 @@ public class ValzBackend implements ReadBackend, WriteBackend {
                 throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
             }
 
-            T oldValue = (T) dataStore.getValue(name);
+            T oldValue = (T)dataStore.getValue(name).getValue();
             List<T> list = Arrays.asList(oldValue, value);
             Object newValue = aggregate.reduce(list.iterator());
             dataStore.setValue(name, newValue);
@@ -35,7 +39,7 @@ public class ValzBackend implements ReadBackend, WriteBackend {
         return dataStore.listVars();
     }
 
-    public synchronized Object getValue(String name) {
+    public synchronized Value getValue(String name) {
         return dataStore.getValue(name);
     }
 

@@ -1,26 +1,7 @@
 package org.valz.examples.hitcount;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
-import org.h2.jdbc.JdbcSQLException;
-import org.valz.client.Val;
-import org.valz.client.Valz;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.InteractionType;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.RemoteReadBackend;
-import org.valz.util.protocol.WriteConfiguration;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.SubmitRequest;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-
 public class Main {
     public static void main(String[] args) throws Exception {
-
-
 //        WriteConfiguration conf = new WriteConfiguration();
 //        conf.setServerURL("http://localhost:8081");
 //
@@ -39,19 +20,19 @@ public class Main {
 //        System.out.println("Count of vars: " + readBackend.listVars().size());
 
 
-        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
-        RequestMessage msg = new RequestMessage(InteractionType.SUBMIT, submitRequest);
-
-
-        String s = new JSONSerializer()
-                .serialize(msg);
-
-        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
-                .use("data.class", SubmitRequest.class)
-                .use("data.aggregate.class", LongSum.class)
-                .deserialize(s);
-
-        int x = 0;
+//        SubmitRequest<Long> submitRequest = new SubmitRequest<Long>("foo", new LongSum(), 1L);
+//        RequestMessage msg = new RequestMessage(InteractionType.SUBMIT, submitRequest);
+//
+//
+//        String s = new JSONSerializer()
+//                .serialize(msg);
+//
+//        RequestMessage msg2 = new JSONDeserializer<RequestMessage>()
+//                .use("data.class", SubmitRequest.class)
+//                .use("data.aggregate.class", LongSum.class)
+//                .deserialize(s);
+//
+//        int x = 0;
 
 //        Class.forName("org.h2.Driver");
 //        Connection conn = null;
