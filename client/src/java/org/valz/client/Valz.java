@@ -1,18 +1,19 @@
 package org.valz.client;
 
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.*;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.RemoteReadBackend;
+import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.RemoteBackend;
+import org.valz.util.protocol.RemoteException;
+import org.valz.util.protocol.WriteConfiguration;
 
 public final class Valz {
-    private static WriteBackend writeBackend;
+    private static Backend backend;
 
     private Valz() {
     }
 
     public static synchronized void init(WriteConfiguration conf) {
-        Valz.writeBackend = new RemoteWriteBackend(conf.getServerURL());
+        Valz.backend = new RemoteBackend(conf.getServerURL());
     }
 
     public static synchronized <T> Val<T> register(
@@ -20,8 +21,8 @@ public final class Valz {
         return new Val<T>() {
             public void submit(T sample) {
                 try {
-                    writeBackend.submit(name, aggregate, sample);
-                } catch (RemoteWriteException e) {
+                    backend.submit(name, aggregate, sample);
+                } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
             }

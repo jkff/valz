@@ -11,25 +11,8 @@ public class InteractionType<I,O> {
     public static final InteractionType<Void, Collection<String>> LIST_VARS = create("LIST_VARS");
     public static final InteractionType<SubmitRequest, Void> SUBMIT = create("SUBMIT");
 
-
-    
-    private String code;
-
-
-
-    private InteractionType() { }
-
+    private final String code;
     private InteractionType(String code) { this.code = code; }
-
-
-
-    public String getCode() {
-        return code;
-    }
-    
-    public void setCode(String code) {
-        this.code = code;
-    }
 
     @Override
     public boolean equals(Object o) {
