@@ -1,5 +1,6 @@
 package org.valz.util.aggregates;
 
+import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,4 +24,16 @@ public interface Aggregate<T> {
 
     @Nullable
     T reduce(T item1, T item2);
+
+    JSONValue dataToJson(T item);
+
+    T dataFromJson(JSONValue jsonValue) throws ParserException;
+
+    String getName();
+
+    /**
+     * Will be used if a val is registered several times, to check
+     * if it is registered with the same aggregate. 
+     */
+    boolean equals(Object other);
 }

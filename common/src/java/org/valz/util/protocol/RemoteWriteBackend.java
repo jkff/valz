@@ -1,35 +1,36 @@
 package org.valz.util.protocol;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.sdicons.json.model.JSONValue;
+import com.sdicons.json.parser.JSONParser;
+import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.messages.RequestMessage;
-import org.valz.util.protocol.messages.ResponseMessage;
+import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.SubmitRequest;
 
-import java.io.IOException;
-import java.util.Collection;
+import java.io.StringReader;
 
 public class RemoteWriteBackend implements WriteBackend {
-    private final String serverUrl;
+    private final WriteConfiguration conf;
+    private final AggregateRegistry registry;
 
 
-    public RemoteWriteBackend(String serverUrl) {
-        this.serverUrl = serverUrl;
+    public RemoteWriteBackend(WriteConfiguration conf, AggregateRegistry registry) {
+        this.conf = conf;
+        this.registry = registry;
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
-        getDataResponse(InteractionType.SUBMIT,
-                new SubmitRequest<T>(name, aggregate, value));
+        getDataResponse(InteractionType.SUBMIT, new SubmitRequest<T>(name, aggregate, value));
         // TODO: save val at exception to queue and try send later
     }
 
-    private <I,O> O getDataResponse(InteractionType<I,O> requestType, I request) throws RemoteWriteException {
+    private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteWriteException {
         try {
-            String response = HttpConnector.post(serverUrl, new JSONSerializer().serialize(new RequestMessage<I>(requestType, request)));
-            ResponseMessage<O> responseMessage = new JSONDeserializer<ResponseMessage<O>>().deserialize(response);
-            return responseMessage.data;
-        } catch (IOException e) {
+            String response = HttpConnector.post(conf.getServerURL(),
+                    InteractionType.requestToJson(type, request, registry).render(false));
+            JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
+            return (O) InteractionType.responseFromJson(responseJson, registry).second;
+        } catch (Exception e) {
             throw new RemoteWriteException(e);
         }
     }
