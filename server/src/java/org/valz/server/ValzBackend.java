@@ -1,45 +1,49 @@
 package org.valz.server;
 
 import org.apache.log4j.Logger;
+import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.Backend;
+import org.valz.util.protocol.ReadBackend;
+import org.valz.util.protocol.WriteBackend;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-public class ValzBackend implements Backend {
+public class ValzBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(ValzBackend.class);
 
-    private final Map<String, Object> name2val = new HashMap<String, Object>();
-    private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
+    private final DataStore dataStore;
 
-    public ValzBackend() {
+    public ValzBackend(DataStore dataStore) {
+        this.dataStore = dataStore;
     }
 
     public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) {
-        if (!name2val.containsKey(name)) {
-            name2val.put(name, value);
-            name2aggregate.put(name, aggregate);
+        Aggregate<?> existingAggregate = dataStore.getAggregate(name);
+        if (existingAggregate == null) {
+            dataStore.createAggregate(name, aggregate, value);
         } else {
-            if (!aggregate.equals(name2aggregate.get(name))) {
+            if (!existingAggregate.equals(aggregate)) {
                 throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
             }
 
-            T oldValue = (T) name2val.get(name);
+            T oldValue = (T)dataStore.getValue(name).getValue();
             List<T> list = Arrays.asList(oldValue, value);
             Object newValue = aggregate.reduce(list.iterator());
-            name2val.put(name, newValue);
+            dataStore.setValue(name, newValue);
         }
     }
 
     public synchronized Collection<String> listVars() {
-        return new ArrayList<String>(name2val.keySet());
+        return dataStore.listVars();
     }
 
-    public synchronized Object getValue(String name) {
-        return name2val.get(name);
+    public synchronized Value getValue(String name) {
+        return dataStore.getValue(name);
     }
 
     public synchronized Aggregate getAggregate(String name) {
-        return name2aggregate.get(name);
+        return dataStore.getAggregate(name);
     }
 }
