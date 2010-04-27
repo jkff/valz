@@ -1,7 +1,6 @@
 package org.valz.util.io;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 
@@ -11,7 +10,7 @@ public class IOUtils {
             if (c != null) {
                 c.close();
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             // Ignore
         }
     }
@@ -30,7 +29,8 @@ public class IOUtils {
         }
     }
 
-    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws IOException {
+    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws
+            IOException {
         Writer w = null;
         try {
             w = new OutputStreamWriter(stream, encoding);
