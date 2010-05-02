@@ -1,4 +1,4 @@
-package org.valz.server;
+package org.valz.util.backends;
 
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
@@ -16,4 +16,6 @@ public interface DataStore {
     <T> Value<T> getValue(String name);
 
     <T> void setValue(String name, T value);
+
+    void removeAggregate(String name);
 }
