@@ -1,4 +1,4 @@
-package org.valz.server;
+package org.valz.util.backends;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -127,6 +127,10 @@ public class H2DataStore implements DataStore, Closeable {
         Aggregate<T> aggregate = getAggregate(name);
         execute("UPDATE Valz SET value = ? WHERE name = ?;",
                 aggregate.dataToJson(value).render(false), name);
+    }
+
+    public void removeAggregate(String name) {
+        execute("DELETE Valz WHERE name = ?;", name);
     }
 
 

@@ -1,4 +1,4 @@
-package org.valz.server;
+package org.valz.util.backends;
 
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
@@ -39,5 +39,10 @@ public class MemoryDataStore implements DataStore {
 
     public <T> void setValue(String name, T value) {
         name2val.put(name, value);
+    }
+
+    public void removeAggregate(String name) {
+        name2val.remove(name);
+        name2aggregate.remove(name);
     }
 }

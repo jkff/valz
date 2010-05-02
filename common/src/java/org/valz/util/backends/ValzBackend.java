@@ -1,4 +1,4 @@
-package org.valz.server;
+package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
 import org.valz.util.Value;
@@ -25,7 +25,8 @@ public class ValzBackend implements ReadBackend, WriteBackend {
             dataStore.createAggregate(name, aggregate, value);
         } else {
             if (!existingAggregate.equals(aggregate)) {
-                throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
+                //throw new IllegalArgumentException("Val with same name and different aggregate already exists.");
+                // TODO: write log - ?
             }
 
             T oldValue = (T)dataStore.getValue(name).getValue();
