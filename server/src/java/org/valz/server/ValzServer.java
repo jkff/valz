@@ -5,6 +5,9 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
+import org.valz.util.backends.DataStore;
+import org.valz.util.backends.H2DataStore;
+import org.valz.util.backends.ValzBackend;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
