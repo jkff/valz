@@ -3,6 +3,7 @@ package org.valz.server;
 import org.junit.*;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
+import org.valz.util.backends.H2DataStore;
 import org.valz.util.io.IOUtils;
 
 import java.io.File;
