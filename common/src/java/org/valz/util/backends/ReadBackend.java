@@ -12,5 +12,5 @@ public interface ReadBackend {
 
     Collection<String> listVars() throws RemoteReadException;
 
-    void removeAggregate(String name) throws RemoteReadException;
+    Void removeAggregate(String name) throws RemoteReadException;
 }

@@ -10,6 +10,7 @@ import java.util.Collection;
 public class FinalStoreBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(FinalStoreBackend.class);
 
+    
     private final DataStore dataStore;
 
     public FinalStoreBackend(DataStore dataStore) {
@@ -36,7 +37,8 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         return dataStore.listVars();
     }
 
-    public synchronized void removeAggregate(String name) throws RemoteReadException {
+    public synchronized Void removeAggregate(String name) throws RemoteReadException {
         dataStore.removeAggregate(name);
+        return null;
     }
 }

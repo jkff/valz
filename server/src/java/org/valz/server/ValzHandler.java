@@ -1,5 +1,7 @@
 package org.valz.server;
 
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.apache.log4j.Logger;
@@ -8,9 +10,11 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.Pair;
 import org.valz.util.Value;
-import org.valz.util.io.IOUtils;
 import org.valz.util.backends.ReadBackend;
+import org.valz.util.backends.RemoteReadException;
+import org.valz.util.backends.RemoteWriteException;
 import org.valz.util.backends.WriteBackend;
+import org.valz.util.io.IOUtils;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.SubmitRequest;
 
@@ -26,6 +30,7 @@ import static org.valz.util.io.IOUtils.readInputStream;
 public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
 
+    
     private final AggregateRegistry registry;
     private final ReadBackend readBackend;
     private final WriteBackend writeBackend;
@@ -42,13 +47,23 @@ public class ValzHandler extends AbstractHandler {
         try {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
 
-            JSONValue requestJson = new JSONParser(new StringReader(reqStr)).nextValue();
-            Pair<InteractionType,Object> typeAndData = InteractionType.requestFromJson(requestJson, registry);
+            JSONValue requestJson = null;
+            try {
+                requestJson = new JSONParser(new StringReader(reqStr)).nextValue();
+            } catch (TokenStreamException e) {
+                throw new BadRequestException("Can not parse json.");
+            } catch (RecognitionException e) {
+                throw new BadRequestException("Can not parse json.");
+            }
+            Pair<InteractionType, Object> typeAndData = InteractionType.requestFromJson(requestJson, registry);
 
             InteractionType t = typeAndData.first;
             Object data = typeAndData.second;
 
             if (t == InteractionType.SUBMIT) {
+                if (!(data instanceof SubmitRequest)) {
+                    throw new BadRequestException("Data is not valid submit request.");
+                }
                 SubmitRequest submitRequest = (SubmitRequest)data;
                 writeBackend.submit(submitRequest.getName(), submitRequest.getAggregate(), submitRequest.getValue());
                 answer(response.getOutputStream(), InteractionType.SUBMIT, null);
@@ -56,26 +71,37 @@ public class ValzHandler extends AbstractHandler {
                 answer(response.getOutputStream(), InteractionType.LIST_VARS, readBackend.listVars());
             } else if (InteractionType.GET_VALUE.equals(t)) {
                 String name = (String)data;
-                answer(response.getOutputStream(), InteractionType.GET_VALUE, ((Value<?>) readBackend.getValue(name)));
+                answer(response.getOutputStream(), InteractionType.GET_VALUE, ((Value<?>)readBackend.getValue(name)));
             } else if (InteractionType.GET_AGGREGATE.equals(t)) {
                 String name = (String)data;
                 answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));
+            } else if (InteractionType.REMOVE_VALUE.equals(t)) {
+                String name = (String)data;
+                answer(response.getOutputStream(), InteractionType.REMOVE_VALUE, readBackend.removeAggregate(name));
             } else {
-                throw new IllegalArgumentException("Unknown request type " + t);
+                throw new BadRequestException("Unknown request type.");
             }
-
             response.setStatus(HttpServletResponse.SC_OK);
+        } catch (BadRequestException e) {
+            IOUtils.writeOutputStream(response.getOutputStream(), e.getMessage(), "utf-8");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (RemoteReadException e) {
+            log.error("RemoteReadException.", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (RemoteWriteException e) {
+            log.error("RemoteWriteException.", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unrecognized error.", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+
         ((Request)request).setHandled(true);
     }
 
 
-    private <T> void answer(OutputStream out, InteractionType<?,T> messageType, T data) throws IOException {
-        IOUtils.writeOutputStream(out,
-                InteractionType.responseToJson(messageType, data, registry).render(false),
+    private <T> void answer(OutputStream out, InteractionType<?, T> messageType, T data) throws IOException {
+        IOUtils.writeOutputStream(out, InteractionType.responseToJson(messageType, data, registry).render(false),
                 "utf-8");
     }
 }

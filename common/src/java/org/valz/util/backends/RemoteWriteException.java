@@ -1,8 +1,5 @@
 package org.valz.util.backends;
 
-/**
- * Created on: 28.03.2010 10:46:36
- */
 public class RemoteWriteException extends Exception {
     public RemoteWriteException() {
     }

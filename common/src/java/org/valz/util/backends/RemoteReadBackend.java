@@ -33,8 +33,8 @@ public class RemoteReadBackend implements ReadBackend {
         return getDataResponse(InteractionType.LIST_VARS, null);
     }
 
-    public void removeAggregate(String name) throws RemoteReadException {
-        getDataResponse(InteractionType.REMOVE_VALUE, name);
+    public Void removeAggregate(String name) throws RemoteReadException {
+        return getDataResponse(InteractionType.REMOVE_VALUE, name);
     }
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteReadException {
