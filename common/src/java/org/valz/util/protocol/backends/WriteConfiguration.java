@@ -1,4 +1,4 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.backends;
 
 public class WriteConfiguration {
 

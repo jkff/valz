@@ -1,9 +1,9 @@
-package org.valz.server;
+package org.valz.util.protocol.backends;
 
 import org.junit.*;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.H2DataStore;
+import org.valz.util.datastores.H2DataStore;
 import org.valz.util.io.IOUtils;
 
 import java.io.File;
@@ -19,7 +19,7 @@ public class H2DataStroreTest {
     private AggregateRegistry registry = null;
     private H2DataStore dataStore = null;
 
-    
+
 
     private void removeFiles() {
         new File(dbname + ".h2.db").delete();
@@ -48,14 +48,14 @@ public class H2DataStroreTest {
         assertArrayEquals(new String[] {}, dataStore.listVars().toArray());
 
         dataStore.createAggregate(varName, new LongSum(), 1L);
-        assertEquals(1, dataStore.getValue(varName));
+        assertEquals(1L, dataStore.getValue(varName).getValue());
         assertEquals(new LongSum(), dataStore.getAggregate(varName));
 
         assertArrayEquals(new String[] {varName}, dataStore.listVars().toArray());
 
 
-        dataStore.setValue(varName, 2);
-        assertEquals(2, dataStore.getValue(varName));
+        dataStore.setValue(varName, 2L);
+        assertEquals(2L, dataStore.getValue(varName).getValue());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class H2DataStroreTest {
         String varName = "var1";
 
         dataStore.createAggregate(varName, new LongSum(), 1L);
-        dataStore.setValue(varName, 2);
-        assertEquals(2, dataStore.getValue(varName));
+        dataStore.setValue(varName, 2L);
+        assertEquals(2L, dataStore.getValue(varName).getValue());
     }
 }

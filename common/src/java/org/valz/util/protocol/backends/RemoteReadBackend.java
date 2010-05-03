@@ -1,10 +1,11 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.backends;
 
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.protocol.HttpConnector;
 import org.valz.util.protocol.messages.InteractionType;
 
 import java.io.StringReader;
@@ -33,13 +34,12 @@ public class RemoteReadBackend implements ReadBackend {
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteReadException {
         try {
-            String response = HttpConnector.post(
-                    conf.getServerUrls().get(0),
+            String response = HttpConnector.post(conf.getServerUrls().get(0),
                     InteractionType.requestToJson(type, request, registry).render(false));
             JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
-            return (O) InteractionType.responseFromJson(responseJson, registry).second;
+            return (O)InteractionType.responseFromJson(responseJson, registry).second;
         } catch (Exception e) {
             throw new RemoteReadException(e);
-        } 
+        }
     }
 }

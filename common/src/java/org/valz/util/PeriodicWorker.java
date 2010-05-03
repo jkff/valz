@@ -1,4 +1,4 @@
-package org.valz.util.backends;
+package org.valz.util;
 
 import java.util.Calendar;
 
@@ -8,9 +8,9 @@ import java.util.Calendar;
  */
 public abstract class PeriodicWorker implements Runnable {
 
-    private final int intervalMillis;
+    private final long intervalMillis;
 
-    public PeriodicWorker(int intervalMillis) {
+    public PeriodicWorker(long intervalMillis) {
         this.intervalMillis = intervalMillis;
     }
 

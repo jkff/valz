@@ -1,4 +1,4 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.backends;
 
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;

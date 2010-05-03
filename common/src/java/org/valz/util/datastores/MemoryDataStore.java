@@ -1,4 +1,4 @@
-package org.valz.util.backends;
+package org.valz.util.datastores;
 
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;

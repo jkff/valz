@@ -1,4 +1,4 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.backends;
 
 /**
  * Created on: 28.03.2010 10:46:36

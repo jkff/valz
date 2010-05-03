@@ -3,8 +3,8 @@ package org.valz.viewer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.ReadConfiguration;
+import org.valz.util.protocol.backends.ReadBackend;
+import org.valz.util.protocol.backends.ReadConfiguration;
 
 import java.util.Arrays;
 

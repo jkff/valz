@@ -1,17 +1,16 @@
-package org.valz.util.backends;
+package org.valz.util.protocol.backends;
 
-import org.valz.util.protocol.RemoteWriteException;
-import org.valz.util.protocol.WriteBackend;
+import org.valz.util.PeriodicWorker;
 import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.util.Queue;
 
-class NonblockingSubmitter extends PeriodicWorker {
+class NonBlockingSubmitter extends PeriodicWorker {
     private final WriteBackend writeBackend;
     private final Queue<SubmitRequest> queue;
 
-    public NonblockingSubmitter(WriteBackend writeBackend, Queue<SubmitRequest> queue) {
-        super(5000);
+    public NonBlockingSubmitter(WriteBackend writeBackend, Queue<SubmitRequest> queue, long intervalMillis) {
+        super(intervalMillis);
         this.writeBackend = writeBackend;
         this.queue = queue;
     }
@@ -22,8 +21,13 @@ class NonblockingSubmitter extends PeriodicWorker {
         while ((request = queue.poll()) != null) {
             try {
                 writeBackend.submit(request.getName(), request.getAggregate(), request.getValue());
+            } catch (ConnectionRemoteWriteException e) {
+                // TODO: write log - ?
+                queue.add(request);
+                break;
             } catch (RemoteWriteException e) {
                 // TODO: write log - ?
+                continue;
             }
         }
     }
