@@ -21,7 +21,6 @@ Components: client api, server, viewer api, client example (uses client api), vi
     Viewer exists (an extremely simple http server)  [jkff]
     Fix build script [jkff]
     Viewer is able to assemble small replies for getValue from multiple servers on the fly [jkff]
---------------- We are here ----------------------
     
     Program supports the following aggregates: int and double sum, ordered list merge (order by JSONObject key), list concatenation, map merge, pair, minimum [slon]
  
@@ -37,6 +36,8 @@ Components: client api, server, viewer api, client example (uses client api), vi
 
     Client sends data to multiple servers at once (roundrobin scheduling)
     Servers send data to parent servers. Servers are arranged in a tree-like structure, so no duplicate update problem arises.
+
+--------------- We are here ----------------------
   
 
     Variables with history:
