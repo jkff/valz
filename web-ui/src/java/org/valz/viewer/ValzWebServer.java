@@ -17,8 +17,6 @@ public class ValzWebServer {
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
 
-
-        // For now I'm too lazy to launch 2 distinct servers. Let's test the thing on 2 identical ones.
         Server server = startServer(
                 getWebServerConfiguration(8900, Arrays.asList("http://localhost:8080", "http://localhost:8080")));
 
