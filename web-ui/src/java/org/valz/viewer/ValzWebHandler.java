@@ -13,9 +13,6 @@ import java.io.IOException;
 import static org.valz.viewer.HtmlBuilder.html;
 import static org.valz.viewer.HtmlBuilder.text;
 
-/**
- * Created on: 27.03.2010 23:57:37
- */
 public class ValzWebHandler extends AbstractHandler {
     private final ReadBackend readBackend;
 
@@ -32,7 +29,7 @@ public class ValzWebHandler extends AbstractHandler {
             for(String var : readBackend.listVars()) {
                 tbody.addChild(html("tr").children(
                         html("td").children(text(var)),
-                        html("td").children(text(readBackend.getValue(var)))));
+                        html("td").children(text(readBackend.getValue(var).getValue()))));
             }
 
             HtmlBuilder table = html("table", "border", 1).children(tbody);
