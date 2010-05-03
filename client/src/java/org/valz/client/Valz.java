@@ -2,18 +2,17 @@ package org.valz.client;
 
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.backends.RemoteWriteBackend;
-import org.valz.util.protocol.backends.RemoteWriteException;
-import org.valz.util.protocol.backends.WriteBackend;
-import org.valz.util.protocol.backends.WriteConfiguration;
+import org.valz.util.backends.RemoteWriteBackend;
+import org.valz.util.backends.RemoteWriteException;
+import org.valz.util.backends.WriteBackend;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
 
 
 
-    public static synchronized void init(WriteConfiguration conf, AggregateRegistry registry) {
-        Valz.writeBackend = new RemoteWriteBackend(conf, registry);
+    public static synchronized void init(String serverURL, AggregateRegistry registry) {
+        Valz.writeBackend = new RemoteWriteBackend(serverURL, registry);
     }
 
     public static synchronized <T> Val<T> register(

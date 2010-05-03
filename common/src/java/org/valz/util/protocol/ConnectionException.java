@@ -1,8 +1,5 @@
 package org.valz.util.protocol;
 
-/**
- * Created on: 28.03.2010 10:46:36
- */
 public class ConnectionException extends Exception {
     public ConnectionException() {
     }

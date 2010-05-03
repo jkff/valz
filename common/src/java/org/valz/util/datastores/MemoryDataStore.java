@@ -14,12 +14,6 @@ public class MemoryDataStore implements DataStore {
     private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
 
 
-
-    public MemoryDataStore() {
-    }
-
-
-
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
         name2aggregate.put(name, aggregate);
         name2val.put(name, value);

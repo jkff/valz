@@ -1,4 +1,4 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.messages.SubmitRequest;

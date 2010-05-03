@@ -1,13 +1,11 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.datastores.DataStore;
 
-import java.util.Arrays;
-import java.util.List;
-
 class BackendUtils {
-    public static <T> void submit(DataStore dataStore, String name, Aggregate<T> aggregate, T value) throws InvalidAggregateException {
+    public static <T> void submit(DataStore dataStore, String name, Aggregate<T> aggregate, T value) throws
+            InvalidAggregateException {
         Aggregate<?> existingAggregate = dataStore.getAggregate(name);
         if (existingAggregate == null) {
             dataStore.createAggregate(name, aggregate, value);
@@ -17,8 +15,7 @@ class BackendUtils {
             }
 
             T oldValue = (T)dataStore.getValue(name).getValue();
-            List<T> list = Arrays.asList(oldValue, value);
-            Object newValue = aggregate.reduce(list.iterator());
+            Object newValue = aggregate.reduce(oldValue, value);
             dataStore.setValue(name, newValue);
         }
     }

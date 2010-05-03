@@ -70,9 +70,7 @@ public class Main {
         //        }
         //
         //
-        //        ReadConfiguration readConf = new ReadConfiguration();
-        //        readConf.setServerUrls(Arrays.asList("http://localhost:8080"));
-        //        RemoteReadBackend readBackend = new RemoteReadBackend(readConf, new AggregateRegistry());
+        //        RemoteReadBackend readBackend = new RemoteReadBackend(Arrays.asList("http://localhost:8080"), new AggregateRegistry());
         //
         //        System.out.println("Count of vars: " + readBackend.listVars().size());
     }

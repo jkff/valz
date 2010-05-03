@@ -107,6 +107,23 @@ public abstract class InteractionType<I, O> {
         }
     };
 
+    public static final InteractionType<String, Void> REMOVE_VALUE = new InteractionType<String,Void>("REMOVE_VALUE") {
+        public String requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
+            return ((JSONString)json).getValue();
+        }
+        @NotNull
+        public JSONValue requestBodyToJson(String request, AggregateRegistry registry) {
+            return new JSONString(request);
+        }
+        public Void responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
+            return null;
+        }
+        @NotNull
+        public JSONValue responseBodyToJson(Void response, AggregateRegistry registry) {
+            return null;
+        }
+    };
+
     public static final InteractionType<SubmitRequest, Void> SUBMIT = new InteractionType<SubmitRequest, Void>("SUBMIT") {
         public SubmitRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
             return SubmitRequest.parse(registry, json);

@@ -1,11 +1,11 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.datastores.DataStore;
 
 public class TransitionalWriteBackend implements WriteBackend {
-    private static final Logger log = Logger.getLogger(FinalStoreBackend.class);
+    private static final Logger log = Logger.getLogger(TransitionalWriteBackend.class);
 
     private final DataStore dataStore;
 
