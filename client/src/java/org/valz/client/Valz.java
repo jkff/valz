@@ -11,8 +11,8 @@ public final class Valz {
 
 
 
-    public static synchronized void init(String serverURL, AggregateRegistry registry) {
-        Valz.writeBackend = new RemoteWriteBackend(serverURL, registry);
+    public static synchronized void init(WriteBackend writeBackend) {
+        Valz.writeBackend = writeBackend;
     }
 
     public static synchronized <T> Val<T> register(
