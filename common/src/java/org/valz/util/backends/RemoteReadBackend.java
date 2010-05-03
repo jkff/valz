@@ -13,11 +13,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class RemoteReadBackend implements ReadBackend {
-    private final List<String> serverUrls;
+    private final List<String> readServerUrls;
     private final AggregateRegistry registry;
 
-    public RemoteReadBackend(List<String> serverUrls, AggregateRegistry registry) {
-        this.serverUrls = serverUrls;
+    public RemoteReadBackend(List<String> readServerUrls, AggregateRegistry registry) {
+        this.readServerUrls = readServerUrls;
         this.registry = registry;
     }
 
@@ -39,7 +39,7 @@ public class RemoteReadBackend implements ReadBackend {
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteReadException {
         try {
-            String response = HttpConnector.post(serverUrls.get(0),
+            String response = HttpConnector.post(readServerUrls.get(0),
                     InteractionType.requestToJson(type, request, registry).render(false));
             JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
             return (O)InteractionType.responseFromJson(responseJson, registry).second;

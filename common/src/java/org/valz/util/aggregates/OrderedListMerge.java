@@ -115,11 +115,11 @@
 //
 //
 //
-//    public static class ConfigParser implements AggregateConfigParser<List> {
+//    public static class ConfigFormatter implements AggregateConfigFormatter<List> {
 //
 //        private final AggregateRegistry registry;
 //
-//        public ConfigParser(AggregateRegistry registry) {
+//        public ConfigFormatter(AggregateRegistry registry) {
 //            this.registry = registry;
 //        }
 //

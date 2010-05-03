@@ -6,20 +6,20 @@ import org.mortbay.jetty.Server;
 import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.server.ValzServer;
+import org.valz.server.ValzServerConfiguration;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.ReadBackend;
-import org.valz.util.backends.RemoteReadBackend;
-import java.util.Arrays;
 
 
 public class IntegrationTest {
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
         AggregateRegistry registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigParser());
+        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
-        Server server = ValzServer.startServer(8080);
+        ValzServerConfiguration conf = ValzServer.getServerConfiguration("h2-integration-test", 8080);
+        
+        Server server = ValzServer.startServer(conf);
 
         try {
             Valz.init("http://localhost:8080/", registry);
@@ -35,10 +35,8 @@ public class IntegrationTest {
             counter.submit(1L);
             counter.submit(2L);
 
-            ReadBackend readBackend = new RemoteReadBackend(Arrays.asList("http://localhost:8080/"), registry);
-
-            Assert.assertTrue(readBackend.listVars().contains(name));
-            Assert.assertEquals(3L, readBackend.getValue(name).getValue());
+            Assert.assertTrue(conf.readBackend.listVars().contains(name));
+            Assert.assertEquals(3L, conf.readBackend.getValue(name).getValue());
         } finally {
             server.stop();
             server.join();

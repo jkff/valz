@@ -3,7 +3,7 @@ package org.valz.util.protocol.messages;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
-import org.valz.util.AggregateParser;
+import org.valz.util.AggregateFormatter;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
@@ -18,7 +18,7 @@ public class SubmitRequest<T> {
         JSONObject jsonObject = (JSONObject)jsonValue;
         Map<String, JSONValue> map = jsonObject.getValue();
         String name = ((JSONString)map.get("name")).getValue();
-        Aggregate aggregate = AggregateParser.parse(registry, map.get("aggregate"));
+        Aggregate aggregate = AggregateFormatter.parse(registry, map.get("aggregate"));
         Object value = aggregate.dataFromJson(map.get("value"));
 
         return new SubmitRequest(name, aggregate, value);
@@ -50,7 +50,7 @@ public class SubmitRequest<T> {
 
     public JSONValue toJson(AggregateRegistry registry) {
         return makeJson(
-                "name", name, "aggregate", AggregateParser.toJson(registry, aggregate),
+                "name", name, "aggregate", AggregateFormatter.toJson(registry, aggregate),
                 "value", aggregate.dataToJson(value));
     }
 }

@@ -1,6 +1,6 @@
 package org.valz.util;
 
-import org.valz.util.aggregates.AggregateConfigParser;
+import org.valz.util.aggregates.AggregateConfigFormatter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,19 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AggregateRegistry {
-    private final Map<String, AggregateConfigParser<?>> name2agg = new HashMap<String, AggregateConfigParser<?>>();
+    private final Map<String, AggregateConfigFormatter<?>> name2agg = new HashMap<String, AggregateConfigFormatter<?>>();
 
     public AggregateRegistry() {
     }
 
-    public void register(String name, AggregateConfigParser<?> configParser) {
+    public void register(String name, AggregateConfigFormatter<?> configFormatter) {
         if (name2agg.containsKey(name)) {
             throw new IllegalArgumentException("Aggregate with this name already registered.");
         }
-        name2agg.put(name, configParser);
+        name2agg.put(name, configFormatter);
     }
 
-    public AggregateConfigParser<?> get(String name) {
+    public AggregateConfigFormatter<?> get(String name) {
         return name2agg.get(name);
     }
 

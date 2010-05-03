@@ -1,9 +1,8 @@
 package org.valz.util.protocol.messages;
 
 import com.sdicons.json.model.*;
-import org.antlr.works.visualization.graphics.GRenderer;
 import org.jetbrains.annotations.NotNull;
-import org.valz.util.AggregateParser;
+import org.valz.util.AggregateFormatter;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.Pair;
 import org.valz.util.Value;
@@ -74,11 +73,11 @@ public abstract class InteractionType<I, O> {
             return new JSONString(request);
         }
         public Aggregate<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
-            return AggregateParser.parse(registry, json);
+            return AggregateFormatter.parse(registry, json);
         }
         @NotNull
         public JSONValue responseBodyToJson(Aggregate<?> response, AggregateRegistry registry) {
-            return AggregateParser.toJson(registry, response);
+            return AggregateFormatter.toJson(registry, response);
         }
     };
 

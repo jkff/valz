@@ -67,18 +67,18 @@
 //
 //
 //
-//    public static class ConfigParser implements AggregateConfigParser<Map> {
+//    public static class ConfigFormatter implements AggregateConfigFormatter<Map> {
 //
 //        private final AggregateRegistry registry;
 //
-//        public ConfigParser(AggregateRegistry registry) {
+//        public ConfigFormatter(AggregateRegistry registry) {
 //            this.registry = registry;
 //        }
 //
 //        public MapMerge parse(JSONValue jsonValue) throws ParserException {
 //            JSONObject jsonObject = (JSONObject)jsonValue;
 //            String name = ((JSONString)jsonObject.get("name")).getValue();
-//            AggregateConfigParser configParser = registry.get(name);
+//            AggregateConfigFormatter configParser = registry.get(name);
 //            Aggregate aggregate = configParser.parse(jsonObject.get("aggregate"));
 //
 //            return new MapMerge(aggregate);
