@@ -1,4 +1,4 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.junit.*;
 import org.valz.util.AggregateRegistry;

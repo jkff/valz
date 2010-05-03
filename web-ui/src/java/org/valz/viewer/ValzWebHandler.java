@@ -2,8 +2,8 @@ package org.valz.viewer;
 
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.valz.util.protocol.backends.ReadBackend;
-import org.valz.util.protocol.backends.RemoteReadException;
+import org.valz.util.backends.ReadBackend;
+import org.valz.util.backends.RemoteReadException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

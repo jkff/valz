@@ -1,4 +1,4 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.valz.util.PeriodicWorker;
 import org.valz.util.aggregates.Aggregate;
@@ -33,7 +33,7 @@ class TransitionalSubmitter extends PeriodicWorker {
                 Aggregate aggregate = dataStore.getAggregate(name);
                 try {
                     writeBackend.submit(name, aggregate, value);
-                } catch (ConnectionRemoteWriteException e) {
+                } catch (ConnectionRefusedRemoteWriteException e) {
                     // TODO: write log - ?
                     break;
                 } catch (RemoteWriteException e) {

@@ -1,4 +1,4 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 public class InvalidAggregateException extends Exception {
     public InvalidAggregateException() {

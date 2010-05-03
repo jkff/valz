@@ -1,4 +1,4 @@
-package org.valz.util.protocol.backends;
+package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
 import org.valz.util.Value;
@@ -24,15 +24,19 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         }
     }
 
-    public synchronized Collection<String> listVars() {
-        return dataStore.listVars();
-    }
-
     public synchronized Value getValue(String name) {
         return dataStore.getValue(name);
     }
 
     public synchronized Aggregate getAggregate(String name) {
         return dataStore.getAggregate(name);
+    }
+
+    public synchronized Collection<String> listVars() {
+        return dataStore.listVars();
+    }
+
+    public synchronized void removeAggregate(String name) throws RemoteReadException {
+        dataStore.removeAggregate(name);
     }
 }

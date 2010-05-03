@@ -7,7 +7,7 @@ import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.datastores.H2DataStore;
 import org.valz.util.datastores.DataStore;
-import org.valz.util.protocol.backends.FinalStoreBackend;
+import org.valz.util.backends.FinalStoreBackend;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);

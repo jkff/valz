@@ -8,16 +8,11 @@ import org.valz.client.Valz;
 import org.valz.server.ValzServer;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.backends.ReadBackend;
-import org.valz.util.protocol.backends.ReadConfiguration;
-import org.valz.util.protocol.backends.RemoteReadBackend;
-import org.valz.util.protocol.backends.WriteConfiguration;
-
+import org.valz.util.backends.ReadBackend;
+import org.valz.util.backends.RemoteReadBackend;
 import java.util.Arrays;
 
-/**
- * Created on: 25.04.2010 21:56:25
- */
+
 public class IntegrationTest {
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
@@ -27,9 +22,7 @@ public class IntegrationTest {
         Server server = ValzServer.startServer(8080);
 
         try {
-            WriteConfiguration conf = new WriteConfiguration();
-            conf.setServerURL("http://localhost:8080/");
-            Valz.init(conf, registry);
+            Valz.init("http://localhost:8080/", registry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -42,9 +35,7 @@ public class IntegrationTest {
             counter.submit(1L);
             counter.submit(2L);
 
-            ReadConfiguration readConf = new ReadConfiguration();
-            readConf.setServerUrls(Arrays.asList("http://localhost:8080/"));
-            ReadBackend readBackend = new RemoteReadBackend(readConf, registry);
+            ReadBackend readBackend = new RemoteReadBackend(Arrays.asList("http://localhost:8080/"), registry);
 
             Assert.assertTrue(readBackend.listVars().contains(name));
             Assert.assertEquals(3L, readBackend.getValue(name).getValue());
