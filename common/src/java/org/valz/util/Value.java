@@ -13,7 +13,7 @@ public class Value<T> {
     public static Value parse(AggregateRegistry registry, JSONValue json) throws ParserException {
         JSONObject jsonObject = (JSONObject)json;
         Map<String, JSONValue> map = jsonObject.getValue();
-        Aggregate aggregate = AggregateParser.parse(registry, map.get("aggregate"));
+        Aggregate aggregate = AggregateFormatter.parse(registry, map.get("aggregate"));
         Object value = aggregate.dataFromJson(map.get("value"));
         return new Value(aggregate, value);
     }
@@ -30,7 +30,11 @@ public class Value<T> {
         return value;
     }
 
+    public Aggregate<T> getAggregate() {
+        return aggregate;
+    }
+
     public JSONValue toJson(AggregateRegistry registry) {
-        return makeJson("aggregate", AggregateParser.toJson(registry, aggregate), "value", aggregate.dataToJson(value));
+        return makeJson("aggregate", AggregateFormatter.toJson(registry, aggregate), "value", aggregate.dataToJson(value));
     }
 }

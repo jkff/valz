@@ -44,7 +44,7 @@
 //
 //
 //
-//    public static class ConfigParser implements AggregateConfigParser<Long> {
+//    public static class ConfigFormatter implements AggregateConfigFormatter<Long> {
 //        public MinLong parse(JSONValue json) {
 //            return new MinLong();
 //        }

@@ -43,7 +43,7 @@ public class LongSum extends AbstractAggregate<Long, LongSum> {
         return 0;
     }
 
-    public static class ConfigParser implements AggregateConfigParser<LongSum> {
+    public static class ConfigFormatter implements AggregateConfigFormatter<LongSum> {
         public LongSum parse(JSONValue jsonValue) {
             return new LongSum();
         }

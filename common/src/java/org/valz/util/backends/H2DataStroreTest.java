@@ -31,7 +31,7 @@ public class H2DataStroreTest {
     public void setUp() {
         removeFiles();
         registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigParser());
+        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
         dataStore = new H2DataStore(dbname, registry);
     }
 

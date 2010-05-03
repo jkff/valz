@@ -10,7 +10,7 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.valz.util.AggregateParser;
+import org.valz.util.AggregateFormatter;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.Value;
 import org.valz.util.aggregates.Aggregate;
@@ -58,7 +58,7 @@ public class H2DataStore implements DataStore, Closeable {
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
         execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);", name,
-                AggregateParser.toJson(registry, aggregate).render(false),
+                AggregateFormatter.toJson(registry, aggregate).render(false),
                 aggregate.dataToJson(value).render(false));
     }
 
@@ -90,7 +90,7 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return AggregateParser.parse(registry, jsonValue);
+                    return AggregateFormatter.parse(registry, jsonValue);
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }
