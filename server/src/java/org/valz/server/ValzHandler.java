@@ -9,8 +9,8 @@ import org.valz.util.AggregateRegistry;
 import org.valz.util.Pair;
 import org.valz.util.Value;
 import org.valz.util.io.IOUtils;
-import org.valz.util.protocol.ReadBackend;
-import org.valz.util.protocol.WriteBackend;
+import org.valz.util.protocol.backends.ReadBackend;
+import org.valz.util.protocol.backends.WriteBackend;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.SubmitRequest;
 

@@ -5,9 +5,9 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.DataStore;
-import org.valz.util.backends.H2DataStore;
-import org.valz.util.backends.ValzBackend;
+import org.valz.util.datastores.H2DataStore;
+import org.valz.util.datastores.DataStore;
+import org.valz.util.protocol.backends.FinalStoreBackend;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -33,7 +33,7 @@ public class ValzServer {
         registry.register(LongSum.NAME, new LongSum.ConfigParser());
 
         DataStore dataStore = new H2DataStore("h2store", registry);
-        ValzBackend backend = new ValzBackend(dataStore);
+        FinalStoreBackend backend = new FinalStoreBackend(dataStore);
 
         server.addHandler(new ValzHandler(backend, backend, registry));
 

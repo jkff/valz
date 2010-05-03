@@ -5,23 +5,32 @@ import org.valz.util.io.IOUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
 public class HttpConnector {
-    public static String post(@NotNull String serverURL, @NotNull String data) throws IOException {
+    public static String post(@NotNull String serverURL, @NotNull String data) throws MalformedURLException,
+            ConnectionException {
         URL url = new URL(serverURL);
         HttpURLConnection connection = null;
 
         try {
             connection = (HttpURLConnection)url.openConnection();
 
-            connection.setRequestMethod("POST");
+            try {
+                connection.setRequestMethod("POST");
+            } catch (ProtocolException e) {
+                throw new RuntimeException(e);
+            }
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setUseCaches(false);
 
             IOUtils.writeOutputStream(connection.getOutputStream(), data, "UTF-8");
             return IOUtils.readInputStream(connection.getInputStream(), "UTF-8");
+        } catch (IOException e) {
+            throw new ConnectionException(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();

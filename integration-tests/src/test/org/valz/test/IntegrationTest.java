@@ -8,7 +8,10 @@ import org.valz.client.Valz;
 import org.valz.server.ValzServer;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
-import org.valz.util.protocol.*;
+import org.valz.util.protocol.backends.ReadBackend;
+import org.valz.util.protocol.backends.ReadConfiguration;
+import org.valz.util.protocol.backends.RemoteReadBackend;
+import org.valz.util.protocol.backends.WriteConfiguration;
 
 import java.util.Arrays;
 

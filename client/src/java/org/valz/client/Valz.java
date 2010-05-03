@@ -2,11 +2,13 @@ package org.valz.client;
 
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.protocol.*;
+import org.valz.util.protocol.backends.RemoteWriteBackend;
+import org.valz.util.protocol.backends.RemoteWriteException;
+import org.valz.util.protocol.backends.WriteBackend;
+import org.valz.util.protocol.backends.WriteConfiguration;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
-
 
 
 

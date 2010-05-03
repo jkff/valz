@@ -1,9 +1,11 @@
-package org.valz.util.protocol;
+package org.valz.util.protocol.backends;
 
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.protocol.ConnectionException;
+import org.valz.util.protocol.HttpConnector;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.SubmitRequest;
 
@@ -21,15 +23,16 @@ public class RemoteWriteBackend implements WriteBackend {
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
         getDataResponse(InteractionType.SUBMIT, new SubmitRequest<T>(name, aggregate, value));
-        // TODO: save val at exception to queue and try send later
     }
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteWriteException {
         try {
-            String response = HttpConnector.post(conf.getServerURL(),
-                    InteractionType.requestToJson(type, request, registry).render(false));
+            String response = HttpConnector
+                    .post(conf.getServerURL(), InteractionType.requestToJson(type, request, registry).render(false));
             JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
-            return (O) InteractionType.responseFromJson(responseJson, registry).second;
+            return (O)InteractionType.responseFromJson(responseJson, registry).second;
+        } catch (ConnectionException e) {
+            throw new ConnectionRemoteWriteException(e);
         } catch (Exception e) {
             throw new RemoteWriteException(e);
         }
