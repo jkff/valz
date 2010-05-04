@@ -1,6 +1,6 @@
 package org.valz.server;
 
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.WriteBackend;
 

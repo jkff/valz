@@ -2,11 +2,10 @@ package org.valz.viewer;
 
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.valz.util.AggregateFormatter;
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateFormatter;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadException;
-import org.valz.util.backends.RemoteWriteException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

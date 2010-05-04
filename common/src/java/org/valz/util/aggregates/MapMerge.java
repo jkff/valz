@@ -6,7 +6,7 @@
 //import com.sdicons.json.model.JSONString;
 //import com.sdicons.json.model.JSONValue;
 //import org.jetbrains.annotations.NotNull;
-//import org.valz.util.AggregateRegistry;
+//import org.valz.util.aggregates.AggregateRegistry;
 //
 //import java.util.Arrays;
 //import java.util.HashMap;
@@ -59,10 +59,10 @@
 //        return "MapMerge";
 //    }
 //
-//    public Object configToJson() {
+//    public Object toJson() {
 //        return makeJson(
 //                "name", mergeConflictsAggregate.getName(),
-//                "aggregate", mergeConflictsAggregate.configToJson());
+//                "aggregate", mergeConflictsAggregate.toJson());
 //    }
 //
 //
@@ -75,11 +75,11 @@
 //            this.registry = registry;
 //        }
 //
-//        public MapMerge parse(JSONValue jsonValue) throws ParserException {
+//        public MapMerge fromJson(JSONValue jsonValue) throws ParserException {
 //            JSONObject jsonObject = (JSONObject)jsonValue;
 //            String name = ((JSONString)jsonObject.get("name")).getValue();
 //            AggregateConfigFormatter configParser = registry.get(name);
-//            Aggregate aggregate = configParser.parse(jsonObject.get("aggregate"));
+//            Aggregate aggregate = configParser.fromJson(jsonObject.get("aggregate"));
 //
 //            return new MapMerge(aggregate);
 //        }

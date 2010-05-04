@@ -1,8 +1,6 @@
 package org.valz.client;
 
-import org.valz.util.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.backends.RemoteWriteBackend;
 import org.valz.util.backends.RemoteWriteException;
 import org.valz.util.backends.WriteBackend;
 

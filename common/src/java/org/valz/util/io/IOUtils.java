@@ -29,8 +29,8 @@ public class IOUtils {
         }
     }
 
-    public static void writeOutputStream(OutputStream stream, @NotNull String data, @NotNull String encoding) throws
-            IOException {
+    public static void writeOutputStream(OutputStream stream, @NotNull String data,
+                                         @NotNull String encoding) throws IOException {
         Writer w = null;
         try {
             w = new OutputStreamWriter(stream, encoding);

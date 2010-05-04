@@ -1,7 +1,7 @@
 package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
-import org.valz.util.Value;
+import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.datastores.DataStore;
 
@@ -10,7 +10,7 @@ import java.util.Collection;
 public class FinalStoreBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(FinalStoreBackend.class);
 
-    
+
     private final DataStore dataStore;
 
     public FinalStoreBackend(DataStore dataStore) {

@@ -8,7 +8,7 @@ import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.server.ValzServer;
 import org.valz.server.ValzServerConfiguration;
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadBackend;
@@ -17,7 +17,6 @@ import org.valz.util.backends.WriteBackend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 
