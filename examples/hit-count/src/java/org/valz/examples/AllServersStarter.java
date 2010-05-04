@@ -1,10 +1,12 @@
+package org.valz.examples;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.client.Val;
 import org.valz.client.Valz;
-import org.valz.server.ValzServerConfiguration;
-import org.valz.test.ServerUtils;
+import org.valz.server.ValzServerConfig;
+import org.valz.server.ServerUtils;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
@@ -22,17 +24,17 @@ public class AllServersStarter {
         PropertyConfigurator.configure("log4j.properties");
 
         int[] ports = {8800, 8801};
-        List<ValzServerConfiguration> listConfigs = ServerUtils.getServerConfigs(ports);
-        List<Server> listServers = ServerUtils.startServers(listConfigs);
+        List<ValzServerConfig> configs = ServerUtils.getServerConfigs(ports);
+        List<Server> servers = ServerUtils.startServers(configs);
 
         Server valzWebServer = ValzWebServer
-                .startServer(ValzWebServer.getWebServerConfiguration(8900, ServerUtils.portsToLocalAddresses(ports)));
+                .startServer(ValzWebServer.getWebServerConfig(8900, ServerUtils.portsToLocalAddresses(ports)));
 
 
         // init client
         {
             List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-            for (ValzServerConfiguration config : listConfigs) {
+            for (ValzServerConfig config : configs) {
                 listWriteBackends.add(config.writeBackend);
             }
             WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
@@ -55,7 +57,7 @@ public class AllServersStarter {
         } catch (InterruptedException e) {
             log.error("Could not stop valz web server", e);
         }
-        ServerUtils.stopServers(listServers);
+        ServerUtils.stopServers(servers);
     }
 
     private AllServersStarter() {

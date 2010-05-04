@@ -1,11 +1,8 @@
-package org.valz.test;
+package org.valz.server;
 
 import org.mortbay.jetty.Server;
-import org.valz.server.ValzServer;
-import org.valz.server.ValzServerConfiguration;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class ServerUtils {
@@ -18,17 +15,17 @@ public class ServerUtils {
         return list;
     }
 
-    public static List<ValzServerConfiguration> getServerConfigs(int... ports) {
-        List<ValzServerConfiguration> listConfigs = new ArrayList<ValzServerConfiguration>();
+    public static List<ValzServerConfig> getServerConfigs(int... ports) {
+        List<ValzServerConfig> listConfigs = new ArrayList<ValzServerConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.getServerConfiguration("h2store" + port, port));
+            listConfigs.add(ValzServer.getServerConfig("h2store" + port, port));
         }
         return listConfigs;
     }
 
-    public static List<Server> startServers(List<ValzServerConfiguration> listConfigs) throws Exception {
+    public static List<Server> startServers(List<ValzServerConfig> listConfigs) throws Exception {
         List<Server> listServers = new ArrayList<Server>();
-        for (ValzServerConfiguration config : listConfigs) {
+        for (ValzServerConfig config : listConfigs) {
             listServers.add(ValzServer.startServer(config));
         }
         return listServers;
