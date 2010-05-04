@@ -38,14 +38,14 @@
 //        return "MinLong";
 //    }
 //
-//    public JSONValue configToJson() {
+//    public JSONValue toJson() {
 //        return new JSONString("");
 //    }
 //
 //
 //
 //    public static class ConfigFormatter implements AggregateConfigFormatter<Long> {
-//        public MinLong parse(JSONValue json) {
+//        public MinLong fromJson(JSONValue json) {
 //            return new MinLong();
 //        }
 //    }

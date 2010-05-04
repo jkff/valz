@@ -1,6 +1,6 @@
 package org.valz.util.backends;
 
-import org.valz.util.Value;
+import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 
 import java.util.Collection;

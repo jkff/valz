@@ -1,8 +1,7 @@
 package org.valz.viewer;
 
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.backends.ReadBackend;
-import org.valz.util.backends.WriteBackend;
 
 public class ValzWebServerConfiguration {
     public final int port;

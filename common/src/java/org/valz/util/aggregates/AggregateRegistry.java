@@ -1,6 +1,4 @@
-package org.valz.util;
-
-import org.valz.util.aggregates.AggregateConfigFormatter;
+package org.valz.util.aggregates;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AggregateRegistry {
-    private final Map<String, AggregateConfigFormatter<?>> name2agg = new HashMap<String, AggregateConfigFormatter<?>>();
+    private final Map<String, AggregateConfigFormatter<?>> name2agg =
+            new HashMap<String, AggregateConfigFormatter<?>>();
 
     public AggregateRegistry() {
     }

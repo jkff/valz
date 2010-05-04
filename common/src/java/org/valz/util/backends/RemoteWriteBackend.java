@@ -2,7 +2,7 @@ package org.valz.util.backends;
 
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.ConnectionException;
 import org.valz.util.protocol.HttpConnector;

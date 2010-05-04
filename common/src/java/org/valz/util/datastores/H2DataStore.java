@@ -10,11 +10,10 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.valz.util.AggregateFormatter;
-import org.valz.util.AggregateRegistry;
-import org.valz.util.Value;
-import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.ParserException;
+import org.valz.util.aggregates.*;
+import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.AggregateFormatter;
+import org.valz.util.aggregates.Value;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -90,7 +89,7 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return AggregateFormatter.parse(registry, jsonValue);
+                    return AggregateFormatter.fromJson(registry, jsonValue);
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }
@@ -125,8 +124,7 @@ public class H2DataStore implements DataStore, Closeable {
 
     public <T> void setValue(String name, T value) {
         Aggregate<T> aggregate = getAggregate(name);
-        execute("UPDATE Valz SET value = ? WHERE name = ?;",
-                aggregate.dataToJson(value).render(false), name);
+        execute("UPDATE Valz SET value = ? WHERE name = ?;", aggregate.dataToJson(value).render(false), name);
     }
 
     public void removeAggregate(String name) {

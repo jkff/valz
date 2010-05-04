@@ -1,8 +1,5 @@
 package org.valz.util.aggregates;
 
-/**
- * Created on: 28.03.2010 10:46:36
- */
 public class ParserException extends RuntimeException {
     public ParserException() {
     }

@@ -2,8 +2,8 @@ package org.valz.util.backends;
 
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
-import org.valz.util.AggregateRegistry;
-import org.valz.util.Value;
+import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.protocol.HttpConnector;
 import org.valz.util.protocol.messages.InteractionType;
@@ -30,7 +30,8 @@ public class RemoteReadBackend implements ReadBackend {
             if (prevAggregate == null) {
                 prevAggregate = aggregate;
             } else if (!aggregate.equals(prevAggregate)) {
-                throw new RemoteReadException("Different servers contains different aggregates with same name.");
+                throw new RemoteReadException(
+                        "Different servers contains different aggregates with same name.");
             }
         }
         return prevAggregate;
@@ -43,7 +44,8 @@ public class RemoteReadBackend implements ReadBackend {
             if (prevValue == null) {
                 prevValue = value;
             } else if (!value.getAggregate().equals(prevValue.getAggregate())) {
-                throw new RemoteReadException("Different servers contains different aggregates with same name.");
+                throw new RemoteReadException(
+                        "Different servers contains different aggregates with same name.");
             } else {
                 prevValue = new Value(prevValue.getAggregate(),
                         prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
@@ -68,10 +70,11 @@ public class RemoteReadBackend implements ReadBackend {
         return null;
     }
 
-    private <I, O> O getDataResponse(String url, InteractionType<I, O> type, I request) throws RemoteReadException {
+    private <I, O> O getDataResponse(String url, InteractionType<I, O> type, I request) throws
+            RemoteReadException {
         try {
-            String response =
-                    HttpConnector.post(url, InteractionType.requestToJson(type, request, registry).render(false));
+            String response = HttpConnector
+                    .post(url, InteractionType.requestToJson(type, request, registry).render(false));
             JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
             return (O)InteractionType.responseFromJson(responseJson, registry).second;
         } catch (Exception e) {

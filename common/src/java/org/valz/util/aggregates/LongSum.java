@@ -39,16 +39,17 @@ public class LongSum extends AbstractAggregate<Long, LongSum> {
     public boolean equals(Object other) {
         return (other instanceof LongSum);
     }
+
     public int hashCode() {
         return 0;
     }
 
     public static class ConfigFormatter implements AggregateConfigFormatter<LongSum> {
-        public LongSum parse(JSONValue jsonValue) {
+        public LongSum fromJson(JSONValue jsonValue) {
             return new LongSum();
         }
 
-        public JSONValue configToJson(LongSum aggregate) {
+        public JSONValue toJson(LongSum aggregate) {
             return null;
         }
     }

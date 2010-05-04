@@ -11,7 +11,8 @@ class BackendUtils {
             dataStore.createAggregate(name, aggregate, value);
         } else {
             if (!existingAggregate.equals(aggregate)) {
-                throw new InvalidAggregateException("Val with same name and different aggregate already exists.");
+                throw new InvalidAggregateException(
+                        "Val with same name and different aggregate already exists.");
             }
 
             T oldValue = (T)dataStore.getValue(name).getValue();

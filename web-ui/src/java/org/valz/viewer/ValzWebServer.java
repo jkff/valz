@@ -3,7 +3,7 @@ package org.valz.viewer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadBackend;

@@ -1,7 +1,9 @@
-package org.valz.util.backends;
+package org.valz.util.datastores;
 
-import org.junit.*;
-import org.valz.util.AggregateRegistry;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.datastores.H2DataStore;
 import org.valz.util.io.IOUtils;

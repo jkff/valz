@@ -4,7 +4,7 @@
 //import com.sdicons.json.mapper.MapperException;
 //import com.sdicons.json.model.JSONValue;
 //import org.jetbrains.annotations.NotNull;
-//import org.valz.util.AggregateRegistry;
+//import org.valz.util.aggregates.AggregateRegistry;
 //import org.valz.util.aggregates.Pair;
 //
 //import java.util.*;
@@ -104,7 +104,7 @@
 //        return "OrderedListMerge";
 //    }
 //
-//    public JSONValue configToJson() {
+//    public JSONValue toJson() {
 //        try {
 //            // TODO: invent comparator mapping and parsing
 //            return JSONMapper.toJSON(comparator);
@@ -123,7 +123,7 @@
 //            this.registry = registry;
 //        }
 //
-//        public OrderedListMerge parse(JSONValue json) throws ParserException {
+//        public OrderedListMerge fromJson(JSONValue json) throws ParserException {
 //            Comparator comparator  ;
 //            try {
 //                comparator = (Comparator)JSONMapper.toJava(json);
