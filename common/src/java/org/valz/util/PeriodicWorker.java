@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 /**
  * Thread daemon for background periodic work.
- * Wakes up every intervalMillis milliseconds and calls action().
+ * Wakes up every intervalMillis milliseconds and calls execute().
  */
 public abstract class PeriodicWorker extends Thread {
 
@@ -16,9 +16,9 @@ public abstract class PeriodicWorker extends Thread {
     }
 
     public void run() {
-        long prevTime = Calendar.getInstance().getTimeInMillis();
+        long prevTime = System.currentTimeMillis();
         while (true) {
-            long delayTime = intervalMillis + prevTime - Calendar.getInstance().getTimeInMillis();
+            long delayTime = intervalMillis + prevTime - System.currentTimeMillis();
             if (delayTime > 0) {
                 try {
                     Thread.sleep(intervalMillis);
@@ -26,10 +26,10 @@ public abstract class PeriodicWorker extends Thread {
                     break;
                 }
             }
-            prevTime = Calendar.getInstance().getTimeInMillis();
-            action();
+            prevTime = System.currentTimeMillis();
+            execute();
         }
     }
 
-    public abstract void action();
+    public abstract void execute();
 }

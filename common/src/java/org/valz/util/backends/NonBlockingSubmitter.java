@@ -19,7 +19,7 @@ class NonBlockingSubmitter extends PeriodicWorker {
     }
 
     @Override
-    public void action() {
+    public void execute() {
         SubmitRequest request;
         while ((request = queue.poll()) != null) {
             try {

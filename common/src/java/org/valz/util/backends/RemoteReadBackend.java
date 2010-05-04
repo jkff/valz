@@ -25,13 +25,19 @@ public class RemoteReadBackend implements ReadBackend {
 
     public Aggregate<?> getAggregate(String name) throws RemoteReadException {
         Aggregate<?> prevAggregate = null;
-        for (String url : readServerUrls) {
-            Aggregate<?> aggregate = getDataResponse(url, InteractionType.GET_AGGREGATE, name);
+        for (int i=0; i<readServerUrls.size(); i++) {
+            Aggregate<?> aggregate = getDataResponse(readServerUrls.get(i), InteractionType.GET_AGGREGATE, name);
             if (prevAggregate == null) {
                 prevAggregate = aggregate;
             } else if (!aggregate.equals(prevAggregate)) {
-                throw new RemoteReadException(
-                        "Different servers contains different aggregates with same name.");
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("%s", readServerUrls.get(i)));
+                for (int j=1; j<i; j++) {
+                    sb.append(String.format(", %s", readServerUrls.get(i)));
+                }
+                throw new RemoteReadException(String.format(
+                        "Server %s contains aggregate %s with description, differs from servers: %s.",
+                        readServerUrls.get(i), name, sb.toString()));
             }
         }
         return prevAggregate;
@@ -39,13 +45,19 @@ public class RemoteReadBackend implements ReadBackend {
 
     public Value getValue(String name) throws RemoteReadException {
         Value prevValue = null;
-        for (String url : readServerUrls) {
-            Value<?> value = getDataResponse(url, InteractionType.GET_VALUE, name);
+        for (int i=0; i<readServerUrls.size(); i++) {
+            Value<?> value = getDataResponse(readServerUrls.get(i), InteractionType.GET_VALUE, name);
             if (prevValue == null) {
                 prevValue = value;
             } else if (!value.getAggregate().equals(prevValue.getAggregate())) {
-                throw new RemoteReadException(
-                        "Different servers contains different aggregates with same name.");
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("%s", readServerUrls.get(i)));
+                for (int j=1; j<i; j++) {
+                    sb.append(String.format(", %s", readServerUrls.get(i)));
+                }
+                throw new RemoteReadException(String.format(
+                        "Server %s contains aggregate %s with description, differs from servers: %s.",
+                        readServerUrls.get(i), name, sb.toString()));
             } else {
                 prevValue = new Value(prevValue.getAggregate(),
                         prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
@@ -63,11 +75,10 @@ public class RemoteReadBackend implements ReadBackend {
         return set;
     }
 
-    public Void removeAggregate(String name) throws RemoteReadException {
+    public void removeAggregate(String name) throws RemoteReadException {
         for (String url : readServerUrls) {
             getDataResponse(url, InteractionType.REMOVE_VALUE, name);
         }
-        return null;
     }
 
     private <I, O> O getDataResponse(String url, InteractionType<I, O> type, I request) throws

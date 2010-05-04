@@ -11,9 +11,6 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.valz.util.aggregates.*;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.AggregateFormatter;
-import org.valz.util.aggregates.Value;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -50,19 +47,20 @@ public class H2DataStore implements DataStore, Closeable {
                 new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
         dataSource = new PoolingDataSource(connectionPool);
 
-        execute("CREATE TABLE IF NOT EXISTS Valz ( name varchar PRIMARY KEY, aggregate varchar, value varchar);");
+        execute("CREATE TABLE IF NOT EXISTS Valz ( name varchar PRIMARY KEY, aggregate varchar, value varchar)");
     }
 
 
 
     public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
-        execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?);", name,
+        execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?)", name,
                 AggregateFormatter.toJson(registry, aggregate).render(false),
                 aggregate.dataToJson(value).render(false));
     }
 
     public Collection<String> listVars() {
-        return executeQuery(new Function<Collection<String>>() {
+        return executeQuery(new ResultSetParser<Collection<String>>() {
+            
             public Collection<String> apply(ResultSet resultSet) throws SQLException {
                 Collection<String> list = new ArrayList<String>();
                 while (resultSet.next()) {
@@ -70,37 +68,41 @@ public class H2DataStore implements DataStore, Closeable {
                 }
                 return list;
             }
-        }, "SELECT name FROM Valz;");
+        }, "SELECT name FROM Valz");
     }
 
     public <T> Aggregate<T> getAggregate(String name) {
-        return executeQuery(new Function<Aggregate<T>>() {
-            public Aggregate<T> apply(ResultSet resultSet) throws SQLException {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                String str = resultSet.getString(1);
-                JSONValue jsonValue;
-                try {
-                    jsonValue = new JSONParser(new StringReader(str)).nextValue();
-                } catch (TokenStreamException e) {
-                    throw new RuntimeException(e);
-                } catch (RecognitionException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    return AggregateFormatter.fromJson(registry, jsonValue);
-                } catch (ParserException e) {
-                    throw new RuntimeException(e);
-                }
+        return executeGet(new JSONValueParser<Aggregate<T>>() {
+
+            public Aggregate<T> apply(JSONValue jsonValue) throws ParserException {
+                return AggregateFormatter.fromJson(registry, jsonValue);
             }
-        }, "SELECT aggregate FROM Valz WHERE name = ?;", name);
+        }, "SELECT aggregate FROM Valz WHERE name = ?", name);
     }
 
     public <T> Value<T> getValue(String name) {
         final Aggregate<T> aggregate = getAggregate(name);
-        return executeQuery(new Function<Value<T>>() {
-            public Value<T> apply(ResultSet resultSet) throws SQLException {
+        return executeGet(new JSONValueParser<Value<T>>() {
+
+            public Value<T> apply(JSONValue jsonValue) throws ParserException {
+                return new Value<T>(aggregate, (T)aggregate.dataFromJson(jsonValue));
+            }
+        }, "SELECT value FROM Valz WHERE name = ?", name);
+    }
+
+    public <T> void setValue(String name, T value) {
+        Aggregate<T> aggregate = getAggregate(name);
+        execute("UPDATE Valz SET value = ? WHERE name = ?", aggregate.dataToJson(value).render(false), name);
+    }
+
+    public void removeAggregate(String name) {
+        execute("DELETE Valz WHERE name = ?", name);
+    }
+
+    private <T> T executeGet(JSONValueParser<T> func, String query, String... params) {
+        final JSONValueParser<T> finalFunc = func;
+        return executeQuery(new ResultSetParser<T>() {
+            public T apply(ResultSet resultSet) throws SQLException {
                 if (!resultSet.next()) {
                     return null;
                 }
@@ -114,25 +116,16 @@ public class H2DataStore implements DataStore, Closeable {
                     throw new RuntimeException(e);
                 }
                 try {
-                    return new Value<T>(aggregate, (T)aggregate.dataFromJson(jsonValue));
+                    return finalFunc.apply(jsonValue);
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
                 }
             }
-        }, "SELECT value FROM Valz WHERE name = ?;", name);
-    }
-
-    public <T> void setValue(String name, T value) {
-        Aggregate<T> aggregate = getAggregate(name);
-        execute("UPDATE Valz SET value = ? WHERE name = ?;", aggregate.dataToJson(value).render(false), name);
-    }
-
-    public void removeAggregate(String name) {
-        execute("DELETE Valz WHERE name = ?;", name);
+        }, query, params);
     }
 
 
-    private <T> T executeQuery(Function<T> func, String query, String... params) {
+    private <T> T executeQuery(ResultSetParser<T> func, String query, String... params) {
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -181,7 +174,11 @@ public class H2DataStore implements DataStore, Closeable {
         }
     }
 
-    private interface Function<T> {
+    private interface ResultSetParser<T> {
         T apply(ResultSet resultSet) throws SQLException;
+    }
+
+    private interface JSONValueParser<T> {
+        T apply(JSONValue jsonValue) throws ParserException;
     }
 }

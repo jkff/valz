@@ -37,8 +37,7 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         return dataStore.listVars();
     }
 
-    public synchronized Void removeAggregate(String name) throws RemoteReadException {
+    public synchronized void removeAggregate(String name) throws RemoteReadException {
         dataStore.removeAggregate(name);
-        return null;
     }
 }

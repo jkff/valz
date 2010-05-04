@@ -21,7 +21,7 @@ public class HttpConnector {
             try {
                 connection.setRequestMethod("POST");
             } catch (ProtocolException e) {
-                throw new RuntimeException(e);
+                throw new AssertionError(e);
             }
             connection.setDoInput(true);
             connection.setDoOutput(true);

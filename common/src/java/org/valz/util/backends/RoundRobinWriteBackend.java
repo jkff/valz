@@ -18,10 +18,11 @@ public class RoundRobinWriteBackend implements WriteBackend {
             nextBackend = (nextBackend + 1) % writeBackends.size();
             try {
                 writeBackends.get(nextBackend).submit(name, aggregate, value);
-                break;
+                return;
             } catch (RemoteWriteException e) {
-                // Ignore
+                continue;
             }
         }
+        throw new RemoteWriteException("All backends are down.");
     }
 }

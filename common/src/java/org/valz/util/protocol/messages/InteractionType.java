@@ -2,11 +2,8 @@ package org.valz.util.protocol.messages;
 
 import com.sdicons.json.model.*;
 import org.jetbrains.annotations.NotNull;
-import org.valz.util.aggregates.AggregateFormatter;
-import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.*;
 import org.valz.util.Pair;
-import org.valz.util.aggregates.Value;
-import org.valz.util.aggregates.Aggregate;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +15,7 @@ public abstract class InteractionType<I, O> {
             new HashMap<String, InteractionType<?, ?>>();
 
     public static Pair<InteractionType, Object> requestFromJson(JSONValue request,
-                                                                AggregateRegistry registry) {
+                                                                AggregateRegistry registry) throws ParserException {
         JSONObject jsonObject = (JSONObject)request;
         Map<String, JSONValue> map = jsonObject.getValue();
         String strType = ((JSONString)map.get("type")).getValue();
@@ -28,7 +25,7 @@ public abstract class InteractionType<I, O> {
     }
 
     public static Pair<InteractionType, Object> responseFromJson(JSONValue response,
-                                                                 AggregateRegistry registry) {
+                                                                 AggregateRegistry registry) throws ParserException {
         JSONObject jsonObject = (JSONObject)response;
         Map<String, JSONValue> map = jsonObject.getValue();
         String strType = ((JSONString)map.get("type")).getValue();
@@ -65,7 +62,7 @@ public abstract class InteractionType<I, O> {
                     return new JSONString(request);
                 }
 
-                public Value<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
+                public Value<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws ParserException {
                     return Value.fromJson(registry, json);
                 }
 
@@ -87,7 +84,7 @@ public abstract class InteractionType<I, O> {
                     return new JSONString(request);
                 }
 
-                public Aggregate<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
+                public Aggregate<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws ParserException {
                     return AggregateFormatter.fromJson(registry, json);
                 }
 
@@ -149,7 +146,7 @@ public abstract class InteractionType<I, O> {
 
     public static final InteractionType<SubmitRequest, Void> SUBMIT =
             new InteractionType<SubmitRequest, Void>("SUBMIT") {
-                public SubmitRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
+                public SubmitRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) throws ParserException {
                     return SubmitRequest.fromJson(registry, json);
                 }
 
@@ -179,12 +176,12 @@ public abstract class InteractionType<I, O> {
         return ALL_TYPES.get(code);
     }
 
-    public abstract I requestBodyFromJson(JSONValue json, AggregateRegistry registry);
+    public abstract I requestBodyFromJson(JSONValue json, AggregateRegistry registry) throws ParserException;
 
     @NotNull
     public abstract JSONValue requestBodyToJson(I request, AggregateRegistry registry);
 
-    public abstract O responseBodyFromJson(JSONValue json, AggregateRegistry registry);
+    public abstract O responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws ParserException;
 
     @NotNull
     public abstract JSONValue responseBodyToJson(O response, AggregateRegistry registry);

@@ -77,7 +77,8 @@ public class ValzHandler extends AbstractHandler {
                 answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));
             } else if (InteractionType.REMOVE_VALUE.equals(t)) {
                 String name = (String)data;
-                answer(response.getOutputStream(), InteractionType.REMOVE_VALUE, readBackend.removeAggregate(name));
+                readBackend.removeAggregate(name);
+                answer(response.getOutputStream(), InteractionType.REMOVE_VALUE, null);
             } else {
                 throw new BadRequestException("Unknown request type.");
             }

@@ -17,8 +17,9 @@ public class ValzWebServer {
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
 
+        // TODO: create config server loader
         Server server = startServer(
-                getWebServerConfiguration(8900, Arrays.asList("http://localhost:8080", "http://localhost:8080")));
+                getWebServerConfig(8900, Arrays.asList("http://localhost:8080", "http://localhost:8080")));
 
         try {
             server.join();
@@ -27,7 +28,7 @@ public class ValzWebServer {
         }
     }
 
-    public static Server startServer(ValzWebServerConfiguration conf) throws Exception {
+    public static Server startServer(ValzWebServerConfig conf) throws Exception {
 
         Server server = new Server(conf.port);
 
@@ -45,11 +46,11 @@ public class ValzWebServer {
         return server;
     }
 
-    public static ValzWebServerConfiguration getWebServerConfiguration(int port, List<String> readServerUrls) {
+    public static ValzWebServerConfig getWebServerConfig(int port, List<String> readServerUrls) {
         AggregateRegistry registry = new AggregateRegistry();
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
         ReadBackend readBackend = new RemoteReadBackend(readServerUrls, registry);
 
-        return new ValzWebServerConfiguration(port, readBackend, registry);
+        return new ValzWebServerConfig(port, readBackend, registry);
     }
 }
