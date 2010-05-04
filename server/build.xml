@@ -20,7 +20,7 @@
 
     <target name="make-manifest">
         <manifest file="build/MANIFEST.MF">
-            <attribute name="AllServersStarter-Class"
+            <attribute name="org.valz.examples.AllServersStarter-Class"
                        value="org.valz.server.ValzServer"/>
         </manifest>
     </target>

@@ -18,7 +18,7 @@ class TransitionalSubmitter extends PeriodicWorker {
     }
 
     @Override
-    public void action() {
+    public void execute() {
         Collection<String> vars = null;
         synchronized (dataStore) {
             vars = dataStore.listVars();

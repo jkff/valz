@@ -17,7 +17,7 @@ public class ValzServer {
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
 
-        Server server = startServer(getServerConfiguration("h2store", 8080));
+        Server server = startServer(getServerConfig("h2store", 8080));
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -25,7 +25,7 @@ public class ValzServer {
         }
     }
 
-    public static Server startServer(ValzServerConfiguration conf) throws Exception {
+    public static Server startServer(ValzServerConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
         server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.registry));
@@ -41,7 +41,7 @@ public class ValzServer {
         return server;
     }
 
-    public static ValzServerConfiguration getServerConfiguration(String storefile, int port) {
+    public static ValzServerConfig getServerConfig(String storefile, int port) {
         AggregateRegistry registry = new AggregateRegistry();
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
@@ -49,7 +49,7 @@ public class ValzServer {
         FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore);
         NonBlockingWriteBackend nonBlockingWriteBackend = new NonBlockingWriteBackend(finalStoreBackend, 100);
 
-        return new ValzServerConfiguration(port, finalStoreBackend, nonBlockingWriteBackend, registry);
+        return new ValzServerConfig(port, finalStoreBackend, nonBlockingWriteBackend, registry);
     }
 
 
