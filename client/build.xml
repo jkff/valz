@@ -17,28 +17,17 @@
             <src location="../common/src/java"/>
         </javac>
     </target>
-
-    <target name="make-manifest">
-        <manifest file="build/MANIFEST.MF">
-            <attribute name="Main-Class"
-                       value="org.valz.server.ValzServer"/>
-        </manifest>
-    </target>
     
-    <target name="make-jar" depends="compile, make-manifest">
+    <target name="make-jar" depends="compile">
         <jar basedir="build/classes"
-             destfile="build/valz-server.jar"
-             includes="**/*"
-             manifest="build/MANIFEST.MF"/>
+             destfile="build/valz-client.jar"
+             includes="**/*"/>
     </target>
 
     <target name="make-dist" depends="make-jar">
         <copy todir="build/dist">
-            <fileset dir="src/script">
-                <include name="**/*"/>
-            </fileset>
             <fileset dir="build">
-                <include name="valz-server.jar"/>
+                <include name="valz-client.jar"/>
             </fileset>
         </copy>
     </target>

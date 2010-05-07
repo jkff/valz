@@ -1,7 +1,7 @@
 syntax: glob
 
 out/*
-server/build/*
+*/build/*
 .idea/workspace.xml
 .idea/inspectionProfiles/*
 .idea/dictionaries/*
