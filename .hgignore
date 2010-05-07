@@ -1,6 +1,7 @@
 syntax: glob
 
 out/*
+build/*
 */build/*
 .idea/workspace.xml
 .idea/inspectionProfiles/*
