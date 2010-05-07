@@ -6,9 +6,28 @@
         <ant dir="server" target="clean"/>
     </target>
 
-    <target name="all">
+    <target name="submodules">
         <ant dir="common"/>
         <ant dir="client"/>
         <ant dir="server"/>
+    </target>
+
+    <target name="all" depends="submodules">
+        <mkdir dir="build/dist" />
+        <copy todir="build/dist">
+            <fileset dir="common/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="build/dist">
+            <fileset dir="client/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="build/dist">
+            <fileset dir="server/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
     </target>
 </project>
