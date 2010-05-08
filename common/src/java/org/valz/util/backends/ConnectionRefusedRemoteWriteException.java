@@ -1,6 +1,8 @@
 package org.valz.util.backends;
 
 public class ConnectionRefusedRemoteWriteException extends RemoteWriteException {
+    private static final long serialVersionUID = 8971593681805788053L;
+
     public ConnectionRefusedRemoteWriteException() {
     }
 
