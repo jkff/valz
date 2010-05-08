@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common-tests/common-tests.iml" filepath="$PROJECT_DIR$/common-tests/common-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/flexjson/flexjson.iml" filepath="$PROJECT_DIR$/flexjson/flexjson.iml" />
       <module fileurl="file://$PROJECT_DIR$/integration-tests/integration-tests.iml" filepath="$PROJECT_DIR$/integration-tests/integration-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/hit-count/sandbox.iml" filepath="$PROJECT_DIR$/examples/hit-count/sandbox.iml" />

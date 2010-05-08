@@ -4,30 +4,39 @@
         <ant dir="common" target="clean"/>
         <ant dir="client" target="clean"/>
         <ant dir="server" target="clean"/>
+        <delete dir="build" />
     </target>
 
-    <target name="submodules">
+    <target name="submodules" depends="clean">
         <ant dir="common"/>
         <ant dir="client"/>
         <ant dir="server"/>
     </target>
 
-    <target name="all" depends="submodules">
-        <mkdir dir="build/dist" />
-        <copy todir="build/dist">
+    <target name="client" depends="submodules">
+        <mkdir dir="build/dist/client" />
+        <copy todir="build/dist/client">
             <fileset dir="common/build/dist">
                 <include name="**/*"/>
             </fileset>
-        </copy>
-        <copy todir="build/dist">
             <fileset dir="client/build/dist">
                 <include name="**/*"/>
             </fileset>
         </copy>
-        <copy todir="build/dist">
+    </target>
+
+    <target name="server" depends="submodules">
+        <mkdir dir="build/dist/server" />
+        <copy todir="build/dist/server">
+            <fileset dir="common/build/dist">
+                <include name="**/*"/>
+            </fileset>
             <fileset dir="server/build/dist">
                 <include name="**/*"/>
             </fileset>
         </copy>
+    </target>
+
+    <target name="all" depends="client, server">
     </target>
 </project>
