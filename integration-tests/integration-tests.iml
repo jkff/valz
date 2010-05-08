@@ -12,6 +12,15 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="web-ui" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/junit-4.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

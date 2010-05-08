@@ -29,6 +29,9 @@
             <fileset dir="build">
                 <include name="valz-common.jar"/>
             </fileset>
+            <fileset dir="lib">
+                <include name="**/*"/>
+            </fileset>
         </copy>
     </target>
 </project>
