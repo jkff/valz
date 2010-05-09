@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-public class LongSum extends AbstractAggregate<Long, LongSum> {
+public class LongSum extends AbstractAggregate<Long> {
     public static final String NAME = "LongSum";
 
     @Override
@@ -37,7 +37,7 @@ public class LongSum extends AbstractAggregate<Long, LongSum> {
     }
 
     public boolean equals(Object other) {
-        return (other instanceof LongSum);
+        return (other != null) && (other instanceof LongSum);
     }
 
     public int hashCode() {
