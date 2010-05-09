@@ -5,8 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
-public abstract class AbstractAggregate<T, S extends Aggregate<T>> implements Aggregate<T> {
-    @Nullable
+public abstract class AbstractAggregate<T> implements Aggregate<T> {
     public T reduce(@NotNull Iterator<T> stream) {
         T res = stream.next();
         while (stream.hasNext()) {
@@ -15,6 +14,5 @@ public abstract class AbstractAggregate<T, S extends Aggregate<T>> implements Ag
         return res;
     }
 
-    @Nullable
     public abstract T reduce(T item1, T item2);
 }
