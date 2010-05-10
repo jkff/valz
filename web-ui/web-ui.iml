@@ -8,6 +8,17 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="module-library" exported="">
+      <library name="jetty">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-util-6.1.22.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jetty/servlet-api-2.5-20081211.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

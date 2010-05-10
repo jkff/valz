@@ -5,7 +5,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.client.Val;
 import org.valz.client.Valz;
-import org.valz.server.ValzServerConfig;
+import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.RoundRobinWriteBackend;
@@ -24,7 +24,7 @@ public class AllServersStarter {
         PropertyConfigurator.configure("log4j.properties");
 
         int[] ports = {8800, 8801};
-        List<ValzServerConfig> configs = ServerUtils.getServerConfigs(ports);
+        List<InternalConfig> configs = ServerUtils.getServerConfigs(100, ports);
         List<Server> servers = ServerUtils.startServers(configs);
 
         Server valzWebServer = ValzWebServer
@@ -34,7 +34,7 @@ public class AllServersStarter {
         // init client
         {
             List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-            for (ValzServerConfig config : configs) {
+            for (InternalConfig config : configs) {
                 listWriteBackends.add(config.writeBackend);
             }
             WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);

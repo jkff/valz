@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.valz.client.Val;
 import org.valz.client.Valz;
+import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
 import org.valz.server.ValzServer;
-import org.valz.server.ValzServerConfig;
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.ReadBackend;
@@ -29,13 +29,14 @@ public class IntegrationTest {
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
         int port = 8800;
+        int delayForCaching = 100;
 
-        ValzServerConfig config = ValzServer.getServerConfig("h2store", port);
+        InternalConfig config = ValzServer.getServerConfig("h2store", port, delayForCaching);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(new RoundRobinWriteBackend(Arrays.asList(config.writeBackend)));
+            Valz.init(Valz.getWriteBackend(registry, String.format("http://localhost:%d", port)));
 
             // init viewer
             ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), registry);
@@ -54,7 +55,7 @@ public class IntegrationTest {
 
 
             // delay for sending samples by daemon threads
-            Thread.sleep(500);
+            Thread.sleep(delayForCaching * 3);
 
             Assert.assertTrue(readBackend.listVars().contains(name));
             Assert.assertEquals(3L, readBackend.getValue(name).getValue());
@@ -72,14 +73,14 @@ public class IntegrationTest {
         // init and start valz servers
         int[] ports = {8800, 8801};
 
-        List<ValzServerConfig> listConfigs = ServerUtils.getServerConfigs(ports);
+        List<InternalConfig> listConfigs = ServerUtils.getServerConfigs(100, ports);
         List<Server> listServers = ServerUtils.startServers(listConfigs);
 
         try {
             // init client
             {
                 List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-                for (ValzServerConfig config : listConfigs) {
+                for (InternalConfig config : listConfigs) {
                     listWriteBackends.add(config.writeBackend);
                 }
                 WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
