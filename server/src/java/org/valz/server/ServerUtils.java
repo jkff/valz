@@ -15,17 +15,17 @@ public class ServerUtils {
         return list;
     }
 
-    public static List<ValzServerConfig> getServerConfigs(int... ports) {
-        List<ValzServerConfig> listConfigs = new ArrayList<ValzServerConfig>();
+    public static List<InternalConfig> getServerConfigs(int delayForCaching, int... ports) {
+        List<InternalConfig> listConfigs = new ArrayList<InternalConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.getServerConfig("h2store" + port, port));
+            listConfigs.add(ValzServer.getServerConfig("h2store" + port, port, delayForCaching));
         }
         return listConfigs;
     }
 
-    public static List<Server> startServers(List<ValzServerConfig> listConfigs) throws Exception {
+    public static List<Server> startServers(List<InternalConfig> listConfigs) throws Exception {
         List<Server> listServers = new ArrayList<Server>();
-        for (ValzServerConfig config : listConfigs) {
+        for (InternalConfig config : listConfigs) {
             listServers.add(ValzServer.startServer(config));
         }
         return listServers;

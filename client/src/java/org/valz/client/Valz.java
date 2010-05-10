@@ -1,8 +1,14 @@
 package org.valz.client;
 
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.backends.RemoteWriteBackend;
 import org.valz.util.backends.RemoteWriteException;
+import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
@@ -24,6 +30,14 @@ public final class Valz {
                 }
             }
         };
+    }
+
+    public static WriteBackend getWriteBackend(AggregateRegistry registry, String... serverURLs) {
+        List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
+        for (String url : serverURLs) {
+            writeBackends.add(new RemoteWriteBackend(url, registry));
+        }
+        return new RoundRobinWriteBackend(writeBackends);
     }
 
     private Valz() {

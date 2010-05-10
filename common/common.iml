@@ -19,17 +19,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
-      <library name="jetty">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-6.1.22.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/jetty/servlet-api-2.5-20081211.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/jetty/jetty-util-6.1.22.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
       <library name="json">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/json/jsontools-core-1.7.jar!/" />
