@@ -35,6 +35,12 @@ public class MemoryDataStore implements DataStore {
         name2val.put(name, value);
     }
 
+    public synchronized <T> void modify(String name, Calculator<T> calculator) {
+        T value = (T)name2val.get(name);
+        T newValue = calculator.calculate(value);
+        name2val.put(name, newValue);
+    }
+
     public void removeAggregate(String name) {
         name2val.remove(name);
         name2aggregate.remove(name);

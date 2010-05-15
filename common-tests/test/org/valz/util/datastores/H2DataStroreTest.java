@@ -56,16 +56,11 @@ public class H2DataStroreTest {
         assertArrayEquals(new String[] {varName}, dataStore.listVars().toArray());
 
 
-        dataStore.setValue(varName, 2L);
-        assertEquals(2L, dataStore.getValue(varName).getValue());
-    }
-
-    @Test
-    public void testSet() {
-        String varName = "var1";
-
-        dataStore.createAggregate(varName, new LongSum(), 1L);
-        dataStore.setValue(varName, 2L);
+        dataStore.modify(varName, new Calculator<Long>(){
+            public Long calculate(Long value) {
+                return value + 1L;
+            }
+        });
         assertEquals(2L, dataStore.getValue(varName).getValue());
     }
 }

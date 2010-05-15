@@ -17,5 +17,7 @@ public interface DataStore {
 
     <T> void setValue(String name, T value);
 
+    <T> void modify(String name, Calculator<T> calculator);
+
     void removeAggregate(String name);
 }
