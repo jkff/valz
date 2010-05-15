@@ -1,6 +1,5 @@
 package org.valz.server;
 
-import nl.chess.it.util.config.ConfigValidationResult;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
@@ -10,11 +9,6 @@ import org.valz.util.backends.FinalStoreBackend;
 import org.valz.util.backends.NonBlockingWriteBackend;
 import org.valz.util.datastores.DataStore;
 import org.valz.util.datastores.H2DataStore;
-import org.valz.util.io.IOUtils;
-
-import java.io.*;
-import java.util.Iterator;
-import java.util.Properties;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -22,9 +16,9 @@ public class ValzServer {
 
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
-        ServerConfig config = readServerConfig();
+        ServerConfig config = ServerConfig.read();
 
-        Server server = startServer(getServerConfig(config.getDataStoreFile(), config.getPort(), config.getDelayForCaching()));
+        Server server = startServer(getInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching));
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -48,7 +42,7 @@ public class ValzServer {
         return server;
     }
 
-    public static InternalConfig getServerConfig(String dataStoreFile, int port, int delayForCaching) {
+    public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching) {
         AggregateRegistry registry = new AggregateRegistry();
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
@@ -59,44 +53,7 @@ public class ValzServer {
 
         return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, registry);
     }
-
-    private static ServerConfig readServerConfig() {
-
-        Properties properties = new Properties();
-
-        InputStream in = null;
-        try {
-            in = new FileInputStream(ServerConfig.FILE_NAME);
-            properties.load(in);
-        } catch (FileNotFoundException e) {
-            System.out.println(String.format("File %s not found.", ServerConfig.FILE_NAME));
-            System.exit(1);
-        } catch (IOException e) {
-            System.out.println(String.format("Cannot read file %s.", ServerConfig.FILE_NAME));
-            System.exit(1);
-        } finally {
-            IOUtils.closeSilently(in);
-        }
-
-        ServerConfig config = new ServerConfig(properties);
-
-        ConfigValidationResult configResult = config.validateConfiguration();
-        if (configResult.thereAreErrors()) {
-            System.out.println("Errors in configuration");
-            for (Iterator iter = configResult.getErrors().iterator(); iter.hasNext();) {
-                System.out.println(" > " + iter.next());
-            }
-            System.exit(1);
-        }
-        if (configResult.thereAreUnusedProperties()) {
-            System.out.println("Unused properties");
-            for (Iterator iter = configResult.getUnusedProperties().iterator(); iter.hasNext();) {
-                System.out.println(" > " + iter.next());
-            }
-        }
-
-        return config;
-    }
+    
 
 
     private ValzServer() {

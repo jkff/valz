@@ -11,6 +11,8 @@ import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
 import org.valz.viewer.ValzWebServer;
+import org.valz.viewer.ViewerConfig;
+import org.valz.viewer.ViewerInternalConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ public class AllServersStarter {
         List<Server> servers = ServerUtils.startServers(configs);
 
         Server valzWebServer = ValzWebServer
-                .startServer(ValzWebServer.getWebServerConfig(8900, ServerUtils.portsToLocalAddresses(ports)));
+                .startServer(8900, ViewerInternalConfig.getConfig(ViewerConfig.read().urls));
 
 
         // init client

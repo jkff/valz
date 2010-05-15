@@ -18,7 +18,7 @@ public class ServerUtils {
     public static List<InternalConfig> getServerConfigs(int delayForCaching, int... ports) {
         List<InternalConfig> listConfigs = new ArrayList<InternalConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.getServerConfig("h2store" + port, port, delayForCaching));
+            listConfigs.add(ValzServer.getInternalServerConfig("h2store" + port, port, delayForCaching));
         }
         return listConfigs;
     }
