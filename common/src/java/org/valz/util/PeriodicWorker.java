@@ -1,5 +1,7 @@
 package org.valz.util;
 
+import org.apache.log4j.Logger;
+
 import java.util.Calendar;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Calendar;
  * Wakes up every intervalMillis milliseconds and calls execute().
  */
 public abstract class PeriodicWorker extends Thread {
+private static final Logger LOG = Logger.getLogger(PeriodicWorker.class);
 
     private final long intervalMillis;
 
@@ -27,7 +30,11 @@ public abstract class PeriodicWorker extends Thread {
                 }
             }
             prevTime = System.currentTimeMillis();
-            execute();
+            try {
+                execute();
+            } catch (Exception e) {
+                LOG.error("Unknown error in PeriodicWorker.execute()", e);
+            }
         }
     }
 
