@@ -1,27 +1,27 @@
 package org.valz.server;
 
-import nl.chess.it.util.config.Config;
+import java.util.prefs.Preferences;
 
-import java.util.Properties;
+public class ServerConfig {
 
-public class ServerConfig extends Config {
-    /**
-     * Name of the file we are looking for to read the configuration.
-     */
-    public static final String FILE_NAME = "serverconfig.properties";
+    public final String dataStoreFile;
+    public final int port;
+    public final int delayForCaching;
 
-    public ServerConfig(Properties properties) {
-        super(properties);
+    public ServerConfig(String dataStoreFile, int port, int delayForCaching) {
+        this.dataStoreFile = dataStoreFile;
+        this.port = port;
+        this.delayForCaching = delayForCaching;
     }
 
-    public String getDataStoreFile() {
-        return getString("property.dataStoreFile");
+    public static ServerConfig read() {
+        Preferences prefs = Preferences.userRoot().node("server.config");
+        ServerConfig config = new ServerConfig(
+                prefs.get("dataStoreFile", "h2store"),
+                prefs.getInt("port", 8080),
+                prefs.getInt("delayForCaching", 100)
+        );
+        return config;
     }
+}
 
-    public int getPort() {
-        return getInt("property.port");
-    }
-
-    public int getDelayForCaching() {
-        return getInt("property.delayForCaching");
-    }}

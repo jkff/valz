@@ -17,7 +17,6 @@ import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -31,7 +30,7 @@ public class IntegrationTest {
         int port = 8800;
         int delayForCaching = 100;
 
-        InternalConfig config = ValzServer.getServerConfig("h2store", port, delayForCaching);
+        InternalConfig config = ValzServer.getInternalServerConfig("h2store", port, delayForCaching);
         Server server = ValzServer.startServer(config);
 
         try {
@@ -104,13 +103,14 @@ public class IntegrationTest {
             Val<Long> counter = Valz.register(name, new LongSum());
 
             // submit data
-            final int SUBMITS_COUNT = 100;
+            final int SUBMITS_COUNT = 200;
             for (int i=0; i<SUBMITS_COUNT; i++) {
                 counter.submit(1L);
+                //Thread.sleep(50);
             }
 
             // delay for sending samples by daemon threads
-            Thread.sleep(500);
+            Thread.sleep(SUBMITS_COUNT * 10);
 
             // check values
             Assert.assertTrue(readBackend.listVars().contains(name));

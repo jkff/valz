@@ -3,23 +3,22 @@ package org.valz.viewer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.ReadBackend;
-import org.valz.util.backends.RemoteReadBackend;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class ValzWebServer {
     private static final Logger log = Logger.getLogger(ValzWebServer.class);
 
+    private ValzWebServer() {
+    }
+
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
 
-        // TODO: create config server loader
-        Server server = startServer(
-                getWebServerConfig(8900, Arrays.asList("http://localhost:8080", "http://localhost:8080")));
+        ViewerConfig config = ViewerConfig.read();
+
+        Server server = startServer(8900,
+                ViewerInternalConfig.getConfig(config.urls));
 
         try {
             server.join();
@@ -28,9 +27,9 @@ public class ValzWebServer {
         }
     }
 
-    public static Server startServer(ValzWebServerConfig conf) throws Exception {
+    public static Server startServer(int port, ViewerInternalConfig conf) throws Exception {
 
-        Server server = new Server(conf.port);
+        Server server = new Server(port);
 
         ValzWebHandler handler = new ValzWebHandler(conf.readBackend, conf.registry);
         server.addHandler(handler);
@@ -42,15 +41,9 @@ public class ValzWebServer {
             throw e;
         }
 
-        log.info("Started server at :" + conf.port);
+        log.info("Started server at :" + port);
         return server;
     }
 
-    public static ValzWebServerConfig getWebServerConfig(int port, List<String> readServerUrls) {
-        AggregateRegistry registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
-        ReadBackend readBackend = new RemoteReadBackend(readServerUrls, registry);
-
-        return new ValzWebServerConfig(port, readBackend, registry);
-    }
+    
 }

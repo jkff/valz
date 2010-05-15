@@ -11,6 +11,7 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="web-ui" />
+    <orderEntry type="module" module-name="viewer" />
   </component>
 </module>
 
