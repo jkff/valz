@@ -3,7 +3,9 @@ package org.valz.util.protocol.messages;
 import com.sdicons.json.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.Pair;
-import org.valz.util.aggregates.*;
+import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.ParserException;
+import org.valz.util.aggregates.Value;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -56,6 +58,29 @@ public abstract class InteractionType<I, O> {
     }
 
 
+
+    public static final InteractionType<SubmitRequest, Void> SUBMIT =
+            new InteractionType<SubmitRequest, Void>("SUBMIT") {
+                public SubmitRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) throws
+                        ParserException {
+                    return SubmitRequest.fromJson(registry, json);
+                }
+
+                @NotNull
+                public JSONValue requestBodyToJson(SubmitRequest request, AggregateRegistry registry) {
+                    return request.toJson(registry);
+                }
+
+                public Void responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
+                    return null;
+                }
+
+                @NotNull
+                public JSONValue responseBodyToJson(Void response, AggregateRegistry registry) {
+                    return new JSONNull();
+                }
+            };
+
     public static final InteractionType<String, Value<?>> GET_VALUE =
             new InteractionType<String, Value<?>>("GET_VALUE") {
                 public String requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
@@ -75,29 +100,6 @@ public abstract class InteractionType<I, O> {
                 @NotNull
                 public JSONValue responseBodyToJson(Value<?> response, AggregateRegistry registry) {
                     return response.toJson(registry);
-                }
-            };
-
-
-    public static final InteractionType<String, Aggregate<?>> GET_AGGREGATE =
-            new InteractionType<String, Aggregate<?>>("GET_AGGREGATE") {
-                public String requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
-                    return ((JSONString)json).getValue();
-                }
-
-                @NotNull
-                public JSONValue requestBodyToJson(String request, AggregateRegistry registry) {
-                    return new JSONString(request);
-                }
-
-                public Aggregate<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws
-                        ParserException {
-                    return AggregateFormatter.fromJson(registry, json);
-                }
-
-                @NotNull
-                public JSONValue responseBodyToJson(Aggregate<?> response, AggregateRegistry registry) {
-                    return AggregateFormatter.toJson(registry, response);
                 }
             };
 
@@ -151,15 +153,18 @@ public abstract class InteractionType<I, O> {
                 }
             };
 
-    public static final InteractionType<SubmitRequest, Void> SUBMIT =
-            new InteractionType<SubmitRequest, Void>("SUBMIT") {
-                public SubmitRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) throws
+
+
+    public static final InteractionType<SubmitBigMapRequest, Void> SUBMIT_BIG_MAP =
+            new InteractionType<SubmitBigMapRequest, Void>("SUBMIT_BIG_MAP") {
+                public SubmitBigMapRequest requestBodyFromJson(JSONValue json,
+                                                               AggregateRegistry registry) throws
                         ParserException {
-                    return SubmitRequest.fromJson(registry, json);
+                    return SubmitBigMapRequest.fromJson(registry, json);
                 }
 
                 @NotNull
-                public JSONValue requestBodyToJson(SubmitRequest request, AggregateRegistry registry) {
+                public JSONValue requestBodyToJson(SubmitBigMapRequest request, AggregateRegistry registry) {
                     return request.toJson(registry);
                 }
 
@@ -173,72 +178,34 @@ public abstract class InteractionType<I, O> {
                 }
             };
 
-
-
     public static final InteractionType<GetBigMapChunkRequest, BigMapChunkValue<?>> GET_BIG_MAP_CHUNK =
             new InteractionType<GetBigMapChunkRequest, BigMapChunkValue<?>>("GET_BIG_MAP_CHUNK") {
                 public GetBigMapChunkRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
                     JSONObject jsonObject = (JSONObject)json;
                     Map<String, JSONValue> jsonMap = jsonObject.getValue();
-                    return new GetBigMapChunkRequest(
-                            ((JSONString)jsonMap.get("name")).getValue(),
+                    return new GetBigMapChunkRequest(((JSONString)jsonMap.get("name")).getValue(),
                             ((JSONString)jsonMap.get("fromKey")).getValue(),
                             ((JSONInteger)jsonMap.get("count")).getValue().intValue());
                 }
 
                 @NotNull
-                public JSONValue requestBodyToJson(GetBigMapChunkRequest request, AggregateRegistry registry) {
-                    return makeJson(
-                            "name", new JSONString(request.name),
-                            "fromKey", new JSONString(request.fromKey),
-                            "count", new JSONInteger(new BigInteger(request.count+"")));
+                public JSONValue requestBodyToJson(GetBigMapChunkRequest request,
+                                                   AggregateRegistry registry) {
+                    return makeJson("name", new JSONString(request.name), "fromKey",
+                            new JSONString(request.fromKey), "count",
+                            new JSONInteger(new BigInteger(request.count + "")));
                 }
 
-                public BigMapChunkValue<?> responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws
+                public BigMapChunkValue<?> responseBodyFromJson(JSONValue json,
+                                                                AggregateRegistry registry) throws
                         ParserException {
                     return BigMapChunkValue.fromJson(registry, json);
                 }
 
                 @NotNull
-                public JSONValue responseBodyToJson(BigMapChunkValue<?> response, AggregateRegistry registry) {
+                public JSONValue responseBodyToJson(BigMapChunkValue<?> response,
+                                                    AggregateRegistry registry) {
                     return response.toJson(registry);
-                }
-            };
-
-    public static final InteractionType<RemoveBigMapChunkRequest, Void> REMOVE_BIG_MAP_CHUNK =
-            new InteractionType<RemoveBigMapChunkRequest, Void>("REMOVE_BIG_MAP_CHUNK") {
-                public RemoveBigMapChunkRequest requestBodyFromJson(JSONValue json, AggregateRegistry registry) {
-                    JSONObject jsonObject = (JSONObject)json;
-                    Map<String, JSONValue> jsonMap = jsonObject.getValue();
-                    Collection<String> list = new ArrayList<String>();
-                    for (JSONValue item : ((JSONArray)jsonMap.get("keys")).getValue()) {
-                        list.add(((JSONString)item).getValue());
-                    }
-
-                    return new RemoveBigMapChunkRequest(
-                            ((JSONString)jsonMap.get("name")).getValue(),
-                            list);
-                }
-
-                @NotNull
-                public JSONValue requestBodyToJson(RemoveBigMapChunkRequest request, AggregateRegistry registry) {
-                    JSONArray jsonArray = new JSONArray();
-                    for (String item : request.keys) {
-                        jsonArray.getValue().add(new JSONString(item));
-                    }
-                    return makeJson(
-                            "name", new JSONString(request.name),
-                            "keys", jsonArray);
-                }
-
-                public Void responseBodyFromJson(JSONValue json, AggregateRegistry registry) throws
-                        ParserException {
-                    return null;
-                }
-
-                @NotNull
-                public JSONValue responseBodyToJson(Void response, AggregateRegistry registry) {
-                    return new JSONNull();
                 }
             };
 
@@ -289,29 +256,6 @@ public abstract class InteractionType<I, O> {
                 @NotNull
                 public JSONValue responseBodyToJson(Void response, AggregateRegistry registry) {
                     return null;
-                }
-            };
-
-    public static final InteractionType<SubmitBigMapRequest, Void> SUBMIT_BIG_MAP =
-            new InteractionType<SubmitBigMapRequest, Void>("SUBMIT_BIG_MAP") {
-                public SubmitBigMapRequest requestBodyFromJson(JSONValue json,
-                                                               AggregateRegistry registry) throws
-                        ParserException {
-                    return SubmitBigMapRequest.fromJson(registry, json);
-                }
-
-                @NotNull
-                public JSONValue requestBodyToJson(SubmitBigMapRequest request, AggregateRegistry registry) {
-                    return request.toJson(registry);
-                }
-
-                public Void responseBodyFromJson(JSONValue json, AggregateRegistry registry) {
-                    return null;
-                }
-
-                @NotNull
-                public JSONValue responseBodyToJson(Void response, AggregateRegistry registry) {
-                    return new JSONNull();
                 }
             };
 

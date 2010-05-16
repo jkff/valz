@@ -1,9 +1,9 @@
 package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
-import org.valz.util.aggregates.BigMap;
-import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.aggregates.Value;
 import org.valz.util.datastores.DataStore;
 
 import java.util.Collection;
@@ -19,29 +19,26 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         this.dataStore = dataStore;
     }
 
-    public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) {
+    public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) throws
+            RemoteWriteException {
         try {
-            BackendUtils.submit(dataStore, name, aggregate, value);
+            dataStore.submit(name, aggregate, value);
         } catch (InvalidAggregateException e) {
-            log.info("Invalid submit.", e);
+            throw new RemoteWriteException(e);
         }
     }
 
-    public <T> void submitBigMap(String name, Aggregate<T> mergeConflictsAggregate, Map<String, T> value) throws
-            RemoteWriteException {
+    public synchronized <T> void submitBigMap(String name, Aggregate<T> aggregate,
+                                              Map<String, T> value) throws RemoteWriteException {
         try {
-            BackendUtils.submitBigMap(dataStore, name, mergeConflictsAggregate, value);
+            dataStore.submitBigMap(name, aggregate, value);
         } catch (InvalidAggregateException e) {
-            log.info("Invalid submit.", e);
+            throw new RemoteWriteException(e);
         }
     }
 
     public synchronized Value getValue(String name) {
         return dataStore.getValue(name);
-    }
-
-    public synchronized Aggregate getAggregate(String name) {
-        return dataStore.getAggregate(name);
     }
 
     public synchronized Collection<String> listVars() {
@@ -52,8 +49,8 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         dataStore.removeAggregate(name);
     }
 
-    public BigMap<?> getBigMap(String name) throws RemoteReadException {
-        return dataStore.getBigMap(name);
+    public BigMapIterator getBigMapIterator(String name) throws RemoteReadException {
+        return dataStore.getBigMapIterator(name);
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {

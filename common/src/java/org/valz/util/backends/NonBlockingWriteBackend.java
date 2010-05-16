@@ -14,7 +14,8 @@ public class NonBlockingWriteBackend implements WriteBackend {
     private final Queue<SubmitBigMapRequest> bigMapsQueue = new ConcurrentLinkedQueue<SubmitBigMapRequest>();
 
     public NonBlockingWriteBackend(WriteBackend writeBackend, long intervalMillis) {
-        new Thread(new NonBlockingSubmitter(writeBackend, aggregatesQueue, bigMapsQueue, intervalMillis)).start();
+        new Thread(new NonBlockingSubmitter(writeBackend, aggregatesQueue, bigMapsQueue, intervalMillis))
+                .start();
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {

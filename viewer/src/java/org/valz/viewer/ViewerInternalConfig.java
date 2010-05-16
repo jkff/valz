@@ -2,11 +2,9 @@ package org.valz.viewer;
 
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.AggregateRegistryCreator;
-import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadBackend;
 
-import java.util.Collection;
 import java.util.List;
 
 public class ViewerInternalConfig {
@@ -20,7 +18,7 @@ public class ViewerInternalConfig {
 
     public static ViewerInternalConfig getConfig(List<String> urls) {
         AggregateRegistry registry = AggregateRegistryCreator.create();
-        ReadBackend readBackend = new RemoteReadBackend(urls, registry);
+        ReadBackend readBackend = new RemoteReadBackend(urls, registry, chunkSize);
         return new ViewerInternalConfig(readBackend, registry);
     }
 }

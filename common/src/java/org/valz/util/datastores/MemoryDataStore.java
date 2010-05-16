@@ -1,6 +1,5 @@
 package org.valz.util.datastores;
 
-import org.valz.util.aggregates.BigMap;
 import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 

@@ -20,22 +20,20 @@ public class TransitionalWriteBackend implements WriteBackend {
         new Thread(new TransitionalSubmitter(writeBackend, dataStore, intervalMillis)).start();
     }
 
-    public <T> void submit(String name, Aggregate<T> aggregate, T value) {
-        synchronized (dataStore) {
-            try {
-                BackendUtils.submit(dataStore, name, aggregate, value);
-            } catch (InvalidAggregateException e) {
-                log.info("Invalid submit.", e);
-            }
+    public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
+        try {
+            dataStore.submit(name, aggregate, value);
+        } catch (InvalidAggregateException e) {
+            throw new RemoteWriteException(e);
         }
     }
 
-    public <T> void submitBigMap(String name, Aggregate<T> mergeConflictsAggregate, Map<String, T> value) throws
+    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
             RemoteWriteException {
         try {
-            BackendUtils.submitBigMap(dataStore, name, mergeConflictsAggregate, value);
+            dataStore.submitBigMap(name, aggregate, value);
         } catch (InvalidAggregateException e) {
-            log.info("Invalid submit.", e);
+            throw new RemoteWriteException(e);
         }
     }
 }
