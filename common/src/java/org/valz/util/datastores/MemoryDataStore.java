@@ -1,5 +1,6 @@
 package org.valz.util.datastores;
 
+import org.valz.util.aggregates.BigMap;
 import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 
@@ -12,9 +13,10 @@ public class MemoryDataStore implements DataStore {
 
     private final Map<String, Object> name2val = new HashMap<String, Object>();
     private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
+    private final Map<String, MemoryBigMap<?>> name2bigMap = new HashMap<String, MemoryBigMap<?>>();
 
 
-    public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
+    public <T> void submit(String name, Aggregate<T> aggregate, T value) {
         name2aggregate.put(name, aggregate);
         name2val.put(name, value);
     }
@@ -44,5 +46,25 @@ public class MemoryDataStore implements DataStore {
     public void removeAggregate(String name) {
         name2val.remove(name);
         name2aggregate.remove(name);
+    }
+
+
+    
+    public <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) {
+        MemoryBigMap<T> bigMap = new MemoryBigMap<T>(aggregate);
+        bigMap.append(value);
+        name2bigMap.put(name, bigMap);
+    }
+
+    public Collection<String> listBigMaps() {
+        return new ArrayList<String>(name2bigMap.keySet());
+    }
+
+    public <T> BigMap<T> getBigMap(String name) {
+        return (BigMap<T>)name2bigMap.get(name);
+    }
+
+    public void removeBigMap(String name) {
+        name2bigMap.remove(name);
     }
 }

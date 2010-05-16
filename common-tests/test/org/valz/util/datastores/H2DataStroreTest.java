@@ -49,7 +49,7 @@ public class H2DataStroreTest {
 
         assertArrayEquals(new String[] {}, dataStore.listVars().toArray());
 
-        dataStore.createAggregate(varName, new LongSum(), 1L);
+        dataStore.submit(varName, new LongSum(), 1L);
         assertEquals(1L, dataStore.getValue(varName).getValue());
         assertEquals(new LongSum(), dataStore.getAggregate(varName));
 

@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class H2DataStore implements DataStore, Closeable {
 
@@ -29,7 +30,7 @@ public class H2DataStore implements DataStore, Closeable {
     private final ObjectPool connectionPool;
     private final AggregateRegistry registry;
 
-
+    // TODO: realize methods for BigMap
 
     public H2DataStore(String filename, AggregateRegistry registry) {
 
@@ -52,7 +53,7 @@ public class H2DataStore implements DataStore, Closeable {
 
 
 
-    public <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
+    public <T> void submit(String name, Aggregate<T> aggregate, T value) {
         execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?)", name,
                 AggregateFormatter.toJson(registry, aggregate).render(false),
                 aggregate.dataToJson(value).render(false));
@@ -138,6 +139,22 @@ public class H2DataStore implements DataStore, Closeable {
 
     public void removeAggregate(String name) {
         execute("DELETE Valz WHERE name = ?", name);
+    }
+
+    public <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Collection<String> listBigMaps() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public <T> BigMap<T> getBigMap(String name) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void removeBigMap(String name) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private <T> T executeGet(JSONValueParser<T> func, String query, String... params) {

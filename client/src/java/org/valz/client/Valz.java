@@ -9,6 +9,7 @@ import org.valz.util.backends.WriteBackend;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class Valz {
     private static WriteBackend writeBackend = null;
@@ -25,6 +26,18 @@ public final class Valz {
             public void submit(T sample) {
                 try {
                     writeBackend.submit(name, aggregate, sample);
+                } catch (RemoteWriteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
+
+    public static synchronized <T> Val<Map<String, T>> registerBigMap(final String name, final Aggregate<T> mergeConflictsAggregate) {
+        return new Val<Map<String, T>>() {
+            public void submit(Map<String, T> sample) {
+                try {
+                    writeBackend.submitBigMap(name, mergeConflictsAggregate, sample);
                 } catch (RemoteWriteException e) {
                     throw new RuntimeException(e);
                 }

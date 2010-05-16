@@ -4,20 +4,24 @@ import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.ParserException;
 import org.valz.util.protocol.ConnectionException;
 import org.valz.util.protocol.HttpConnector;
 import org.valz.util.protocol.messages.InteractionType;
+import org.valz.util.protocol.messages.ResponseParser;
+import org.valz.util.protocol.messages.SubmitBigMapRequest;
 import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.io.StringReader;
+import java.util.Map;
 
 public class RemoteWriteBackend implements WriteBackend {
-    private final String serverURL;
+    private final ResponseParser responseParser;
     private final AggregateRegistry registry;
 
 
     public RemoteWriteBackend(String serverURL, AggregateRegistry registry) {
-        this.serverURL = serverURL;
+        this.responseParser = new ResponseParser(serverURL, registry);
         this.registry = registry;
     }
 
@@ -25,16 +29,12 @@ public class RemoteWriteBackend implements WriteBackend {
         getDataResponse(InteractionType.SUBMIT, new SubmitRequest<T>(name, aggregate, value));
     }
 
+    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
+            RemoteWriteException {
+        getDataResponse(InteractionType.SUBMIT_BIG_MAP, new SubmitBigMapRequest<T>(name, aggregate, value));
+    }
+
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteWriteException {
-        try {
-            String response = HttpConnector
-                    .post(serverURL, InteractionType.requestToJson(type, request, registry).render(false));
-            JSONValue responseJson = new JSONParser(new StringReader(response)).nextValue();
-            return (O)InteractionType.responseFromJson(responseJson, registry).second;
-        } catch (ConnectionException e) {
-            throw new ConnectionRefusedRemoteWriteException(e);
-        } catch (Exception e) {
-            throw new RemoteWriteException(e);
-        }
+        return responseParser.getWriteDataResponse(type, request);
     }
 }

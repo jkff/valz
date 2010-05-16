@@ -10,9 +10,14 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class HttpConnector {
-    public static String post(@NotNull String serverURL, @NotNull String data) throws MalformedURLException,
+    public static String post(@NotNull String serverURL, @NotNull String data) throws
             ConnectionException {
-        URL url = new URL(serverURL);
+        URL url = null;
+        try {
+            url = new URL(serverURL);
+        } catch (MalformedURLException e) {
+            throw new ConnectionException(e);
+        }
         HttpURLConnection connection = null;
 
         try {
