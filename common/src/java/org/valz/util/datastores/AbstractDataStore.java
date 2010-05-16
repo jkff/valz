@@ -42,7 +42,7 @@ public abstract class AbstractDataStore implements DataStore {
             }
 
             for (Map.Entry<String, T> entry : map.entrySet()) {
-                T existingValue = getBigMapItem(name, entry.getKey());
+                T existingValue = (T)getBigMapItem(name, entry.getKey());
                 if (existingValue == null) {
                     setBigMapItem(name, entry.getKey(), entry.getValue());
                 } else {

@@ -16,8 +16,8 @@ public class CollectionUtils {
         return new HashSet<T>(Arrays.asList(ts));
     }
 
-    public static <K, T> SortedMap<K, T> sortedMap(@NotNull K[] keys, @NotNull V[] values) {
-        TreeMap<K, T> map = new TreeMap<K, T>();
+    public static <K, V> SortedMap<K, V> sortedMap(@NotNull K[] keys, @NotNull V[] values) {
+        TreeMap<K, V> map = new TreeMap<K, V>();
         if (keys.length != values.length) {
             throw new IllegalArgumentException("Lengths of keys and values must be same.");
         }

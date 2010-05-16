@@ -1,69 +1,76 @@
 package org.valz.util.datastores;
 
-import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.aggregates.Value;
+import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryDataStore implements DataStore {
+public class MemoryDataStore extends AbstractDataStore {
 
-    private final Map<String, Object> name2val = new HashMap<String, Object>();
-    private final Map<String, Aggregate<?>> name2aggregate = new HashMap<String, Aggregate<?>>();
-    private final Map<String, MemoryBigMap<?>> name2bigMap = new HashMap<String, MemoryBigMap<?>>();
+    private final Map<String, Value> aggregates = new HashMap<String, Value>();
+    private final Map<String, MemoryBigMap> bigMaps = new HashMap<String, MemoryBigMap>();
 
+    @Override
+    protected <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
+        aggregates.put(name, new Value(aggregate, value));
+    }
 
-    public <T> void submit(String name, Aggregate<T> aggregate, T value) {
-        name2aggregate.put(name, aggregate);
-        name2val.put(name, value);
+    @Override
+    protected <T> void setAggregateValue(String name, T newValue) {
+        Aggregate aggregate = aggregates.get(name).getAggregate();
+        aggregates.put(name, new Value(aggregate, newValue));
     }
 
     public Collection<String> listVars() {
-        return new ArrayList<String>(name2val.keySet());
-    }
-
-    public <T> Aggregate<T> getAggregate(String name) {
-        return (Aggregate<T>)name2aggregate.get(name);
+        return new ArrayList<String>(aggregates.keySet());
     }
 
     public <T> Value<T> getValue(String name) {
-        return new Value(name2aggregate.get(name), name2val.get(name));
-    }
-
-    public <T> void setValue(String name, T value) {
-        name2val.put(name, value);
-    }
-
-    public synchronized <T> void modify(String name, Calculator<T> calculator) {
-        T value = (T)name2val.get(name);
-        T newValue = calculator.calculate(value);
-        name2val.put(name, newValue);
+        return aggregates.get(name);
     }
 
     public void removeAggregate(String name) {
-        name2val.remove(name);
-        name2aggregate.remove(name);
+        aggregates.remove(name);
     }
 
 
-    
+
     public <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) {
         MemoryBigMap<T> bigMap = new MemoryBigMap<T>(aggregate);
         bigMap.append(value);
-        name2bigMap.put(name, bigMap);
+        bigMaps.put(name, bigMap);
+    }
+
+    @Override
+    protected <T> void setBigMapItem(String name, String key, T newValue) {
+        bigMaps.get(name).put(key, newValue);
+    }
+
+    @Override
+    protected <T> T getBigMapItem(String name, String key) {
+        return (T)bigMaps.get(name).get(key);
     }
 
     public Collection<String> listBigMaps() {
-        return new ArrayList<String>(name2bigMap.keySet());
+        return new ArrayList<String>(bigMaps.keySet());
     }
 
-    public <T> BigMap<T> getBigMap(String name) {
-        return (BigMap<T>)name2bigMap.get(name);
+    public <T> BigMapIterator<T> getBigMapIterator(String name) {
+        return bigMaps.get(name).iterator();
+    }
+
+    public <T> BigMapChunkValue<T> getChunkForSubmit(String name, String fromKey, int count) {
+
+        return new BigMapChunkValue<T>(bigMaps.get(name).getAggregate(),
+                bigMaps.get(name).getChunkForSubmit(fromKey, count));
     }
 
     public void removeBigMap(String name) {
-        name2bigMap.remove(name);
+        bigMaps.remove(name);
     }
 }
