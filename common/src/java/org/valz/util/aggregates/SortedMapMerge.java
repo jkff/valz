@@ -10,26 +10,26 @@ import java.util.*;
 import static org.valz.util.JsonUtils.makeJson;
 
 
-public class SortedMapMerge<V> extends AbstractAggregate<SortedMap<String,V>> {
+public class SortedMapMerge<T> extends AbstractAggregate<SortedMap<String,T>> {
     public static final String NAME = "SortedMapMerge";
 
-    public final Aggregate<? super V> mergeConflictsAggregate;
+    public final Aggregate<? super T> mergeConflictsAggregate;
 
-    public SortedMapMerge(@NotNull Aggregate<? super V> mergeConflictsAggregate) {
+    public SortedMapMerge(@NotNull Aggregate<? super T> mergeConflictsAggregate) {
         this.mergeConflictsAggregate = mergeConflictsAggregate;
     }
 
     @Override
-    public SortedMap<String,V> reduce(@NotNull Iterator<SortedMap<String,V>> stream) {
-        SortedMap<String,V> res = new TreeMap<String,V>();
+    public SortedMap<String,T> reduce(@NotNull Iterator<SortedMap<String,T>> stream) {
+        SortedMap<String,T> res = new TreeMap<String,T>();
         while (stream.hasNext()) {
-            for (Map.Entry<String, V> entry : stream.next().entrySet()) {
-                V existingValue = res.get(entry.getKey());
+            for (Map.Entry<String, T> entry : stream.next().entrySet()) {
+                T existingValue = res.get(entry.getKey());
                 if (existingValue == null) {
                     res.put(entry.getKey(), entry.getValue());
                 } else {
                     res.put(entry.getKey(),
-                            (V)mergeConflictsAggregate.reduce(existingValue, entry.getValue()));
+                            (T)mergeConflictsAggregate.reduce(existingValue, entry.getValue()));
                 }
             }
         }
@@ -37,24 +37,24 @@ public class SortedMapMerge<V> extends AbstractAggregate<SortedMap<String,V>> {
     }
 
     @Override
-    public SortedMap<String,V> reduce(SortedMap<String,V> item1, SortedMap<String,V> item2) {
+    public SortedMap<String,T> reduce(SortedMap<String,T> item1, SortedMap<String,T> item2) {
         return reduce(Arrays.asList(item1, item2).iterator());
     }
 
-    public JSONValue dataToJson(SortedMap<String,V> item) {
+    public JSONValue dataToJson(SortedMap<String,T> item) {
         JSONObject obj = new JSONObject();
         Map<String, JSONValue> map = obj.getValue();
-        for (Map.Entry<String, V> entry : item.entrySet()) {
+        for (Map.Entry<String, T> entry : item.entrySet()) {
             map.put(entry.getKey(), mergeConflictsAggregate.dataToJson(entry.getValue()));
         }
         return obj;
     }
 
-    public SortedMap<String,V> dataFromJson(JSONValue jsonValue) throws ParserException {
+    public SortedMap<String,T> dataFromJson(JSONValue jsonValue) throws ParserException {
         JSONObject jsonObject = (JSONObject)jsonValue;
-        TreeMap<String, V> map = new TreeMap<String, V>();
+        TreeMap<String, T> map = new TreeMap<String, T>();
         for (Map.Entry<String, JSONValue> entry : jsonObject.getValue().entrySet()) {
-            map.put(entry.getKey(), (V)mergeConflictsAggregate.dataFromJson(entry.getValue()));
+            map.put(entry.getKey(), (T)mergeConflictsAggregate.dataFromJson(entry.getValue()));
         }
         return map;
     }
@@ -75,8 +75,8 @@ public class SortedMapMerge<V> extends AbstractAggregate<SortedMap<String,V>> {
         public SortedMapMerge fromJson(JSONValue jsonValue) throws ParserException {
             JSONObject jsonObject = (JSONObject)jsonValue;
             String name = ((JSONString)jsonObject.get("name")).getValue();
-            AggregateConfigFormatter configParser = registry.get(name);
-            Aggregate aggregate = configParser.fromJson(jsonObject.get("aggregate"));
+            AggregateConfigFormatter configFormatter = registry.get(name);
+            Aggregate aggregate = configFormatter.fromJson(jsonObject.get("aggregate"));
             return (SortedMapMerge)aggregate;
         }
 

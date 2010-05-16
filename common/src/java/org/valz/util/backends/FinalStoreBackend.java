@@ -1,11 +1,13 @@
 package org.valz.util.backends;
 
 import org.apache.log4j.Logger;
+import org.valz.util.aggregates.BigMap;
 import org.valz.util.aggregates.Value;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.datastores.DataStore;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class FinalStoreBackend implements ReadBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(FinalStoreBackend.class);
@@ -25,6 +27,15 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         }
     }
 
+    public <T> void submitBigMap(String name, Aggregate<T> mergeConflictsAggregate, Map<String, T> value) throws
+            RemoteWriteException {
+        try {
+            BackendUtils.submitBigMap(dataStore, name, mergeConflictsAggregate, value);
+        } catch (InvalidAggregateException e) {
+            log.info("Invalid submit.", e);
+        }
+    }
+
     public synchronized Value getValue(String name) {
         return dataStore.getValue(name);
     }
@@ -39,5 +50,17 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
 
     public synchronized void removeAggregate(String name) throws RemoteReadException {
         dataStore.removeAggregate(name);
+    }
+
+    public BigMap<?> getBigMap(String name) throws RemoteReadException {
+        return dataStore.getBigMap(name);
+    }
+
+    public Collection<String> listBigMaps() throws RemoteReadException {
+        return dataStore.listBigMaps();
+    }
+
+    public void removeBigMap(String name) throws RemoteReadException {
+        dataStore.removeBigMap(name);
     }
 }

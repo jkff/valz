@@ -27,11 +27,9 @@ public class AggregatesUnion<A, B> extends AbstractAggregate<Pair<A,B>> {
     }
 
     public JSONValue dataToJson(Pair<A, B> item) {
-        JSONObject obj = new JSONObject();
-        Map<String, JSONValue> map = obj.getValue();
-        map.put("first", first.dataToJson(item.first));
-        map.put("second", second.dataToJson(item.second));
-        return obj;
+        return makeJson(
+                    "first", first.dataToJson(item.first),
+                    "second", second.dataToJson(item.second));
     }
 
     public Pair<A, B> dataFromJson(JSONValue jsonValue) throws ParserException {

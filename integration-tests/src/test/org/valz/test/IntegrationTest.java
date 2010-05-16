@@ -106,7 +106,6 @@ public class IntegrationTest {
             final int SUBMITS_COUNT = 200;
             for (int i=0; i<SUBMITS_COUNT; i++) {
                 counter.submit(1L);
-                //Thread.sleep(50);
             }
 
             // delay for sending samples by daemon threads

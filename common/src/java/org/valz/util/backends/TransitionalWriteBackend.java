@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.datastores.DataStore;
 
+import java.util.Map;
+
 public class TransitionalWriteBackend implements WriteBackend {
     private static final Logger log = Logger.getLogger(TransitionalWriteBackend.class);
 
@@ -25,6 +27,15 @@ public class TransitionalWriteBackend implements WriteBackend {
             } catch (InvalidAggregateException e) {
                 log.info("Invalid submit.", e);
             }
+        }
+    }
+
+    public <T> void submitBigMap(String name, Aggregate<T> mergeConflictsAggregate, Map<String, T> value) throws
+            RemoteWriteException {
+        try {
+            BackendUtils.submitBigMap(dataStore, name, mergeConflictsAggregate, value);
+        } catch (InvalidAggregateException e) {
+            log.info("Invalid submit.", e);
         }
     }
 }
