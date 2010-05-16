@@ -1,24 +1,30 @@
 package org.valz.util.backends;
 
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.protocol.messages.*;
+import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.protocol.messages.BigMapChunkValue;
+import org.valz.util.protocol.messages.GetBigMapChunkRequest;
+import org.valz.util.protocol.messages.InteractionType;
+import org.valz.util.protocol.messages.ResponseParser;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
-class RemoteBigMapIterator<T> implements Iterator<Map.Entry<String, T>> {
+class RemoteBigMapIterator<T> implements BigMapIterator<T> {
 
     private final ResponseParser responseParser;
-    private final AggregateRegistry registry;
     private final String name;
 
     private Iterator<Map.Entry<String, T>> curIterator = null;
     private String curKey = "";
     private final int chunkSize;
+    private Aggregate<T> aggregate;
 
-    public RemoteBigMapIterator(String readServerUrl, AggregateRegistry registry, String name, int chunkSize) {
+    public RemoteBigMapIterator(ResponseParser responseParser, String name, int chunkSize) {
         this.chunkSize = chunkSize;
-        this.responseParser = new ResponseParser(readServerUrl, registry);
-        this.registry = registry;
+        this.responseParser = responseParser;
         this.name = name;
     }
 
@@ -33,13 +39,7 @@ class RemoteBigMapIterator<T> implements Iterator<Map.Entry<String, T>> {
     }
 
     public void remove() {
-        //TODO: make removing by chunks
-        try {
-            responseParser.getReadDataResponse(InteractionType.REMOVE_BIG_MAP_CHUNK,
-                    new RemoveBigMapChunkRequest(name, Arrays.asList(curKey)));
-        } catch (RemoteReadException e) {
-            throw new RuntimeException(e);
-        }
+        throw new UnsupportedOperationException();
     }
 
     private Iterator<Map.Entry<String, T>> getIterator() {
@@ -55,11 +55,18 @@ class RemoteBigMapIterator<T> implements Iterator<Map.Entry<String, T>> {
     }
 
     private Iterator<Map.Entry<String, T>> getNextIterator(boolean passFirstItem) throws RemoteReadException {
-        BigMapChunkValue chunkValue = responseParser.getReadDataResponse(InteractionType.GET_BIG_MAP_CHUNK, new GetBigMapChunkRequest(name, curKey, chunkSize));
-        Iterator<Map.Entry<String,T>> iter = (Iterator<Map.Entry<String,T>>)chunkValue.getValue().entrySet().iterator();
+        BigMapChunkValue chunkValue = responseParser.getReadDataResponse(InteractionType.GET_BIG_MAP_CHUNK,
+                new GetBigMapChunkRequest(name, curKey, chunkSize));
+        aggregate = chunkValue.getAggregate();
+        Iterator<Map.Entry<String, T>> iter =
+                (Iterator<Map.Entry<String, T>>)chunkValue.getValue().entrySet().iterator();
         if (iter.hasNext() && passFirstItem) {
             iter.next();
         }
         return iter;
+    }
+
+    public Aggregate<T> getAggregate() {
+        return aggregate;
     }
 }

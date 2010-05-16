@@ -1,74 +1,60 @@
 package org.valz.util.backends;
 
-import com.sdicons.json.model.JSONValue;
-import com.sdicons.json.parser.JSONParser;
-import org.valz.util.aggregates.*;
-import org.valz.util.protocol.ConnectionException;
-import org.valz.util.protocol.HttpConnector;
+import org.valz.util.Pair;
+import org.valz.util.aggregates.Aggregate;
+import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.aggregates.Value;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
 
-import java.io.StringReader;
 import java.util.*;
 
 public class RemoteReadBackend implements ReadBackend {
     private final List<ResponseParser> responseParsers = new ArrayList<ResponseParser>();
-    private final AggregateRegistry registry;
+    private final int chunkSize;
 
-    public RemoteReadBackend(List<String> readServerUrls, AggregateRegistry registry) {
+    public RemoteReadBackend(List<String> readServerUrls, AggregateRegistry registry, int chunkSize) {
+        this.chunkSize = chunkSize;
         for (String url : readServerUrls) {
             responseParsers.add(new ResponseParser(url, registry));
         }
-        this.registry = registry;
-    }
-
-    public Aggregate<?> getAggregate(String name) throws RemoteReadException {
-        Aggregate<?> prevAggregate = null;
-        for (int i=0; i<responseParsers.size(); i++) {
-            Aggregate<?> aggregate = responseParsers.get(i).getReadDataResponse(InteractionType.GET_AGGREGATE, name);
-            if (prevAggregate == null) {
-                prevAggregate = aggregate;
-            } else if (!aggregate.equals(prevAggregate)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("%s", responseParsers.get(i).getUrl()));
-                for (int j=1; j<i; j++) {
-                    sb.append(String.format(", %s", responseParsers.get(i).getUrl()));
-                }
-                throw new RemoteReadException(String.format(
-                        "Server %s contains aggregate %s with description, differs from servers: %s.",
-                        responseParsers.get(i).getUrl(), name, sb.toString()));
-            }
-        }
-        return prevAggregate;
     }
 
     public Value getValue(String name) throws RemoteReadException {
         Value prevValue = null;
-        for (int i=0; i<responseParsers.size(); i++) {
-            Value<?> value = responseParsers.get(i).getReadDataResponse(InteractionType.GET_VALUE, name);
+        for (ResponseParser parser : responseParsers) {
+            Value<?> value = parser.getReadDataResponse(InteractionType.GET_VALUE, name);
             if (prevValue == null) {
                 prevValue = value;
-            } else if (!value.getAggregate().equals(prevValue.getAggregate())) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("%s", responseParsers.get(i).getUrl()));
-                for (int j=1; j<i; j++) {
-                    sb.append(String.format(", %s", responseParsers.get(i).getUrl()));
-                }
-                throw new RemoteReadException(String.format(
-                        "Server %s contains aggregate %s with description, differs from servers: %s.",
-                        responseParsers.get(i).getUrl(), name, sb.toString()));
             } else {
+                checkAggregates(value.getAggregate(), prevValue.getAggregate(), name, parser);
                 prevValue = new Value(prevValue.getAggregate(),
-                        prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
+                    prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
             }
         }
         return prevValue;
     }
 
+    private void checkAggregates(Aggregate agg1, Aggregate agg2, String name, ResponseParser parser) throws
+            RemoteReadException {
+        if (!agg1.equals(agg2)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("%s", responseParsers.get(0).getUrl()));
+            for (int j = 1; j < responseParsers.size() && responseParsers.get(j) != parser; j++) {
+                sb.append(String.format(", %s", responseParsers.get(j).getUrl()));
+            }
+            throw new RemoteReadException(String.format(
+                    "Server %s contains aggregate %s with description, differs from servers: %s.",
+                    parser.getUrl(), name, sb.toString()));
+        }
+    }
+
     public Collection<String> listVars() throws RemoteReadException {
         Set<String> set = new HashSet<String>();
         for (ResponseParser responseParser : responseParsers) {
-            Collection<String> collection = responseParser.getReadDataResponse(InteractionType.LIST_VARS, null);
+            Collection<String> collection =
+                    responseParser.getReadDataResponse(InteractionType.LIST_VARS, null);
             set.addAll(collection);
         }
         return set;
@@ -80,14 +66,60 @@ public class RemoteReadBackend implements ReadBackend {
         }
     }
 
-    public BigMap<?> getBigMap(String name) throws RemoteReadException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public <T> BigMapIterator<T> getBigMapIterator(String name) throws RemoteReadException {
+        final PriorityQueue<Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>>> queue =
+                new PriorityQueue<Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>>>(0,
+                        new Comparator<Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>>>() {
+                            public int compare(Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>> p1,
+                                               Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>> p2) {
+                                return p1.first.getKey().compareTo(p2.first.getKey());
+                            }
+                        });
+
+        Aggregate<T> aggregate = null;
+        for (ResponseParser parser : responseParsers) {
+            RemoteBigMapIterator<T> iter = new RemoteBigMapIterator<T>(parser, name, chunkSize);
+            if (iter.hasNext()) {
+                queue.offer(new Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>>(iter.next(), iter));
+            }
+            if (aggregate == null) {
+                aggregate = iter.getAggregate();
+            } else {
+                checkAggregates(aggregate, iter.getAggregate(), name, parser);
+            }
+        }
+        final Aggregate<T> finalAggregate = aggregate;
+
+        return new BigMapIterator<T>() {
+            public boolean hasNext() {
+                return !queue.isEmpty();
+            }
+
+            public Map.Entry<String, T> next() {
+                Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>> p = queue.remove();
+                Map.Entry<String, T> res = p.first;
+                if (p.second.hasNext()) {
+                    Map.Entry<String, T> next = p.second.next();
+                    queue.offer(new Pair<Map.Entry<String, T>, RemoteBigMapIterator<T>>(next, p.second));
+                }
+                return res;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public Aggregate<T> getAggregate() {
+                return finalAggregate;
+            }
+        };
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {
         Set<String> set = new HashSet<String>();
         for (ResponseParser responseParser : responseParsers) {
-            Collection<String> collection = responseParser.getReadDataResponse(InteractionType.LIST_BIG_MAPS, null);
+            Collection<String> collection =
+                    responseParser.getReadDataResponse(InteractionType.LIST_BIG_MAPS, null);
             set.addAll(collection);
         }
         return set;
@@ -98,4 +130,6 @@ public class RemoteReadBackend implements ReadBackend {
             responseParser.getReadDataResponse(InteractionType.REMOVE_BIG_MAP, name);
         }
     }
+
+    
 }

@@ -38,7 +38,8 @@ public class IntegrationTest {
             Valz.init(Valz.getWriteBackend(registry, String.format("http://localhost:%d", port)));
 
             // init viewer
-            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), registry);
+            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), registry,
+                    chunkSize);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -92,7 +93,8 @@ public class IntegrationTest {
                 AggregateRegistry registry = new AggregateRegistry();
                 registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
-                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), registry);
+                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), registry,
+                        chunkSize);
             }
 
             // Produce a fresh name to avoid using values

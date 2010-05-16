@@ -1,18 +1,12 @@
 package org.valz.util.backends;
 
-import com.sdicons.json.model.JSONValue;
-import com.sdicons.json.parser.JSONParser;
-import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.ParserException;
-import org.valz.util.protocol.ConnectionException;
-import org.valz.util.protocol.HttpConnector;
+import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
 import org.valz.util.protocol.messages.SubmitBigMapRequest;
 import org.valz.util.protocol.messages.SubmitRequest;
 
-import java.io.StringReader;
 import java.util.Map;
 
 public class RemoteWriteBackend implements WriteBackend {

@@ -6,7 +6,6 @@ import org.valz.util.protocol.messages.SubmitBigMapRequest;
 import org.valz.util.protocol.messages.SubmitRequest;
 
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 class NonBlockingSubmitter extends PeriodicWorker {
     private static final Logger LOG = Logger.getLogger(NonBlockingSubmitter.class);
@@ -15,7 +14,8 @@ class NonBlockingSubmitter extends PeriodicWorker {
     private final Queue<SubmitRequest> aggregatesQueue;
     private final Queue<SubmitBigMapRequest> bigMapsQueue;
 
-    public NonBlockingSubmitter(WriteBackend writeBackend, Queue<SubmitRequest> aggregatesQueue, Queue<SubmitBigMapRequest> bigMapsQueue, long intervalMillis) {
+    public NonBlockingSubmitter(WriteBackend writeBackend, Queue<SubmitRequest> aggregatesQueue,
+                                Queue<SubmitBigMapRequest> bigMapsQueue, long intervalMillis) {
         super(intervalMillis);
         this.writeBackend = writeBackend;
         this.aggregatesQueue = aggregatesQueue;
