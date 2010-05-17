@@ -10,6 +10,7 @@ import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
 import org.valz.server.ValzServer;
 import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistryCreator;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadBackend;
@@ -24,8 +25,7 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
-        AggregateRegistry registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
+        AggregateRegistry registry = AggregateRegistryCreator.create();
 
         int port = 8800;
         int delayForCaching = 100;
@@ -93,7 +93,7 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend = null;
             {
-                AggregateRegistry registry = new AggregateRegistry();
+                AggregateRegistry registry = AggregateRegistryCreator.create();
                 registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
                 readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), registry,

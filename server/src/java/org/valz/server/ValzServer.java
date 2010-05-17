@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.aggregates.AggregateRegistryCreator;
 import org.valz.util.aggregates.LongSum;
 import org.valz.util.backends.FinalStoreBackend;
 import org.valz.util.backends.NonBlockingWriteBackend;
@@ -45,8 +46,7 @@ public class ValzServer {
 
     public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
                                                          int chunkSize) {
-        AggregateRegistry registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
+        AggregateRegistry registry = AggregateRegistryCreator.create();
 
         DataStore dataStore = new H2DataStore(dataStoreFile, registry);
         FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);

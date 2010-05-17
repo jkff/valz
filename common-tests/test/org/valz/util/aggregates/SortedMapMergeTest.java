@@ -18,9 +18,7 @@ public class SortedMapMergeTest {
 
     @Before
     public void setUp() {
-        registry = new AggregateRegistry();
-        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
-        registry.register(SortedMapMerge.NAME, new SortedMapMerge.ConfigFormatter(registry));
+        registry = AggregateRegistryCreator.create();
     }
 
     @After
