@@ -3,25 +3,25 @@ package org.valz.util.backends;
 import org.apache.log4j.Logger;
 import org.valz.util.PeriodicWorker;
 import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
 import org.valz.util.datastores.DataStore;
+import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
 
 class TransitionalSubmitter extends PeriodicWorker {
     private static final Logger LOG = Logger.getLogger(TransitionalSubmitter.class);
 
     private final WriteBackend writeBackend;
     private final DataStore dataStore;
+    private int chunkSize;
 
-    public TransitionalSubmitter(WriteBackend writeBackend, DataStore dataStore, long intervalMillis) {
+    public TransitionalSubmitter(WriteBackend writeBackend, DataStore dataStore, long intervalMillis,
+                                 int chunkSize) {
         super(intervalMillis);
         this.writeBackend = writeBackend;
         this.dataStore = dataStore;
+        this.chunkSize = chunkSize;
     }
 
     @Override
@@ -37,28 +37,27 @@ class TransitionalSubmitter extends PeriodicWorker {
         }
         for (String name : bigMaps) {
             synchronized (dataStore) {
-                BigMapIterator<Map.Entry> bigMapIterator = dataStore.getBigMapIterator(name);
-                if (bigMapIterator == null) {
+                Aggregate aggregate = dataStore.getBigMapAggregate(name);
+                BigMapChunkValue chunk = dataStore.getBigMapChunkForSubmit(name, "", chunkSize);
+                try {
+                    writeBackend.submitBigMap(name, aggregate, chunk.getValue());
+                } catch (ConnectionRefusedRemoteWriteException e) {
+                    try {
+                        dataStore.submit(name, aggregate, chunk.getValue());
+                    } catch (InvalidAggregateException e1) {
+                        // Ignore
+                    }
+                    LOG.error("Can not send data to remote backend. Reason: connection failed.", e);
+                    break;
+                } catch (RemoteWriteException e) {
+                    try {
+                        dataStore.submit(name, aggregate, chunk.getValue());
+                    } catch (InvalidAggregateException e1) {
+                        // Ignore
+                    }
+                    LOG.error("Can not send data to remote backend.", e);
                     continue;
                 }
-
-//                while (bigMapIterator.hasNext()) {
-//                    // TODO: make chunks by 100 items, not by 1
-//                    Map.Entry<String, ?> entry = bigMapIterator.next();
-//                    Map chunk = Collections.singletonMap(entry.getKey(), entry.getValue());
-//                    iter.remove();
-//                    try {
-//                        writeBackend.submitBigMap(name, (Aggregate)bigMap.aggregate, chunk);
-//                    } catch (ConnectionRefusedRemoteWriteException e) {
-//                        bigMap.append(chunk);
-//                        LOG.error("Can not send data to remote backend. Reason: connection failed.", e);
-//                        break;
-//                    } catch (RemoteWriteException e) {
-//                        bigMap.append(chunk);
-//                        LOG.error("Can not send data to remote backend.", e);
-//                        continue;
-//                    }
-//                }
             }
         }
     }
@@ -74,7 +73,6 @@ class TransitionalSubmitter extends PeriodicWorker {
                 if (value == null) {
                     continue;
                 }
-                //Aggregate aggregate = value.getAggregate();
                 dataStore.removeAggregate(name);
                 try {
                     writeBackend.submit(name, value.getAggregate(), value.getValue());
@@ -82,7 +80,7 @@ class TransitionalSubmitter extends PeriodicWorker {
                     try {
                         dataStore.submit(name, value.getAggregate(), value.getValue());
                     } catch (InvalidAggregateException e1) {
-                        // TODO: change this method for safe
+                        // Ignore
                     }
                     LOG.error("Can not send data to remote backend. Reason: connection failed.", e);
                     break;
@@ -90,7 +88,7 @@ class TransitionalSubmitter extends PeriodicWorker {
                     try {
                         dataStore.submit(name, value.getAggregate(), value.getValue());
                     } catch (InvalidAggregateException e1) {
-                        // TODO: change this method for safe
+                        // Ignore
                     }
                     LOG.error("Can not send data to remote backend.", e);
                     continue;

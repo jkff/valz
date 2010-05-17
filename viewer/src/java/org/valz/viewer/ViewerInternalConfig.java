@@ -16,7 +16,7 @@ public class ViewerInternalConfig {
         this.registry = registry;
     }
 
-    public static ViewerInternalConfig getConfig(List<String> urls) {
+    public static ViewerInternalConfig getConfig(List<String> urls, int chunkSize) {
         AggregateRegistry registry = AggregateRegistryCreator.create();
         ReadBackend readBackend = new RemoteReadBackend(urls, registry, chunkSize);
         return new ViewerInternalConfig(readBackend, registry);

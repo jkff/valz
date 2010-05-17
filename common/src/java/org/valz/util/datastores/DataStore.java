@@ -26,9 +26,11 @@ public interface DataStore {
 
     Collection<String> listBigMaps();
 
-    <T> BigMapIterator<T> getBigMapIterator(String name);
+    <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count);
 
-    <T> BigMapChunkValue<T> getChunkForSubmit(String name, String fromKey, int count);
+    <T> Aggregate<T> getBigMapAggregate(String name);
+
+    <T> BigMapChunkValue<T> getBigMapChunkForSubmit(String name, String fromKey, int count);
 
     void removeBigMap(String name);
 }

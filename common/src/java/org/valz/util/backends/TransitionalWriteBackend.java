@@ -15,9 +15,10 @@ public class TransitionalWriteBackend implements WriteBackend {
         return dataStore;
     }
 
-    public TransitionalWriteBackend(WriteBackend writeBackend, DataStore dataStore, long intervalMillis) {
+    public TransitionalWriteBackend(WriteBackend writeBackend, DataStore dataStore, long intervalMillis,
+                                    int chunkSize) {
         this.dataStore = dataStore;
-        new Thread(new TransitionalSubmitter(writeBackend, dataStore, intervalMillis)).start();
+        new Thread(new TransitionalSubmitter(writeBackend, dataStore, intervalMillis, chunkSize)).start();
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {

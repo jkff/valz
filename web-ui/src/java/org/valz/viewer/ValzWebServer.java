@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 
-import java.util.Arrays;
-
 public class ValzWebServer {
     private static final Logger log = Logger.getLogger(ValzWebServer.class);
 
@@ -18,7 +16,7 @@ public class ValzWebServer {
         ViewerConfig config = ViewerConfig.read();
 
         Server server = startServer(8900,
-                ViewerInternalConfig.getConfig(config.urls));
+                ViewerInternalConfig.getConfig(config.urls, 0));
 
         try {
             server.join();

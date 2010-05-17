@@ -29,8 +29,9 @@ public class IntegrationTest {
 
         int port = 8800;
         int delayForCaching = 100;
+        int chunkSize = 100;
 
-        InternalConfig config = ValzServer.getInternalServerConfig("h2store", port, delayForCaching);
+        InternalConfig config = ValzServer.getInternalServerConfig("h2store", port, delayForCaching, chunkSize);
         Server server = ValzServer.startServer(config);
 
         try {
@@ -72,8 +73,10 @@ public class IntegrationTest {
 
         // init and start valz servers
         int[] ports = {8800, 8801};
+        int delayForCaching = 100;
+        int chunkSize = 100;
 
-        List<InternalConfig> listConfigs = ServerUtils.getServerConfigs(100, ports);
+        List<InternalConfig> listConfigs = ServerUtils.getServerConfigs(chunkSize, delayForCaching, ports);
         List<Server> listServers = ServerUtils.startServers(listConfigs);
 
         try {

@@ -47,7 +47,12 @@ public class MemoryDataStore extends AbstractDataStore {
     }
 
     @Override
-    protected <T> void setBigMapItem(String name, String key, T newValue) {
+    protected <T> void insertBigMapItem(String name, String key, T value) {
+        bigMaps.get(name).put(key, value);
+    }
+
+    @Override
+    protected <T> void updateBigMapItem(String name, String key, T newValue) {
         bigMaps.get(name).put(key, newValue);
     }
 
@@ -60,11 +65,16 @@ public class MemoryDataStore extends AbstractDataStore {
         return new ArrayList<String>(bigMaps.keySet());
     }
 
-    public <T> BigMapIterator<T> getBigMapIterator(String name) {
-        return bigMaps.get(name).iterator();
+    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) {
+        MemoryBigMap<T> memoryBigMap = bigMaps.get(name);
+        return new BigMapChunkValue<T>(memoryBigMap.getAggregate(), memoryBigMap.getChunk(fromKey, count));
     }
 
-    public <T> BigMapChunkValue<T> getChunkForSubmit(String name, String fromKey, int count) {
+    public <T> Aggregate<T> getBigMapAggregate(String name) {
+        return bigMaps.get(name).getAggregate();
+    }
+
+    public <T> BigMapChunkValue<T> getBigMapChunkForSubmit(String name, String fromKey, int count) {
 
         return new BigMapChunkValue<T>(bigMaps.get(name).getAggregate(),
                 bigMaps.get(name).getChunkForSubmit(fromKey, count));

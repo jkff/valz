@@ -5,18 +5,21 @@ import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
 import org.valz.util.datastores.DataStore;
+import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class FinalStoreBackend implements ReadBackend, WriteBackend {
+public class FinalStoreBackend implements ReadChunkBackend, WriteBackend {
     private static final Logger log = Logger.getLogger(FinalStoreBackend.class);
 
 
     private final DataStore dataStore;
+    private int chunkSize;
 
-    public FinalStoreBackend(DataStore dataStore) {
+    public FinalStoreBackend(DataStore dataStore, int chunkSize) {
         this.dataStore = dataStore;
+        this.chunkSize = chunkSize;
     }
 
     public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) throws
@@ -49,8 +52,8 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         dataStore.removeAggregate(name);
     }
 
-    public BigMapIterator getBigMapIterator(String name) throws RemoteReadException {
-        return dataStore.getBigMapIterator(name);
+    public <T> BigMapIterator<T> getBigMapIterator(String name) throws RemoteReadException {
+        return new DatabaseBigMapIterator<T>(dataStore, name, chunkSize);
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {
@@ -59,5 +62,10 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
 
     public void removeBigMap(String name) throws RemoteReadException {
         dataStore.removeBigMap(name);
+    }
+
+    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) throws
+            RemoteReadException {
+        return dataStore.getBigMapChunk(name, fromKey, count);
     }
 }
