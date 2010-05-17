@@ -26,11 +26,13 @@ public class AllServersStarter {
         PropertyConfigurator.configure("log4j.properties");
 
         int[] ports = {8800, 8801};
-        List<InternalConfig> configs = ServerUtils.getServerConfigs(100, ports);
+        int delayForCaching = 100;
+        int chunkSize = 100;
+        List<InternalConfig> configs = ServerUtils.getServerConfigs(delayForCaching, chunkSize, ports);
         List<Server> servers = ServerUtils.startServers(configs);
 
         Server valzWebServer = ValzWebServer
-                .startServer(8900, ViewerInternalConfig.getConfig(ViewerConfig.read().urls));
+                .startServer(8900, ViewerInternalConfig.getConfig(ViewerConfig.read().urls, 0));
 
 
         // init client

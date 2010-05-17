@@ -23,32 +23,6 @@ class MemoryBigMap<T> {
         this.aggregate = aggregate;
     }
 
-    public BigMapIterator<T> iterator() {
-        return iteratorSince("");
-    }
-
-    public synchronized BigMapIterator<T> iteratorSince(String fromKey) {
-        final Iterator<Map.Entry<String, T>> iter = map.tailMap(fromKey).entrySet().iterator();
-
-        return new BigMapIterator<T>() {
-            public Aggregate<T> getAggregate() {
-                return aggregate;
-            }
-
-            public boolean hasNext() {
-                return iter.hasNext();
-            }
-
-            public Map.Entry<String, T> next() {
-                return iter.next();
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
     public synchronized void append(Map<String, T> value) {
         for (Map.Entry<String, T> entry : value.entrySet()) {
             if (!map.containsKey(entry.getKey())) {
@@ -81,6 +55,22 @@ class MemoryBigMap<T> {
 
             res.put(entry.getKey(), entry.getValue());
             map.remove(entry.getKey());
+        }
+
+        return res;
+    }
+
+    public Map<String, T> getChunk(String fromKey, int count) {
+        Map<String, T> res = new TreeMap<String, T>();
+
+        SortedMap<String, T> tailMap = map.tailMap(fromKey);
+        for (Map.Entry<String, T> entry : tailMap.entrySet()) {
+            if (count <= 0) {
+                break;
+            }
+            count--;
+
+            res.put(entry.getKey(), entry.getValue());
         }
 
         return res;

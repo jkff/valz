@@ -18,7 +18,8 @@ public class ValzServer {
         PropertyConfigurator.configure("log4j.properties");
         ServerConfig config = ServerConfig.read();
 
-        Server server = startServer(getInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching));
+        Server server = startServer(getInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching,
+                config.chunkSize));
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -29,7 +30,7 @@ public class ValzServer {
     public static Server startServer(InternalConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
-        server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.registry));
+        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.registry));
 
         try {
             server.start();
@@ -42,12 +43,13 @@ public class ValzServer {
         return server;
     }
 
-    public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching) {
+    public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
+                                                         int chunkSize) {
         AggregateRegistry registry = new AggregateRegistry();
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
         DataStore dataStore = new H2DataStore(dataStoreFile, registry);
-        FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore);
+        FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);
         NonBlockingWriteBackend nonBlockingWriteBackend =
                 new NonBlockingWriteBackend(finalStoreBackend, delayForCaching);
 

@@ -2,6 +2,7 @@ package org.valz.util.backends;
 
 import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
+import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
 
