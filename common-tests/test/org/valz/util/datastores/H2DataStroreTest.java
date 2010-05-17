@@ -4,10 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.valz.util.CollectionUtils;
-import org.valz.util.aggregates.Aggregate;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.LongMin;
-import org.valz.util.aggregates.LongSum;
+import org.valz.util.aggregates.*;
 import org.valz.util.backends.InvalidAggregateException;
 import org.valz.util.datastores.H2DataStore;
 import org.valz.util.io.IOUtils;
@@ -38,7 +35,7 @@ public class H2DataStroreTest {
     @Before
     public void setUp() {
         removeFiles();
-        registry = new AggregateRegistry();
+        registry = AggregateRegistryCreator.create();
         registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
         registry.register(LongMin.NAME, new LongMin.ConfigFormatter());
         dataStore = new H2DataStore(dbname, registry);
