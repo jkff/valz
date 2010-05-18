@@ -17,11 +17,11 @@ import static org.valz.viewer.HtmlBuilder.text;
 
 public class ValzWebHandler extends AbstractHandler {
     private final ReadBackend readBackend;
-    private final AggregateRegistry registry;
+    private final AggregateRegistry aggregateRegistry;
 
-    public ValzWebHandler(ReadBackend readBackend, AggregateRegistry registry) {
+    public ValzWebHandler(ReadBackend readBackend, AggregateRegistry aggregateRegistry) {
         this.readBackend = readBackend;
-        this.registry = registry;
+        this.aggregateRegistry = aggregateRegistry;
     }
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
@@ -39,7 +39,7 @@ public class ValzWebHandler extends AbstractHandler {
                 tbody.addChild(html("tr").children(
                         html("td").children(text(var)),
                         html("td").children(text(readBackend.getValue(var).getAggregate().getName())),
-                        html("td").children(text(AggregateFormatter.toJson(registry, readBackend.getValue(var).getAggregate()))),
+                        html("td").children(text(AggregateFormatter.toJson(aggregateRegistry, readBackend.getValue(var).getAggregate()))),
                         html("td").children(text(readBackend.getValue(var).getValue()))));
             }
 

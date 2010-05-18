@@ -29,7 +29,7 @@ public class ValzWebServer {
 
         Server server = new Server(port);
 
-        ValzWebHandler handler = new ValzWebHandler(conf.readBackend, conf.registry);
+        ValzWebHandler handler = new ValzWebHandler(conf.readBackend, conf.aggregateRegistry);
         server.addHandler(handler);
 
         try {

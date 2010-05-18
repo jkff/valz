@@ -7,10 +7,14 @@ import com.sdicons.json.parser.JSONParser;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.valz.util.JsonUtils;
 import org.valz.util.Pair;
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.Value;
-import org.valz.util.backends.*;
+import org.valz.util.backends.ReadChunkBackend;
+import org.valz.util.backends.RemoteReadException;
+import org.valz.util.backends.RemoteWriteException;
+import org.valz.util.backends.WriteBackend;
 import org.valz.util.io.IOUtils;
 import org.valz.util.protocol.messages.GetBigMapChunkRequest;
 import org.valz.util.protocol.messages.InteractionType;
@@ -30,14 +34,15 @@ public class ValzHandler extends AbstractHandler {
     private static final Logger log = Logger.getLogger(ValzHandler.class);
 
 
-    private final AggregateRegistry registry;
+    private final AggregateRegistry aggregateRegistry;
     private final ReadChunkBackend readChunkBackend;
     private final WriteBackend writeBackend;
 
-    public ValzHandler(ReadChunkBackend readChunkBackend, WriteBackend writeBackend, AggregateRegistry registry) {
+    public ValzHandler(ReadChunkBackend readChunkBackend, WriteBackend writeBackend,
+                       AggregateRegistry aggregateRegistry) {
         this.readChunkBackend = readChunkBackend;
         this.writeBackend = writeBackend;
-        this.registry = registry;
+        this.aggregateRegistry = aggregateRegistry;
     }
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response,
@@ -46,16 +51,9 @@ public class ValzHandler extends AbstractHandler {
         try {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
 
-            JSONValue requestJson = null;
-            try {
-                requestJson = new JSONParser(new StringReader(reqStr)).nextValue();
-            } catch (TokenStreamException e) {
-                throw new BadRequestException("Can not parse json.");
-            } catch (RecognitionException e) {
-                throw new BadRequestException("Can not parse json.");
-            }
+            JSONValue requestJson = JsonUtils.jsonFromString(reqStr);
             Pair<InteractionType, Object> typeAndData =
-                    InteractionType.requestFromJson(requestJson, registry);
+                    InteractionType.requestFromJson(requestJson, aggregateRegistry);
 
             InteractionType t = typeAndData.first;
             Object data = typeAndData.second;
@@ -74,9 +72,6 @@ public class ValzHandler extends AbstractHandler {
                 String name = (String)data;
                 answer(response.getOutputStream(), InteractionType.GET_VALUE,
                         ((Value<?>)readChunkBackend.getValue(name)));
-                //            } else if (InteractionType.GET_AGGREGATE.equals(t)) {
-                //                String name = (String)data;
-                //                answer(response.getOutputStream(), InteractionType.GET_AGGREGATE, readBackend.getAggregate(name));
             } else if (InteractionType.REMOVE_VALUE.equals(t)) {
                 String name = (String)data;
                 readChunkBackend.removeAggregate(name);
@@ -86,11 +81,12 @@ public class ValzHandler extends AbstractHandler {
                     throw new BadRequestException("Data is not valid submit big map request.");
                 }
                 SubmitBigMapRequest submitBigMapRequest = (SubmitBigMapRequest)data;
-                writeBackend.submitBigMap(submitBigMapRequest.getName(), submitBigMapRequest.getAggregate(),
-                        submitBigMapRequest.getValue());
-                answer(response.getOutputStream(), InteractionType.SUBMIT, null);
+                writeBackend.submitBigMap(submitBigMapRequest.getName(), submitBigMapRequest.getKeyType(),
+                        submitBigMapRequest.getAggregate(), submitBigMapRequest.getValue());
+                answer(response.getOutputStream(), InteractionType.SUBMIT_BIG_MAP, null);
             } else if (InteractionType.LIST_BIG_MAPS.equals(t)) {
-                answer(response.getOutputStream(), InteractionType.LIST_BIG_MAPS, readChunkBackend.listBigMaps());
+                answer(response.getOutputStream(), InteractionType.LIST_BIG_MAPS,
+                        readChunkBackend.listBigMaps());
             } else if (InteractionType.GET_BIG_MAP_CHUNK.equals(t)) {
                 GetBigMapChunkRequest chunkRequest = (GetBigMapChunkRequest)data;
                 answer(response.getOutputStream(), InteractionType.GET_BIG_MAP_CHUNK,
@@ -124,6 +120,6 @@ public class ValzHandler extends AbstractHandler {
 
     private <T> void answer(OutputStream out, InteractionType<?, T> messageType, T data) throws IOException {
         IOUtils.writeOutputStream(out,
-                InteractionType.responseToJson(messageType, data, registry).render(false), "utf-8");
+                InteractionType.responseToJson(messageType, data, aggregateRegistry).render(false), "utf-8");
     }
 }

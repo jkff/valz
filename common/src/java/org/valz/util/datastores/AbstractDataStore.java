@@ -4,6 +4,7 @@ import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
 import org.valz.util.backends.InvalidAggregateException;
+import org.valz.util.keytypes.KeyType;
 
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public abstract class AbstractDataStore implements DataStore {
 
 
 
-    public synchronized <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> map) throws
+    public synchronized <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map) throws
             InvalidAggregateException {
 
         // name.toUpperCase() - because h2 database makes uppercase for table names
@@ -38,14 +39,14 @@ public abstract class AbstractDataStore implements DataStore {
 
         Aggregate existingAggregate = getBigMapAggregate(name);
         if (existingAggregate == null) {
-            createBigMap(name, aggregate, map);
+            createBigMap(name, keyType, aggregate, map);
         } else {
             if (!existingAggregate.equals(aggregate)) {
                 throw new InvalidAggregateException(
                         "Val with same name and different aggregate already exists.");
             }
 
-            for (Map.Entry<String, T> entry : map.entrySet()) {
+            for (Map.Entry<K, T> entry : map.entrySet()) {
                 T existingValue = (T)getBigMapItem(name, entry.getKey());
                 if (existingValue == null) {
                     insertBigMapItem(name, entry.getKey(), entry.getValue());
@@ -56,13 +57,13 @@ public abstract class AbstractDataStore implements DataStore {
         }
     }
 
-    protected abstract <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> map);
+    protected abstract <K, T> void createBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map);
 
-    protected abstract <T> void insertBigMapItem(String name, String key, T value);
+    protected abstract <K, T> void insertBigMapItem(String name, K key, T value);
 
-    protected abstract <T> void updateBigMapItem(String name, String key, T newValue);
+    protected abstract <K, T> void updateBigMapItem(String name, K key, T newValue);
 
-    protected abstract <T> T getBigMapItem(String name, String key);
+    protected abstract <K, T> T getBigMapItem(String name, K key);
 
     
 }

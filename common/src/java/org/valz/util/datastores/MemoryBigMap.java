@@ -3,6 +3,7 @@ package org.valz.util.datastores;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Iterator;
@@ -10,21 +11,27 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-class MemoryBigMap<T> {
+class MemoryBigMap<K, T> {
+
+    private final Aggregate<T> aggregate;
+    private final KeyType<K> keyType;
+    private final SortedMap<K, T> map = new TreeMap<K, T>();
+
+    public MemoryBigMap(KeyType<K> keyType, @NotNull Aggregate<T> aggregate) {
+        this.keyType = keyType;
+        this.aggregate = aggregate;
+    }
+
+    public KeyType<K> getKeyType() {
+        return keyType;
+    }
 
     public Aggregate<T> getAggregate() {
         return aggregate;
     }
 
-    private final Aggregate<T> aggregate;
-    private final SortedMap<String, T> map = new TreeMap<String, T>();
-
-    public MemoryBigMap(@NotNull Aggregate<T> aggregate) {
-        this.aggregate = aggregate;
-    }
-
-    public synchronized void append(Map<String, T> value) {
-        for (Map.Entry<String, T> entry : value.entrySet()) {
+    public synchronized void append(Map<K, T> value) {
+        for (Map.Entry<K, T> entry : value.entrySet()) {
             if (!map.containsKey(entry.getKey())) {
                 map.put(entry.getKey(), entry.getValue());
             } else {
@@ -35,19 +42,19 @@ class MemoryBigMap<T> {
         }
     }
 
-    public T get(String key) {
+    public T get(K key) {
         return map.get(key);
     }
 
-    public T put(String key, T value) {
+    public T put(K key, T value) {
         return map.put(key, value);
     }
 
-    public Map<String, T> getChunkForSubmit(String fromKey, int count) {
-        Map<String, T> res = new TreeMap<String, T>();
+    public Map<K, T> getChunkForSubmit(K fromKey, int count) {
+        Map<K, T> res = new TreeMap<K, T>();
 
-        SortedMap<String, T> tailMap = map.tailMap(fromKey);
-        for (Map.Entry<String, T> entry : tailMap.entrySet()) {
+        SortedMap<K, T> tailMap = map.tailMap(fromKey);
+        for (Map.Entry<K, T> entry : tailMap.entrySet()) {
             if (count <= 0) {
                 break;
             }
@@ -60,11 +67,11 @@ class MemoryBigMap<T> {
         return res;
     }
 
-    public Map<String, T> getChunk(String fromKey, int count) {
-        Map<String, T> res = new TreeMap<String, T>();
+    public Map<K, T> getChunk(K fromKey, int count) {
+        Map<K, T> res = new TreeMap<K, T>();
 
-        SortedMap<String, T> tailMap = map.tailMap(fromKey);
-        for (Map.Entry<String, T> entry : tailMap.entrySet()) {
+        SortedMap<K, T> tailMap = map.tailMap(fromKey);
+        for (Map.Entry<K, T> entry : tailMap.entrySet()) {
             if (count <= 0) {
                 break;
             }
@@ -75,4 +82,5 @@ class MemoryBigMap<T> {
 
         return res;
     }
+
 }

@@ -2,6 +2,8 @@ package org.valz.util.backends;
 
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateRegistry;
+import org.valz.util.keytypes.KeyType;
+import org.valz.util.keytypes.KeyTypeRegistry;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
 import org.valz.util.protocol.messages.SubmitBigMapRequest;
@@ -11,21 +13,19 @@ import java.util.Map;
 
 public class RemoteWriteBackend implements WriteBackend {
     private final ResponseParser responseParser;
-    private final AggregateRegistry registry;
 
 
-    public RemoteWriteBackend(String serverURL, AggregateRegistry registry) {
-        this.responseParser = new ResponseParser(serverURL, registry);
-        this.registry = registry;
+    public RemoteWriteBackend(String serverURL, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
+        this.responseParser = new ResponseParser(serverURL, keyTypeRegistry, aggregateRegistry);
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
         getDataResponse(InteractionType.SUBMIT, new SubmitRequest<T>(name, aggregate, value));
     }
 
-    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
+    public <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value) throws
             RemoteWriteException {
-        getDataResponse(InteractionType.SUBMIT_BIG_MAP, new SubmitBigMapRequest<T>(name, aggregate, value));
+        getDataResponse(InteractionType.SUBMIT_BIG_MAP, new SubmitBigMapRequest<K, T>(name, keyType, aggregate, value));
     }
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteWriteException {

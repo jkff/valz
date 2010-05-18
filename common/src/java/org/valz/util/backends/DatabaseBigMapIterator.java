@@ -11,7 +11,7 @@ import org.valz.util.protocol.messages.ResponseParser;
 import java.util.Iterator;
 import java.util.Map;
 
-class DatabaseBigMapIterator<T> extends AbstractBigMapIterator<T> {
+class DatabaseBigMapIterator<K, T> extends AbstractBigMapIterator<K, T> {
 
     private final DataStore dataStore;
 
@@ -21,8 +21,8 @@ class DatabaseBigMapIterator<T> extends AbstractBigMapIterator<T> {
     }
 
     @Override
-    protected BigMapChunkValue<T> getNextChunk(String name, String fromKey, int count) throws
+    protected BigMapChunkValue<K, T> getNextChunk(String name, K fromKey, int count) throws
             RemoteReadException {
-        return dataStore.getBigMapChunk(name, curKey, chunkSize);
+        return (BigMapChunkValue<K, T>)dataStore.getBigMapChunk(name, curKey, chunkSize);
     }
 }

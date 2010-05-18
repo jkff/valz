@@ -1,6 +1,7 @@
 package org.valz.util.backends;
 
 import org.valz.util.aggregates.Aggregate;
+import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.SubmitBigMapRequest;
 import org.valz.util.protocol.messages.SubmitRequest;
 
@@ -22,8 +23,8 @@ public class NonBlockingWriteBackend implements WriteBackend {
         aggregatesQueue.offer(new SubmitRequest<T>(name, aggregate, value));
     }
 
-    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
+    public <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value) throws
             RemoteWriteException {
-        bigMapsQueue.offer(new SubmitBigMapRequest<T>(name, aggregate, value));
+        bigMapsQueue.offer(new SubmitBigMapRequest<K, T>(name, keyType, aggregate, value));
     }
 }

@@ -9,16 +9,16 @@ import java.util.List;
 
 public class ViewerInternalConfig {
     public final ReadBackend readBackend;
-    public final AggregateRegistry registry;
+    public final AggregateRegistry aggregateRegistry;
 
-    public ViewerInternalConfig(ReadBackend readBackend, AggregateRegistry registry) {
+    public ViewerInternalConfig(ReadBackend readBackend, AggregateRegistry aggregateRegistry) {
         this.readBackend = readBackend;
-        this.registry = registry;
+        this.aggregateRegistry = aggregateRegistry;
     }
 
     public static ViewerInternalConfig getConfig(List<String> urls, int chunkSize) {
-        AggregateRegistry registry = AggregateRegistryCreator.create();
-        ReadBackend readBackend = new RemoteReadBackend(urls, registry, chunkSize);
-        return new ViewerInternalConfig(readBackend, registry);
+        AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
+        ReadBackend readBackend = new RemoteReadBackend(urls, aggregateRegistry, chunkSize);
+        return new ViewerInternalConfig(readBackend, aggregateRegistry);
     }
 }

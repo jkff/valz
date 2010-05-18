@@ -21,7 +21,7 @@ public class H2DataStroreTest {
 
 
 
-    private AggregateRegistry registry = null;
+    private AggregateRegistry aggregateRegistry = null;
     private H2DataStore dataStore = null;
 
 
@@ -35,10 +35,10 @@ public class H2DataStroreTest {
     @Before
     public void setUp() {
         removeFiles();
-        registry = AggregateRegistryCreator.create();
-        registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
-        registry.register(LongMin.NAME, new LongMin.ConfigFormatter());
-        dataStore = new H2DataStore(dbname, registry);
+        aggregateRegistry = AggregateRegistryCreator.create();
+        aggregateRegistry.register(LongSum.NAME, new LongSum.ConfigFormatter());
+        aggregateRegistry.register(LongMin.NAME, new LongMin.ConfigFormatter());
+        dataStore = new H2DataStore(dbname, aggregateRegistry);
     }
 
     @After

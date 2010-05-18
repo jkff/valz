@@ -5,7 +5,7 @@ import org.valz.util.protocol.messages.GetBigMapChunkRequest;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
 
-class RemoteBigMapIterator<T> extends AbstractBigMapIterator<T> {
+class RemoteBigMapIterator<K, T> extends AbstractBigMapIterator<K, T> {
 
     private final ResponseParser responseParser;
 
@@ -15,9 +15,9 @@ class RemoteBigMapIterator<T> extends AbstractBigMapIterator<T> {
     }
 
     @Override
-    protected BigMapChunkValue<T> getNextChunk(String name, String fromKey, int count) throws
+    protected BigMapChunkValue<K, T> getNextChunk(String name, K fromKey, int count) throws
             RemoteReadException {
-        return (BigMapChunkValue<T>)responseParser.getReadDataResponse(InteractionType.GET_BIG_MAP_CHUNK,
-                new GetBigMapChunkRequest(name, curKey, chunkSize));
+        return (BigMapChunkValue<K, T>)responseParser.getReadDataResponse(InteractionType.GET_BIG_MAP_CHUNK,
+                new GetBigMapChunkRequest<K>(name, curKey, chunkSize, keyType));
     }
 }

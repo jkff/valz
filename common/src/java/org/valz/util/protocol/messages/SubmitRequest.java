@@ -3,23 +3,24 @@ package org.valz.util.protocol.messages;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
+import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateFormatter;
 import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.ParserException;
 
 import java.util.Map;
 
+import static org.valz.util.CollectionUtils.ar;
 import static org.valz.util.JsonUtils.makeJson;
 
 public class SubmitRequest<T> {
 
-    public static SubmitRequest fromJson(AggregateRegistry registry, JSONValue jsonValue) throws
+    public static SubmitRequest fromJson(AggregateRegistry aggregateRegistry, JSONValue jsonValue) throws
             ParserException {
         JSONObject jsonObject = (JSONObject)jsonValue;
         Map<String, JSONValue> map = jsonObject.getValue();
         String name = ((JSONString)map.get("name")).getValue();
-        Aggregate aggregate = AggregateFormatter.fromJson(registry, map.get("aggregate"));
+        Aggregate aggregate = AggregateFormatter.fromJson(aggregateRegistry, map.get("aggregate"));
         Object value = aggregate.dataFromJson(map.get("value"));
 
         return new SubmitRequest(name, aggregate, value);
@@ -49,8 +50,8 @@ public class SubmitRequest<T> {
         this.value = value;
     }
 
-    public JSONValue toJson(AggregateRegistry registry) {
-        return makeJson("name", name, "aggregate", AggregateFormatter.toJson(registry, aggregate), "value",
-                aggregate.dataToJson(value));
+    public JSONValue toJson(AggregateRegistry aggregateRegistry) {
+        return makeJson(ar("name", "aggregate", "value"),
+                ar(name, AggregateFormatter.toJson(aggregateRegistry, aggregate), aggregate.dataToJson(value)));
     }
 }

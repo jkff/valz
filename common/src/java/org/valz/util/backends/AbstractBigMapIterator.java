@@ -2,6 +2,7 @@ package org.valz.util.backends;
 
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.BigMapIterator;
+import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 import org.valz.util.protocol.messages.GetBigMapChunkRequest;
 import org.valz.util.protocol.messages.InteractionType;
@@ -12,13 +13,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-public abstract class AbstractBigMapIterator<T> implements BigMapIterator<T> {
+public abstract class AbstractBigMapIterator<K,T> implements BigMapIterator<K,T> {
 
     protected final String name;
 
-    protected Iterator<Map.Entry<String, T>> curIterator = null;
-    protected String curKey = "";
+    protected Iterator<Map.Entry<K, T>> curIterator = null;
+    protected K curKey = null;
     protected final int chunkSize;
+    protected KeyType<K> keyType;
     protected Aggregate<T> aggregate;
 
     public AbstractBigMapIterator(String name, int chunkSize) {
@@ -30,8 +32,8 @@ public abstract class AbstractBigMapIterator<T> implements BigMapIterator<T> {
         return getIterator().hasNext();
     }
 
-    public Map.Entry<String, T> next() {
-        Map.Entry<String, T> entry = getIterator().next();
+    public Map.Entry<K, T> next() {
+        Map.Entry<K, T> entry = getIterator().next();
         curKey = entry.getKey();
         return entry;
     }
@@ -40,24 +42,25 @@ public abstract class AbstractBigMapIterator<T> implements BigMapIterator<T> {
         throw new UnsupportedOperationException();
     }
 
-    private Iterator<Map.Entry<String, T>> getIterator() {
+    private Iterator<Map.Entry<K, T>> getIterator() {
         if (curIterator == null || !curIterator.hasNext()) {
             try {
                 curIterator = getNextIterator(curIterator != null);
             } catch (RemoteReadException e) {
                 // return empty iterator
-                return new TreeMap<String, T>().entrySet().iterator();
+                return new TreeMap<K, T>().entrySet().iterator();
             }
         }
         return curIterator;
     }
 
 
-    public Iterator<Map.Entry<String, T>> getNextIterator(boolean passFirstItem) throws RemoteReadException {
-        BigMapChunkValue<T> chunkValue = getNextChunk(name, curKey, chunkSize);
+    public Iterator<Map.Entry<K, T>> getNextIterator(boolean passFirstItem) throws RemoteReadException {
+        BigMapChunkValue<K, T> chunkValue = getNextChunk(name, curKey, chunkSize);
+        keyType = chunkValue.getKeyType();
         aggregate = chunkValue.getAggregate();
-        Iterator<Map.Entry<String, T>> iter =
-                (Iterator<Map.Entry<String, T>>)chunkValue.getValue().entrySet().iterator();
+        Iterator<Map.Entry<K, T>> iter =
+                chunkValue.getValue().entrySet().iterator();
         if (iter.hasNext() && passFirstItem) {
             iter.next();
         }
@@ -65,9 +68,14 @@ public abstract class AbstractBigMapIterator<T> implements BigMapIterator<T> {
     }
 
 
-    protected abstract BigMapChunkValue<T> getNextChunk(String name, String fromKey, int count) throws
+    protected abstract BigMapChunkValue<K, T> getNextChunk(String name, K fromKey, int count) throws
             RemoteReadException;
     
+
+    public KeyType<K> getKeyType() {
+        return keyType;
+    }
+
     public Aggregate<T> getAggregate() {
         return aggregate;
     }

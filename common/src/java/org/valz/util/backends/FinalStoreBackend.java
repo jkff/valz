@@ -5,6 +5,7 @@ import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
 import org.valz.util.datastores.DataStore;
+import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
@@ -31,10 +32,10 @@ public class FinalStoreBackend implements ReadChunkBackend, WriteBackend {
         }
     }
 
-    public synchronized <T> void submitBigMap(String name, Aggregate<T> aggregate,
-                                              Map<String, T> value) throws RemoteWriteException {
+    public synchronized <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate,
+                                              Map<K, T> value) throws RemoteWriteException {
         try {
-            dataStore.submitBigMap(name, aggregate, value);
+            dataStore.submitBigMap(name, keyType, aggregate, value);
         } catch (InvalidAggregateException e) {
             throw new RemoteWriteException(e);
         }
@@ -52,8 +53,8 @@ public class FinalStoreBackend implements ReadChunkBackend, WriteBackend {
         dataStore.removeAggregate(name);
     }
 
-    public <T> BigMapIterator<T> getBigMapIterator(String name) throws RemoteReadException {
-        return new DatabaseBigMapIterator<T>(dataStore, name, chunkSize);
+    public <K, T> BigMapIterator<K, T> getBigMapIterator(String name) throws RemoteReadException {
+        return new DatabaseBigMapIterator<K, T>(dataStore, name, chunkSize);
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {
@@ -64,7 +65,7 @@ public class FinalStoreBackend implements ReadChunkBackend, WriteBackend {
         dataStore.removeBigMap(name);
     }
 
-    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) throws
+    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws
             RemoteReadException {
         return dataStore.getBigMapChunk(name, fromKey, count);
     }

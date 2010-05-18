@@ -5,6 +5,8 @@ import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.AggregateRegistry;
 import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
+import org.valz.util.keytypes.KeyType;
+import org.valz.util.keytypes.KeyTypeRegistry;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
@@ -15,10 +17,10 @@ public class RemoteReadBackend implements ReadBackend {
     private final List<ResponseParser> responseParsers = new ArrayList<ResponseParser>();
     private final int chunkSize;
 
-    public RemoteReadBackend(List<String> readServerUrls, AggregateRegistry registry, int chunkSize) {
+    public RemoteReadBackend(List<String> readServerUrls, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, int chunkSize) {
         this.chunkSize = chunkSize;
         for (String url : readServerUrls) {
-            responseParsers.add(new ResponseParser(url, registry));
+            responseParsers.add(new ResponseParser(url, keyTypeRegistry, aggregateRegistry));
         }
     }
 
@@ -29,7 +31,7 @@ public class RemoteReadBackend implements ReadBackend {
             if (prevValue == null) {
                 prevValue = value;
             } else {
-                checkAggregates(value.getAggregate(), prevValue.getAggregate(), name, parser);
+                checkEquals(value.getAggregate(), prevValue.getAggregate(), name, parser);
                 prevValue = new Value(prevValue.getAggregate(),
                     prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
             }
@@ -37,9 +39,9 @@ public class RemoteReadBackend implements ReadBackend {
         return prevValue;
     }
 
-    private void checkAggregates(Aggregate agg1, Aggregate agg2, String name, ResponseParser parser) throws
+    private <T> void checkEquals(T obj1, T obj2, String name, ResponseParser parser) throws
             RemoteReadException {
-        if (!agg1.equals(agg2)) {
+        if (!obj1.equals(obj2)) {
             StringBuilder sb = new StringBuilder();
             sb.append(String.format("%s", responseParsers.get(0).getUrl()));
             for (int j = 1; j < responseParsers.size() && responseParsers.get(j) != parser; j++) {
@@ -67,47 +69,60 @@ public class RemoteReadBackend implements ReadBackend {
         }
     }
 
-    public <T> BigMapIterator<T> getBigMapIterator(String name) throws RemoteReadException {
-        final PriorityQueue<Pair<Map.Entry<String, T>, BigMapIterator<T>>> queue =
-                new PriorityQueue<Pair<Map.Entry<String, T>, BigMapIterator<T>>>(0,
-                        new Comparator<Pair<Map.Entry<String, T>, BigMapIterator<T>>>() {
-                            public int compare(Pair<Map.Entry<String, T>, BigMapIterator<T>> p1,
-                                               Pair<Map.Entry<String, T>, BigMapIterator<T>> p2) {
-                                return p1.first.getKey().compareTo(p2.first.getKey());
+    public <K, T> BigMapIterator<K, T> getBigMapIterator(String name) throws RemoteReadException {
+
+        class Container {
+            public KeyType<K> keyType = null;
+        }
+
+        final Container container = new Container();
+        Aggregate<T> aggregate = null;
+
+        final PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>> queue =
+                new PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>(0,
+                        new Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>() {
+                            public int compare(Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p1,
+                                               Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p2) {
+                                return container.keyType.compare(p1.first.getKey(), p2.first.getKey());
                             }
                         });
 
-        Aggregate<T> aggregate = null;
         for (ResponseParser parser : responseParsers) {
-            BigMapIterator<T> iter = new RemoteBigMapIterator<T>(parser, name, chunkSize);
+            BigMapIterator<K, T> iter = new RemoteBigMapIterator<K, T>(parser, name, chunkSize);
             if (iter.hasNext()) {
-                queue.offer(new Pair<Map.Entry<String, T>, BigMapIterator<T>>(iter.next(), iter));
+                queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(iter.next(), iter));
             }
             if (aggregate == null) {
+                container.keyType = iter.getKeyType();
                 aggregate = iter.getAggregate();
             } else {
-                checkAggregates(aggregate, iter.getAggregate(), name, parser);
+                checkEquals(aggregate, iter.getAggregate(), name, parser);
+                checkEquals(container.keyType, iter.getKeyType(), name, parser);
             }
         }
         final Aggregate<T> finalAggregate = aggregate;
 
-        return new BigMapIterator<T>() {
+        return new BigMapIterator<K, T>() {
             public boolean hasNext() {
                 return !queue.isEmpty();
             }
 
-            public Map.Entry<String, T> next() {
-                Pair<Map.Entry<String, T>, BigMapIterator<T>> p = queue.remove();
-                Map.Entry<String, T> res = p.first;
+            public Map.Entry<K, T> next() {
+                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p = queue.remove();
+                Map.Entry<K, T> res = p.first;
                 if (p.second.hasNext()) {
-                    Map.Entry<String, T> next = p.second.next();
-                    queue.offer(new Pair<Map.Entry<String, T>, BigMapIterator<T>>(next, p.second));
+                    Map.Entry<K, T> next = p.second.next();
+                    queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(next, p.second));
                 }
                 return res;
             }
 
             public void remove() {
                 throw new UnsupportedOperationException();
+            }
+
+            public KeyType<K> getKeyType() {
+                return container.keyType;
             }
 
             public Aggregate<T> getAggregate() {
