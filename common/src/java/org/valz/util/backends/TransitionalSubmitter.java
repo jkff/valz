@@ -5,6 +5,7 @@ import org.valz.util.PeriodicWorker;
 import org.valz.util.aggregates.Aggregate;
 import org.valz.util.aggregates.Value;
 import org.valz.util.datastores.DataStore;
+import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
@@ -37,10 +38,11 @@ class TransitionalSubmitter extends PeriodicWorker {
         }
         for (String name : bigMaps) {
             synchronized (dataStore) {
+                KeyType keyType = dataStore.getBigMapKeyType(name);
                 Aggregate aggregate = dataStore.getBigMapAggregate(name);
-                BigMapChunkValue chunk = dataStore.getBigMapChunkForSubmit(name, "", chunkSize);
+                BigMapChunkValue chunk = dataStore.getBigMapChunkForSubmit(name, keyType.getMinValue(), chunkSize);
                 try {
-                    writeBackend.submitBigMap(name, aggregate, chunk.getValue());
+                    writeBackend.submitBigMap(name, keyType, aggregate, chunk.getValue());
                 } catch (ConnectionRefusedRemoteWriteException e) {
                     try {
                         dataStore.submit(name, aggregate, chunk.getValue());

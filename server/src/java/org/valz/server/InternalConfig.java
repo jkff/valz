@@ -9,13 +9,13 @@ public class InternalConfig {
     public final int port;
     public final ReadChunkBackend readChunkBackend;
     public final WriteBackend writeBackend;
-    public final AggregateRegistry registry;
+    public final AggregateRegistry aggregateRegistry;
 
     public InternalConfig(int port, ReadChunkBackend readChunkBackend, WriteBackend writeBackend,
-                               AggregateRegistry registry) {
+                               AggregateRegistry aggregateRegistry) {
         this.port = port;
         this.readChunkBackend = readChunkBackend;
         this.writeBackend = writeBackend;
-        this.registry = registry;
+        this.aggregateRegistry = aggregateRegistry;
     }
 }

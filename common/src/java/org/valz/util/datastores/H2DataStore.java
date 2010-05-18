@@ -1,22 +1,21 @@
 package org.valz.util.datastores;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import com.sdicons.json.model.JSONValue;
-import com.sdicons.json.parser.JSONParser;
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.valz.util.JsonUtils;
 import org.valz.util.aggregates.*;
+import org.valz.util.keytypes.KeyType;
+import org.valz.util.keytypes.KeyTypeFormatter;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,13 +29,13 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
 
     private final DataSource dataSource;
     private final ObjectPool connectionPool;
-    private final AggregateRegistry registry;
+    private final AggregateRegistry aggregateRegistry;
 
     // TODO: realize methods for BigMap
 
-    public H2DataStore(String filename, AggregateRegistry registry) {
+    public H2DataStore(String filename, AggregateRegistry aggregateRegistry) {
 
-        this.registry = registry;
+        this.aggregateRegistry = aggregateRegistry;
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
@@ -74,7 +73,7 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
         return executeGet(new JSONValueParser<Aggregate<T>>() {
 
             public Aggregate<T> apply(JSONValue jsonValue) throws ParserException {
-                return AggregateFormatter.fromJson(registry, jsonValue);
+                return AggregateFormatter.fromJson(aggregateRegistry, jsonValue);
             }
         }, "SELECT aggregate FROM Valz WHERE name = ?", name);
     }
@@ -96,7 +95,7 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
     @Override
     protected <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
         execute("INSERT INTO Valz(name, aggregate, value) VALUES(?, ?, ?)", name,
-                AggregateFormatter.toJson(registry, aggregate).render(false),
+                AggregateFormatter.toJson(aggregateRegistry, aggregate).render(false),
                 aggregate.dataToJson(value).render(false));
     }
 
@@ -110,35 +109,35 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
 
 
     @Override
-    protected <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> map) {
+    protected <K, T> void createBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map) {
 
         name = name.toUpperCase();
 
         execute("INSERT INTO BigMaps(name, aggregate) VALUES(?, ?)", name,
-                AggregateFormatter.toJson(registry, aggregate).render(false));
+                AggregateFormatter.toJson(aggregateRegistry, aggregate).render(false));
         execute(String.format("CREATE TABLE BM.%s ( key varchar PRIMARY KEY, value varchar )", name));
-        for (Map.Entry<String, T> entry : map.entrySet()) {
+        for (Map.Entry<K, T> entry : map.entrySet()) {
             execute(String.format("INSERT INTO BM.%s (key, value) VALUES(?, ?)", name), entry.getKey(),
                     aggregate.dataToJson(entry.getValue()).render(false));
         }
     }
 
     @Override
-    protected <T> void insertBigMapItem(String name, String key, T value) {
+    protected <K, T> void insertBigMapItem(String name, K key, T value) {
         Aggregate<T> aggregate = getBigMapAggregate(name);
         execute(String.format("INSERT INTO BM.%s (key, value) VALUES(?, ?)", name), key,
                     aggregate.dataToJson(value).render(false));
     }
 
     @Override
-    protected <T> void updateBigMapItem(String name, String key, T newValue) {
+    protected <K, T> void updateBigMapItem(String name, K key, T newValue) {
         Aggregate<T> aggregate = getBigMapAggregate(name);
         execute(String.format("UPDATE Bm.%s SET value = ? WHERE key = ?", name),
                 aggregate.dataToJson(newValue).render(false), key);
     }
 
     @Override
-    protected <T> T getBigMapItem(String name, String key) {
+    protected <K, T> T getBigMapItem(String name, K key) {
         final Aggregate<T> aggregate = getBigMapAggregate(name);
         return executeGet(new JSONValueParser<T>() {
             public T apply(JSONValue jsonValue) throws ParserException {
@@ -152,9 +151,19 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
 
         return executeGet(new JSONValueParser<Aggregate<T>>() {
             public Aggregate<T> apply(JSONValue jsonValue) throws ParserException {
-                return AggregateFormatter.fromJson(registry, jsonValue);
+                return AggregateFormatter.fromJson(aggregateRegistry, jsonValue);
             }
         }, "SELECT aggregate FROM BigMaps WHERE name = ?", name);
+    }
+
+    public <K> KeyType<K> getBigMapKeyType(String name) {
+        name = name.toUpperCase();
+
+        return executeGet(new JSONValueParser<KeyType<K>>() {
+            public KeyType<K> apply(JSONValue jsonValue) throws ParserException {
+                return KeyTypeFormatter.fromJson(aggregateRegistry, jsonValue);
+            }
+        }, "SELECT keyType FROM BigMaps WHERE name = ?", name);
     }
 
     public Collection<String> listBigMaps() {
@@ -169,26 +178,27 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
         }, "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='BM'");
     }
 
-    public synchronized <T> BigMapChunkValue<T> getBigMapChunkForSubmit(String name, String fromKey,
+    public synchronized <K, T> BigMapChunkValue<K, T> getBigMapChunkForSubmit(String name, String fromKey,
                                                                         int count) {
         name = name.toUpperCase();
 
-        BigMapChunkValue<T> chunk = getBigMapChunk(name, fromKey, count);
+        BigMapChunkValue<K, T> chunk = getBigMapChunk(name, fromKey, count);
         execute(String.format("DELETE BM.%s WHERE key >= ? ORDER BY key LIMIT ?", name), fromKey, count);
         return chunk;
     }
 
-    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) {
+    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, String fromKey, int count) {
         name = name.toUpperCase();
 
         final Aggregate<T> aggregate = getBigMapAggregate(name);
-        Map<String, T> map = executeQuery(new ResultSetParser<Map<String, T>>() {
-            public Map<String, T> apply(ResultSet resultSet) throws SQLException {
-                Map<String, T> amap = new TreeMap<String, T>();
+        final KeyType<K> keyType = getBigMapKeyType(name);
+        Map<K, T> map = executeQuery(new ResultSetParser<Map<K, T>>() {
+            public Map<K, T> apply(ResultSet resultSet) throws SQLException {
+                Map<K, T> amap = new TreeMap<K, T>();
                 while (resultSet.next()) {
                     try {
-                        amap.put(resultSet.getString(1),
-                                aggregate.dataFromJson(strToJson(resultSet.getString(2))));
+                        amap.put(keyType.dataFromJson(JsonUtils.jsonFromString(resultSet.getString(1))),
+                                aggregate.dataFromJson(JsonUtils.jsonFromString((resultSet.getString(2)))));
                     } catch (ParserException e) {
                         throw new RuntimeException(e);
                     }
@@ -196,7 +206,7 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
                 return amap;
             }
         }, String.format("SELECT TOP(?) key, value FROM BM.%s WHERE key >= ? ORDER BY key", name), count, fromKey);
-        return new BigMapChunkValue<T>(aggregate, map);
+        return new BigMapChunkValue<K, T>(aggregate, keyType, map);
     }
 
     public void removeBigMap(String name) {
@@ -214,8 +224,8 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                JSONValue jsonValue = strToJson(str);
                 try {
+                    JSONValue jsonValue = JsonUtils.jsonFromString(str);
                     return finalFunc.apply(jsonValue);
                 } catch (ParserException e) {
                     throw new RuntimeException(e);
@@ -224,17 +234,6 @@ public class H2DataStore extends AbstractDataStore implements Closeable {
         }, query, params);
     }
 
-    private JSONValue strToJson(String str) {
-        JSONValue jsonValue;
-        try {
-            jsonValue = new JSONParser(new StringReader(str)).nextValue();
-        } catch (TokenStreamException e) {
-            throw new RuntimeException(e);
-        } catch (RecognitionException e) {
-            throw new RuntimeException(e);
-        }
-        return jsonValue;
-    }
 
 
     private <T> T executeQuery(ResultSetParser<T> func, StatementCreator... creators) {

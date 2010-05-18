@@ -7,9 +7,10 @@ import org.valz.util.Pair;
 
 import java.util.Map;
 
+import static org.valz.util.CollectionUtils.ar;
 import static org.valz.util.JsonUtils.makeJson;
 
-public class AggregatesUnion<A, B> extends AbstractAggregate<Pair<A,B>> {
+public class AggregatesUnion<A, B> extends AbstractAggregate<Pair<A, B>> {
 
     public static final String NAME = "AggregatesUnion";
 
@@ -23,57 +24,56 @@ public class AggregatesUnion<A, B> extends AbstractAggregate<Pair<A,B>> {
 
     @Override
     public Pair<A, B> reduce(Pair<A, B> item1, Pair<A, B> item2) {
-        return new Pair<A,B>(first.reduce(item1.first, item2.first), second.reduce(item1.second, item2.second));
+        return new Pair<A, B>(first.reduce(item1.first, item2.first),
+                second.reduce(item1.second, item2.second));
     }
 
     public JSONValue dataToJson(Pair<A, B> item) {
-        return makeJson(
-                    "first", first.dataToJson(item.first),
-                    "second", second.dataToJson(item.second));
+        return makeJson(ar("first", "second"),
+                ar(first.dataToJson(item.first), second.dataToJson(item.second)));
     }
 
     public Pair<A, B> dataFromJson(JSONValue jsonValue) throws ParserException {
         JSONObject jsonObject = (JSONObject)jsonValue;
         Map<String, JSONValue> jsonMap = jsonObject.getValue();
-        return new Pair<A,B>(first.dataFromJson(jsonMap.get("first")), second.dataFromJson(jsonMap.get("second")));
+        return new Pair<A, B>(first.dataFromJson(jsonMap.get("first")),
+                second.dataFromJson(jsonMap.get("second")));
     }
 
     public String getName() {
         return NAME;
     }
 
-    
 
-    public static class ConfigFormatter implements AggregateConfigFormatter<AggregatesUnion<?,?>> {
 
-        private final AggregateRegistry registry;
+    public static class ConfigFormatter implements AggregateConfigFormatter<AggregatesUnion<?, ?>> {
 
-        public ConfigFormatter(AggregateRegistry registry) {
-            this.registry = registry;
+        private final AggregateRegistry aggregateRegistry;
+
+        public ConfigFormatter(AggregateRegistry aggregateRegistry) {
+            this.aggregateRegistry = aggregateRegistry;
         }
 
         public AggregatesUnion fromJson(JSONValue jsonValue) throws ParserException {
             JSONObject jsonObject = (JSONObject)jsonValue;
-            
+
             String firstName = ((JSONString)jsonObject.get("firstName")).getValue();
-            AggregateConfigFormatter firstConfigFormatter = registry.get(firstName);
+            AggregateConfigFormatter firstConfigFormatter = aggregateRegistry.get(firstName);
             Aggregate firstAggregate = firstConfigFormatter.fromJson(jsonObject.get("firstAggregate"));
-            
+
             String secondName = ((JSONString)jsonObject.get("secondName")).getValue();
-            AggregateConfigFormatter secondConfigFormatter = registry.get(secondName);
+            AggregateConfigFormatter secondConfigFormatter = aggregateRegistry.get(secondName);
             Aggregate secondAggregate = secondConfigFormatter.fromJson(jsonObject.get("secondAggregate"));
-            
+
             return new AggregatesUnion(firstAggregate, secondAggregate);
         }
 
         public JSONValue toJson(AggregatesUnion aggregate) {
-            AggregateConfigFormatter firstFormatter = registry.get(aggregate.first.getName());
-            AggregateConfigFormatter secondFormatter = registry.get(aggregate.second.getName());
-            return makeJson(
-                    "firstName", aggregate.first.getName(),
-                    "firstAggregate", firstFormatter.toJson(aggregate.first),
-                    "secondName", aggregate.second.getName(),
-                    "secondAggregate", secondFormatter.toJson(aggregate.second));
+            AggregateConfigFormatter firstFormatter = aggregateRegistry.get(aggregate.first.getName());
+            AggregateConfigFormatter secondFormatter = aggregateRegistry.get(aggregate.second.getName());
+            return makeJson(ar("firstName", "firstAggregate", "secondName", "secondAggregate"),
+                    ar(aggregate.first.getName(), firstFormatter.toJson(aggregate.first),
+                            aggregate.second.getName(), secondFormatter.toJson(aggregate.second)));
         }
 
     }

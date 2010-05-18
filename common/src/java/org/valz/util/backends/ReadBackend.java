@@ -17,7 +17,7 @@ public interface ReadBackend {
 
     Collection<String> listBigMaps() throws RemoteReadException;
 
-    <T> BigMapIterator<T> getBigMapIterator(String name) throws RemoteReadException;
+    <K, T> BigMapIterator<K, T> getBigMapIterator(String name) throws RemoteReadException;
 
     void removeBigMap(String name) throws RemoteReadException;
 }

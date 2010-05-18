@@ -3,5 +3,5 @@ package org.valz.util.backends;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
 public interface ReadChunkBackend extends ReadBackend {
-    <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) throws RemoteReadException;
+    <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws RemoteReadException;
 }

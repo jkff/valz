@@ -31,7 +31,7 @@ public class ValzServer {
     public static Server startServer(InternalConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
-        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.registry));
+        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.aggregateRegistry));
 
         try {
             server.start();
@@ -46,14 +46,14 @@ public class ValzServer {
 
     public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
                                                          int chunkSize) {
-        AggregateRegistry registry = AggregateRegistryCreator.create();
+        AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
 
-        DataStore dataStore = new H2DataStore(dataStoreFile, registry);
+        DataStore dataStore = new H2DataStore(dataStoreFile, aggregateRegistry);
         FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);
         NonBlockingWriteBackend nonBlockingWriteBackend =
                 new NonBlockingWriteBackend(finalStoreBackend, delayForCaching);
 
-        return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, registry);
+        return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, aggregateRegistry);
     }
     
 

@@ -6,6 +6,7 @@ import org.valz.util.backends.RemoteWriteBackend;
 import org.valz.util.backends.RemoteWriteException;
 import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
+import org.valz.util.keytypes.KeyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,11 @@ public final class Valz {
         };
     }
 
-    public static synchronized <T> Val<Map<String, T>> registerBigMap(final String name, final Aggregate<T> mergeConflictsAggregate) {
-        return new Val<Map<String, T>>() {
-            public void submit(Map<String, T> sample) {
+    public static synchronized <K, T> Val<Map<K, T>> registerBigMap(final String name, final KeyType<K> keyType, final Aggregate<T> mergeConflictsAggregate) {
+        return new Val<Map<K, T>>() {
+            public void submit(Map<K, T> sample) {
                 try {
-                    writeBackend.submitBigMap(name, mergeConflictsAggregate, sample);
+                    writeBackend.submitBigMap(name, keyType, mergeConflictsAggregate, sample);
                 } catch (RemoteWriteException e) {
                     throw new RuntimeException(e);
                 }
@@ -45,10 +46,10 @@ public final class Valz {
         };
     }
 
-    public static WriteBackend getWriteBackend(AggregateRegistry registry, String... serverURLs) {
+    public static WriteBackend getWriteBackend(AggregateRegistry aggregateRegistry, String... serverURLs) {
         List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
         for (String url : serverURLs) {
-            writeBackends.add(new RemoteWriteBackend(url, registry));
+            writeBackends.add(new RemoteWriteBackend(url, aggregateRegistry));
         }
         return new RoundRobinWriteBackend(writeBackends);
     }

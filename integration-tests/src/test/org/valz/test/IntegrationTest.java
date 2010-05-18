@@ -25,7 +25,7 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
-        AggregateRegistry registry = AggregateRegistryCreator.create();
+        AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
 
         int port = 8800;
         int delayForCaching = 100;
@@ -36,10 +36,10 @@ public class IntegrationTest {
 
         try {
             // init client
-            Valz.init(Valz.getWriteBackend(registry, String.format("http://localhost:%d", port)));
+            Valz.init(Valz.getWriteBackend(aggregateRegistry, String.format("http://localhost:%d", port)));
 
             // init viewer
-            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), registry,
+            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), aggregateRegistry,
                     chunkSize);
 
             // Produce a fresh name to avoid using values
@@ -93,10 +93,10 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend = null;
             {
-                AggregateRegistry registry = AggregateRegistryCreator.create();
-                registry.register(LongSum.NAME, new LongSum.ConfigFormatter());
+                AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
+                aggregateRegistry.register(LongSum.NAME, new LongSum.ConfigFormatter());
 
-                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), registry,
+                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), aggregateRegistry,
                         chunkSize);
             }
 
