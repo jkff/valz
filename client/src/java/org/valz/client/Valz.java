@@ -7,6 +7,7 @@ import org.valz.util.backends.RemoteWriteException;
 import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
 import org.valz.util.keytypes.KeyType;
+import org.valz.util.keytypes.KeyTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +47,10 @@ public final class Valz {
         };
     }
 
-    public static WriteBackend getWriteBackend(AggregateRegistry aggregateRegistry, String... serverURLs) {
+    public static WriteBackend getWriteBackend(KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, String... serverURLs) {
         List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
         for (String url : serverURLs) {
-            writeBackends.add(new RemoteWriteBackend(url, aggregateRegistry));
+            writeBackends.add(new RemoteWriteBackend(url, keyTypeRegistry, aggregateRegistry));
         }
         return new RoundRobinWriteBackend(writeBackends);
     }

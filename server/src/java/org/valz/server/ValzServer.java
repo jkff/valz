@@ -10,6 +10,8 @@ import org.valz.util.backends.FinalStoreBackend;
 import org.valz.util.backends.NonBlockingWriteBackend;
 import org.valz.util.datastores.DataStore;
 import org.valz.util.datastores.H2DataStore;
+import org.valz.util.keytypes.KeyTypeRegistry;
+import org.valz.util.keytypes.KeyTypeRegistryCreator;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -31,7 +33,7 @@ public class ValzServer {
     public static Server startServer(InternalConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
-        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.aggregateRegistry));
+        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.keyTypeRegistry, conf.aggregateRegistry));
 
         try {
             server.start();
@@ -47,13 +49,14 @@ public class ValzServer {
     public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
                                                          int chunkSize) {
         AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
+        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
 
-        DataStore dataStore = new H2DataStore(dataStoreFile, aggregateRegistry);
+        DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
         FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);
         NonBlockingWriteBackend nonBlockingWriteBackend =
                 new NonBlockingWriteBackend(finalStoreBackend, delayForCaching);
 
-        return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, aggregateRegistry);
+        return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, keyTypeRegistry, aggregateRegistry);
     }
     
 

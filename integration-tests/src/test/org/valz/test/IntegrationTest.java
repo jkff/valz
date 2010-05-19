@@ -16,6 +16,8 @@ import org.valz.util.backends.ReadBackend;
 import org.valz.util.backends.RemoteReadBackend;
 import org.valz.util.backends.RoundRobinWriteBackend;
 import org.valz.util.backends.WriteBackend;
+import org.valz.util.keytypes.KeyTypeRegistry;
+import org.valz.util.keytypes.KeyTypeRegistryCreator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
+        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
         AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
 
         int port = 8800;
@@ -36,10 +39,10 @@ public class IntegrationTest {
 
         try {
             // init client
-            Valz.init(Valz.getWriteBackend(aggregateRegistry, String.format("http://localhost:%d", port)));
+            Valz.init(Valz.getWriteBackend(keyTypeRegistry, aggregateRegistry, String.format("http://localhost:%d", port)));
 
             // init viewer
-            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), aggregateRegistry,
+            ReadBackend readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), keyTypeRegistry, aggregateRegistry,
                     chunkSize);
 
             // Produce a fresh name to avoid using values
@@ -94,9 +97,9 @@ public class IntegrationTest {
             ReadBackend readBackend = null;
             {
                 AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
-                aggregateRegistry.register(LongSum.NAME, new LongSum.ConfigFormatter());
+                KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
 
-                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), aggregateRegistry,
+                readBackend = new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), keyTypeRegistry, aggregateRegistry,
                         chunkSize);
             }
 

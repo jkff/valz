@@ -16,6 +16,7 @@ import org.valz.util.backends.RemoteReadException;
 import org.valz.util.backends.RemoteWriteException;
 import org.valz.util.backends.WriteBackend;
 import org.valz.util.io.IOUtils;
+import org.valz.util.keytypes.KeyTypeRegistry;
 import org.valz.util.protocol.messages.GetBigMapChunkRequest;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.SubmitBigMapRequest;
@@ -35,13 +36,15 @@ public class ValzHandler extends AbstractHandler {
 
 
     private final AggregateRegistry aggregateRegistry;
+    private final KeyTypeRegistry keyTypeRegistry;
     private final ReadChunkBackend readChunkBackend;
     private final WriteBackend writeBackend;
 
     public ValzHandler(ReadChunkBackend readChunkBackend, WriteBackend writeBackend,
-                       AggregateRegistry aggregateRegistry) {
+                       KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
         this.readChunkBackend = readChunkBackend;
         this.writeBackend = writeBackend;
+        this.keyTypeRegistry = keyTypeRegistry;
         this.aggregateRegistry = aggregateRegistry;
     }
 
@@ -53,7 +56,7 @@ public class ValzHandler extends AbstractHandler {
 
             JSONValue requestJson = JsonUtils.jsonFromString(reqStr);
             Pair<InteractionType, Object> typeAndData =
-                    InteractionType.requestFromJson(requestJson, aggregateRegistry);
+                    InteractionType.requestFromJson(requestJson, keyTypeRegistry, aggregateRegistry);
 
             InteractionType t = typeAndData.first;
             Object data = typeAndData.second;
@@ -120,6 +123,6 @@ public class ValzHandler extends AbstractHandler {
 
     private <T> void answer(OutputStream out, InteractionType<?, T> messageType, T data) throws IOException {
         IOUtils.writeOutputStream(out,
-                InteractionType.responseToJson(messageType, data, aggregateRegistry).render(false), "utf-8");
+                InteractionType.responseToJson(messageType, data, keyTypeRegistry, aggregateRegistry).render(false), "utf-8");
     }
 }
