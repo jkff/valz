@@ -6,9 +6,10 @@ import org.valz.util.aggregates.Value;
 import org.valz.util.backends.InvalidAggregateException;
 import org.valz.util.keytypes.KeyType;
 
+import java.io.Closeable;
 import java.util.Map;
 
-public abstract class AbstractDataStore implements DataStore {
+public abstract class AbstractDataStore implements DataStore, Closeable {
 
     public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) throws
             InvalidAggregateException {
@@ -47,11 +48,11 @@ public abstract class AbstractDataStore implements DataStore {
             }
 
             for (Map.Entry<K, T> entry : map.entrySet()) {
-                T existingValue = (T)getBigMapItem(name, entry.getKey());
+                T existingValue = (T)getBigMapItem(name, keyType, aggregate, entry.getKey());
                 if (existingValue == null) {
-                    insertBigMapItem(name, entry.getKey(), entry.getValue());
+                    insertBigMapItem(name, keyType, aggregate, entry.getKey(), entry.getValue());
                 } else {
-                    updateBigMapItem(name, entry.getKey(), aggregate.reduce(existingValue, entry.getValue()));
+                    updateBigMapItem(name, keyType, aggregate, entry.getKey(), aggregate.reduce(existingValue, entry.getValue()));
                 }
             }
         }
@@ -59,11 +60,11 @@ public abstract class AbstractDataStore implements DataStore {
 
     protected abstract <K, T> void createBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map);
 
-    protected abstract <K, T> void insertBigMapItem(String name, K key, T value);
+    protected abstract <K, T> void insertBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key, T value);
 
-    protected abstract <K, T> void updateBigMapItem(String name, K key, T newValue);
+    protected abstract <K, T> void updateBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key, T newValue);
 
-    protected abstract <K, T> T getBigMapItem(String name, K key);
+    protected abstract <K, T> T getBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key);
 
     
 }

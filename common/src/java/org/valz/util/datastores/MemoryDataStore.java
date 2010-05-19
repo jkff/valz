@@ -5,6 +5,7 @@ import org.valz.util.aggregates.Value;
 import org.valz.util.keytypes.KeyType;
 import org.valz.util.protocol.messages.BigMapChunkValue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,17 +48,19 @@ public class MemoryDataStore extends AbstractDataStore {
     }
 
     @Override
-    protected <K, T> void insertBigMapItem(String name, K key, T value) {
+    protected <K, T> void insertBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
+                                           T value) {
         bigMaps.get(name).put(key, value);
     }
 
     @Override
-    protected <K, T> void updateBigMapItem(String name, K key, T newValue) {
+    protected <K, T> void updateBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
+                                           T newValue) {
         bigMaps.get(name).put(key, newValue);
     }
 
     @Override
-    protected <K, T> T getBigMapItem(String name, K key) {
+    protected <K, T> T getBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key) {
         return (T)bigMaps.get(name).get(key);
     }
 
@@ -85,5 +88,9 @@ public class MemoryDataStore extends AbstractDataStore {
 
     public void removeBigMap(String name) {
         bigMaps.remove(name);
+    }
+
+    public void close() throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

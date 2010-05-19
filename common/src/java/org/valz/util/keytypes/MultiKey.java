@@ -84,8 +84,9 @@ public class MultiKey implements KeyType<List<?>> {
         for (KeyType item : collection) {
             if (item instanceof MultiKey) {
                 res.addAll(flat(((MultiKey)item).keys));
+            } else {
+                res.add(item);
             }
-            res.add(item);
         }
         return res;
     }
