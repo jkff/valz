@@ -7,7 +7,6 @@ import org.valz.util.aggregates.BigMapIterator;
 import org.valz.util.aggregates.Value;
 import org.valz.util.keytypes.KeyType;
 import org.valz.util.keytypes.KeyTypeRegistry;
-import org.valz.util.protocol.messages.BigMapChunkValue;
 import org.valz.util.protocol.messages.InteractionType;
 import org.valz.util.protocol.messages.ResponseParser;
 
@@ -17,7 +16,8 @@ public class RemoteReadBackend implements ReadBackend {
     private final List<ResponseParser> responseParsers = new ArrayList<ResponseParser>();
     private final int chunkSize;
 
-    public RemoteReadBackend(List<String> readServerUrls, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, int chunkSize) {
+    public RemoteReadBackend(List<String> readServerUrls, KeyTypeRegistry keyTypeRegistry,
+                             AggregateRegistry aggregateRegistry, int chunkSize) {
         this.chunkSize = chunkSize;
         for (String url : readServerUrls) {
             responseParsers.add(new ResponseParser(url, keyTypeRegistry, aggregateRegistry));
@@ -33,7 +33,7 @@ public class RemoteReadBackend implements ReadBackend {
             } else {
                 checkEquals(value.getAggregate(), prevValue.getAggregate(), name, parser);
                 prevValue = new Value(prevValue.getAggregate(),
-                    prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
+                        prevValue.getAggregate().reduce(prevValue.getValue(), value.getValue()));
             }
         }
         return prevValue;
@@ -78,14 +78,17 @@ public class RemoteReadBackend implements ReadBackend {
         final Container container = new Container();
         Aggregate<T> aggregate = null;
 
+        final Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>> comparator =
+                new Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>() {
+                    public int compare(Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p1,
+                                       Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p2) {
+                        return container.keyType.compare(p1 == null ? null : p1.first.getKey(),
+                                p2 == null ? null : p2.first.getKey());
+                    }
+                };
+
         final PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>> queue =
-                new PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>(0,
-                        new Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>() {
-                            public int compare(Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p1,
-                                               Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p2) {
-                                return container.keyType.compare(p1.first.getKey(), p2.first.getKey());
-                            }
-                        });
+                new PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>(1, comparator);
 
         for (ResponseParser parser : responseParsers) {
             BigMapIterator<K, T> iter = new RemoteBigMapIterator<K, T>(parser, name, chunkSize);
@@ -108,11 +111,26 @@ public class RemoteReadBackend implements ReadBackend {
             }
 
             public Map.Entry<K, T> next() {
-                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p = queue.remove();
-                Map.Entry<K, T> res = p.first;
-                if (p.second.hasNext()) {
-                    Map.Entry<K, T> next = p.second.next();
-                    queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(next, p.second));
+                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> curPair = null;
+                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> pair = null;
+                Map.Entry<K, T> res = null;
+
+                while (!queue.isEmpty()) {
+                    curPair = queue.peek();
+                    if (pair == null) {
+                        pair = queue.remove();
+                        res = curPair.first;
+                    } else {
+                        if (0 != comparator.compare(pair, curPair)) {
+                            break;
+                        }
+                        curPair = queue.remove();
+                        res.setValue(finalAggregate.reduce(res.getValue(), curPair.first.getValue()));
+                    }
+                    if (curPair.second.hasNext()) {
+                        Map.Entry<K, T> next = curPair.second.next();
+                        queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(next, curPair.second));
+                    }
                 }
                 return res;
             }
@@ -147,5 +165,5 @@ public class RemoteReadBackend implements ReadBackend {
         }
     }
 
-    
+
 }
