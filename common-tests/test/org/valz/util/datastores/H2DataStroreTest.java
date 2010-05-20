@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.valz.util.CollectionUtils.*;
 
 public class H2DataStroreTest {
-    private final String dbname = "h2test";
+    private final String dbname = "h2store";
 
 
 
