@@ -1,9 +1,7 @@
 package org.valz.test;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.valz.client.Val;
@@ -32,26 +30,13 @@ import java.util.Map;
 
 public class IntegrationTest {
 
-    private final String dbname = "h2test";
-    private KeyTypeRegistry keyTypeRegistry;
-    private AggregateRegistry aggregateRegistry;
+    private final KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
+    private final AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
 
     private void removeFiles(String dbname) {
         new File(dbname + ".h2.db").delete();
         new File(dbname + ".lock.db").delete();
         new File(dbname + ".trace.db").delete();
-    }
-
-    @Before
-    public void setUp() {
-        removeFiles(dbname);
-        aggregateRegistry = AggregateRegistryCreator.create();
-        keyTypeRegistry = KeyTypeRegistryCreator.create();
-    }
-
-    @After
-    public void tearDown() {
-        removeFiles(dbname);
     }
 
     @Test
@@ -60,7 +45,7 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.getInternalServerConfig(dbname, port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.getInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
         Server server = ValzServer.startServer(config);
 
         try {
@@ -94,6 +79,8 @@ public class IntegrationTest {
         } finally {
             server.stop();
             server.join();
+
+            removeFiles(ServerUtils.getDbName(port));
         }
     }
 
@@ -149,6 +136,9 @@ public class IntegrationTest {
         } finally {
             // stop servers
             ServerUtils.stopServers(listServers);
+            for (String item : ServerUtils.getMultipleDbNames(ports)) {
+                removeFiles(item);
+            }            
         }
     }
 
@@ -158,7 +148,7 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.getInternalServerConfig(dbname, port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.getInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
         Server server = ValzServer.startServer(config);
 
         try {
@@ -193,6 +183,8 @@ public class IntegrationTest {
         } finally {
             server.stop();
             server.join();
+
+            removeFiles(ServerUtils.getDbName(port));
         }
     }
 
@@ -203,7 +195,7 @@ public class IntegrationTest {
         PropertyConfigurator.configure("log4j.properties");
 
         // init and start valz servers
-        int[] ports = {8800, 8801};
+        int[] ports = {8950, 8951};
         int delayForCaching = 100;
         int chunkSize = 100;
 
@@ -241,10 +233,11 @@ public class IntegrationTest {
             }
 
             // delay for sending samples by daemon threads
-            Thread.sleep(SUBMITS_COUNT * 10);
+            Thread.sleep(SUBMITS_COUNT * 50);
 
             // TODO: check listBigMaps
-            // TODO: remove h2store after tests
+            System.out.println(readBackend.listBigMaps().size());
+            System.out.println(readBackend.listBigMaps().toArray()[0]);
 
             // check values
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
@@ -258,6 +251,9 @@ public class IntegrationTest {
         } finally {
             // stop servers
             ServerUtils.stopServers(listServers);
+            for (String item : ServerUtils.getMultipleDbNames(ports)) {
+                removeFiles(item);
+            }
         }
     }
 }

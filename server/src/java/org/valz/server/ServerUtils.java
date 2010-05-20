@@ -18,9 +18,21 @@ public class ServerUtils {
     public static List<InternalConfig> getServerConfigs(int chunkSize, int delayForCaching, int... ports) {
         List<InternalConfig> listConfigs = new ArrayList<InternalConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.getInternalServerConfig("h2store" + port, port, delayForCaching, chunkSize));
+            listConfigs.add(ValzServer.getInternalServerConfig(getDbName(port), port, delayForCaching, chunkSize));
         }
         return listConfigs;
+    }
+
+    public static String getDbName(int port) {
+        return "h2store" + port;
+    }
+
+    public static List<String> getMultipleDbNames(int... ports) {
+        List<String> dbnames = new ArrayList<String>();
+        for (int port : ports) {
+            dbnames.add(getDbName(port));
+        }
+        return dbnames;
     }
 
     public static List<Server> startServers(List<InternalConfig> listConfigs) throws Exception {
