@@ -35,11 +35,11 @@ public final class Valz {
         };
     }
 
-    public static synchronized <K, T> Val<Map<K, T>> registerBigMap(final String name, final KeyType<K> keyType, final Aggregate<T> mergeConflictsAggregate) {
+    public static synchronized <K, T> Val<Map<K, T>> registerBigMap(final String name, final KeyType<K> keyType, final Aggregate<T> aggregate) {
         return new Val<Map<K, T>>() {
             public void submit(Map<K, T> sample) {
                 try {
-                    writeBackend.submitBigMap(name, keyType, mergeConflictsAggregate, sample);
+                    writeBackend.submitBigMap(name, keyType, aggregate, sample);
                 } catch (RemoteWriteException e) {
                     throw new RuntimeException(e);
                 }

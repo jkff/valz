@@ -29,12 +29,12 @@ class NonBlockingSubmitter extends PeriodicWorker {
     }
 
     private void sumbitBigMaps() {
-        SubmitRequest request;
-        while ((request = aggregatesQueue.poll()) != null) {
+        SubmitBigMapRequest request;
+        while ((request = bigMapsQueue.poll()) != null) {
             try {
-                writeBackend.submit(request.getName(), request.getAggregate(), request.getValue());
+                writeBackend.submitBigMap(request.getName(), request.getKeyType(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
-                aggregatesQueue.add(request);
+                bigMapsQueue.add(request);
                 LOG.info("Invalid submit. Reason: connection failed.", e);
                 break;
             } catch (RemoteWriteException e) {

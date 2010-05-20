@@ -50,16 +50,16 @@ public class ValzHandler extends AbstractHandler {
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response,
                        int dispatch) throws IOException, ServletException {
+
         response.setContentType("text/html");
         try {
             String reqStr = readInputStream(request.getInputStream(), "UTF-8");
-
             JSONValue requestJson = JsonUtils.jsonFromString(reqStr);
             Pair<InteractionType, Object> typeAndData =
                     InteractionType.requestFromJson(requestJson, keyTypeRegistry, aggregateRegistry);
-
             InteractionType t = typeAndData.first;
             Object data = typeAndData.second;
+
 
             if (t == InteractionType.SUBMIT) {
                 if (!(data instanceof SubmitRequest)) {

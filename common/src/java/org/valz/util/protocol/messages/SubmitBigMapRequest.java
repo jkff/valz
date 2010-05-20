@@ -78,6 +78,6 @@ public class SubmitBigMapRequest<K, T> {
             map.put(keyType.dataToJson(entry.getKey()).render(false), aggregate.dataToJson(entry.getValue()));
         } 
         return makeJson(ar("name", "keyType", "aggregate", "value"),
-                ar(name, keyType, AggregateFormatter.toJson(aggregateRegistry, aggregate), mapObj));
+                ar(name, KeyTypeFormatter.toJson(keyTypeRegistry, keyType), AggregateFormatter.toJson(aggregateRegistry, aggregate), mapObj));
     }
 }

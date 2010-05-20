@@ -56,8 +56,8 @@ public class H2DataStoreBigMaps {
 
 
         database.execute(
-                String.format("CREATE TABLE BM.%s (%s, value varchar, CONSTRAINT PK PRIMARY KEY(%s))", name,
-                        columnsDeclaration, columnsNames));
+                String.format("CREATE TABLE BM.%s (%s, value varchar, CONSTRAINT PK_BM_%s PRIMARY KEY(%s))", name,
+                        columnsDeclaration, name, columnsNames));
         for (Map.Entry<K, T> entry : map.entrySet()) {
             insertBigMapItem(name, keyType, aggregate, entry.getKey(), entry.getValue());
         }
@@ -183,6 +183,10 @@ public class H2DataStoreBigMaps {
     public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, final KeyType<K> keyType,
                                                         final Aggregate<T> aggregate, K fromKey, int count) {
         name = name.toUpperCase();
+
+        if (fromKey == null) {
+            fromKey = keyType.getMinValue();
+        }
 
         String keyGreater = formatKeyType(keyType, "key%d >= ?", " AND ");
         String columnsNames = formatKeyType(keyType, "key%d", ", ");
