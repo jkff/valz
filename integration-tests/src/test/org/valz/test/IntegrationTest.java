@@ -9,17 +9,15 @@ import org.valz.client.Valz;
 import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
 import org.valz.server.ValzServer;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.AggregateRegistryCreator;
-import org.valz.util.aggregates.BigMapIterator;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.ReadBackend;
-import org.valz.util.backends.RemoteReadBackend;
-import org.valz.util.backends.RoundRobinWriteBackend;
-import org.valz.util.backends.WriteBackend;
-import org.valz.util.keytypes.KeyString;
-import org.valz.util.keytypes.KeyTypeRegistry;
-import org.valz.util.keytypes.KeyTypeRegistryCreator;
+import org.valz.aggregates.AggregateRegistry;
+import org.valz.bigmap.BigMapIterator;
+import org.valz.aggregates.LongSum;
+import org.valz.backends.ReadBackend;
+import org.valz.backends.RemoteReadBackend;
+import org.valz.backends.RoundRobinWriteBackend;
+import org.valz.backends.WriteBackend;
+import org.valz.keytypes.StringKey;
+import org.valz.keytypes.KeyTypeRegistry;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,8 +28,8 @@ import java.util.Map;
 
 public class IntegrationTest {
 
-    private final KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
-    private final AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
+    private final KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
+    private final AggregateRegistry aggregateRegistry = AggregateRegistry.create();
 
     private void removeFiles(String dbname) {
         new File(dbname + ".h2.db").delete();
@@ -45,12 +43,12 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.getInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.getWriteBackend(keyTypeRegistry, aggregateRegistry,
+            Valz.init(Valz.makeWriteBackend(keyTypeRegistry, aggregateRegistry,
                     String.format("http://localhost:%d", port)));
 
             // init viewer
@@ -148,12 +146,12 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.getInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.getWriteBackend(keyTypeRegistry, aggregateRegistry,
+            Valz.init(Valz.makeWriteBackend(keyTypeRegistry, aggregateRegistry,
                     String.format("http://localhost:%d", port)));
 
             // init viewer
@@ -166,7 +164,7 @@ public class IntegrationTest {
             // It would be better to clear the data before test,
             // but this approach will suffice for now.
             String name = ("MAP" + (1 + Math.random())).replace('.', '_');
-            Val<Map<String, Long>> map = Valz.registerBigMap(name, new KeyString(), new LongSum());
+            Val<Map<String, Long>> map = Valz.registerBigMap(name, new StringKey(), new LongSum());
 
 
             // submit data
@@ -223,7 +221,7 @@ public class IntegrationTest {
             // It would be better to clear the data before test,
             // but this approach will suffice for now.
             String name = ("MAP" + (1 + Math.random())).replace('.', '_');
-            Val<Map<String, Long>> map = Valz.registerBigMap(name, new KeyString(), new LongSum());
+            Val<Map<String, Long>> map = Valz.registerBigMap(name, new StringKey(), new LongSum());
 
 
             // submit data

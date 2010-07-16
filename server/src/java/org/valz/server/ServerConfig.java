@@ -18,13 +18,12 @@ public class ServerConfig {
 
     public static ServerConfig read() {
         Preferences prefs = Preferences.userRoot().node("server.config");
-        ServerConfig config = new ServerConfig(
+        return new ServerConfig(
                 prefs.get("dataStoreFile", "h2store"),
                 prefs.getInt("port", 8080),
                 prefs.getInt("delayForCaching", 100),
                 prefs.getInt("chunkSize", 100)
         );
-        return config;
     }
 }
 
