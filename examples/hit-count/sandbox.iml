@@ -11,7 +11,26 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="web-ui" />
-    <orderEntry type="module" module-name="viewer" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../server/lib/jetty/servlet-api-2.5-20081211.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../server/lib/jetty/jetty-6.1.22.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../server/lib/jetty/jetty-util-6.1.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../common/lib/log4j/log4j-1.2.15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

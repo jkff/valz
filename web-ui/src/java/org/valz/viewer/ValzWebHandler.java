@@ -2,10 +2,10 @@ package org.valz.viewer;
 
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.valz.util.aggregates.AggregateFormatter;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.backends.ReadBackend;
-import org.valz.util.backends.RemoteReadException;
+import org.valz.aggregates.AggregateFormat;
+import org.valz.aggregates.AggregateRegistry;
+import org.valz.backends.ReadBackend;
+import org.valz.backends.RemoteReadException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class ValzWebHandler extends AbstractHandler {
                 tbody.addChild(html("tr").children(
                         html("td").children(text(var)),
                         html("td").children(text(readBackend.getValue(var).getAggregate().getName())),
-                        html("td").children(text(AggregateFormatter.toJson(aggregateRegistry, readBackend.getValue(var).getAggregate()))),
+                        html("td").children(text(AggregateFormat.toJson(aggregateRegistry, readBackend.getValue(var).getAggregate()))),
                         html("td").children(text(readBackend.getValue(var).getValue()))));
             }
 

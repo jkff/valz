@@ -2,41 +2,36 @@ package org.valz.util;
 
 import org.apache.log4j.Logger;
 
-import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Thread daemon for background periodic work.
- * Wakes up every intervalMillis milliseconds and calls execute().
+ * Wakes up every intervalMillis milliseconds and calls tick().
  */
-public abstract class PeriodicWorker extends Thread {
-private static final Logger LOG = Logger.getLogger(PeriodicWorker.class);
+public abstract class PeriodicWorker {
+    private static final Logger LOG = Logger.getLogger(PeriodicWorker.class);
+    private String name;
+    private long intervalMillis;
 
-    private final long intervalMillis;
-
-    public PeriodicWorker(long intervalMillis) {
+    public PeriodicWorker(final String name, long intervalMillis) {
+        this.name = name;
         this.intervalMillis = intervalMillis;
-        setDaemon(true);
     }
 
-    public void run() {
-        long prevTime = System.currentTimeMillis();
-        while (true) {
-            long delayTime = intervalMillis + prevTime - System.currentTimeMillis();
-            if (delayTime > 0) {
+    public abstract void tick();
+
+    public void start() {
+
+        new Timer(name, true).schedule(new TimerTask() {
+            @Override
+            public void run() {
                 try {
-                    Thread.sleep(intervalMillis);
-                } catch (InterruptedException e) {
-                    break;
+                    tick();
+                } catch (Exception e) {
+                    LOG.error("Tick of " + name + " failed", e);
                 }
             }
-            prevTime = System.currentTimeMillis();
-            try {
-                execute();
-            } catch (Exception e) {
-                LOG.error("Unknown error in PeriodicWorker.execute()", e);
-            }
-        }
+        }, intervalMillis, intervalMillis);
     }
-
-    public abstract void execute();
 }

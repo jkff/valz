@@ -3,15 +3,12 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.util.aggregates.AggregateRegistry;
-import org.valz.util.aggregates.AggregateRegistryCreator;
-import org.valz.util.aggregates.LongSum;
-import org.valz.util.backends.FinalStoreBackend;
-import org.valz.util.backends.NonBlockingWriteBackend;
-import org.valz.util.datastores.DataStore;
-import org.valz.util.datastores.H2DataStore;
-import org.valz.util.keytypes.KeyTypeRegistry;
-import org.valz.util.keytypes.KeyTypeRegistryCreator;
+import org.valz.aggregates.AggregateRegistry;
+import org.valz.backends.FinalStoreBackend;
+import org.valz.backends.NonBlockingWriteBackend;
+import org.valz.datastores.DataStore;
+import org.valz.datastores.h2.H2DataStore;
+import org.valz.keytypes.KeyTypeRegistry;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -21,7 +18,8 @@ public class ValzServer {
         PropertyConfigurator.configure("log4j.properties");
         ServerConfig config = ServerConfig.read();
 
-        Server server = startServer(getInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching,
+        Server server = startServer(
+                makeInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching,
                 config.chunkSize));
         try {
             server.join();
@@ -33,7 +31,7 @@ public class ValzServer {
     public static Server startServer(InternalConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
-        server.addHandler(new ValzHandler(conf.readChunkBackend, conf.writeBackend, conf.keyTypeRegistry, conf.aggregateRegistry));
+        server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.keyTypeRegistry, conf.aggregateRegistry));
 
         try {
             server.start();
@@ -46,10 +44,10 @@ public class ValzServer {
         return server;
     }
 
-    public static InternalConfig getInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
+    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
                                                          int chunkSize) {
-        AggregateRegistry aggregateRegistry = AggregateRegistryCreator.create();
-        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistryCreator.create();
+        AggregateRegistry aggregateRegistry = AggregateRegistry.create();
+        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
 
         DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
         FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);
