@@ -1,30 +1,24 @@
 package org.valz.backends;
 
-import org.apache.log4j.Logger;
 import org.valz.aggregates.Aggregate;
 import org.valz.aggregates.Sample;
-import org.valz.bigmap.BigMapIterator;
-import org.valz.bigmap.DatabaseBigMapIterator;
 import org.valz.datastores.DataStore;
 import org.valz.keytypes.KeyType;
+import org.valz.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
 import java.util.Map;
 
 public class FinalStoreBackend implements ReadBackend, WriteBackend {
-    private static final Logger LOG = Logger.getLogger(FinalStoreBackend.class);
-
-
     private final DataStore dataStore;
-    private int chunkSize;
 
-    public FinalStoreBackend(DataStore dataStore, int chunkSize) {
+    public FinalStoreBackend(DataStore dataStore) {
         this.dataStore = dataStore;
-        this.chunkSize = chunkSize;
     }
 
-    public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value) throws
-            RemoteWriteException {
+    public synchronized <T> void submit(String name, Aggregate<T> aggregate, T value)
+            throws RemoteWriteException
+    {
         try {
             dataStore.submit(name, aggregate, value);
         } catch (InvalidAggregateException e) {
@@ -32,8 +26,10 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         }
     }
 
-    public synchronized <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate,
-                                              Map<K, T> value) throws RemoteWriteException {
+    public synchronized <K, T> void submitBigMap(
+            String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value)
+            throws RemoteWriteException
+    {
         try {
             dataStore.submitBigMap(name, keyType, aggregate, value);
         } catch (InvalidAggregateException e) {
@@ -53,8 +49,8 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         dataStore.removeAggregate(name);
     }
 
-    public <K, T> BigMapIterator<K, T> getBigMapIterator(String name) throws RemoteReadException {
-        return new DatabaseBigMapIterator<K, T>(dataStore, name, chunkSize);
+    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws RemoteReadException {
+        return dataStore.getBigMapChunk(name, fromKey, count);
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {

@@ -15,7 +15,6 @@ import static org.valz.util.CollectionUtils.ar;
 import static org.valz.util.JsonUtils.makeJson;
 
 public class BigMapChunkValue<K, T> {
-
     public static <K, T> BigMapChunkValue<K, T> fromJson(KeyTypeRegistry keyTypeRegistry,
                                                          AggregateRegistry aggregateRegistry,
                                                          JSONValue json) throws ParserException {
@@ -47,21 +46,11 @@ public class BigMapChunkValue<K, T> {
         this.value = value;
     }
 
-
-    public KeyType<K> getKeyType() {
-        return keyType;
-    }
-
-    public Aggregate<T> getAggregate() {
-        return aggregate;
-    }
-
     public Map<K, T> getValue() {
         return value;
     }
 
     public JSONValue toJson(KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
-
         JSONObject jsonObject = new JSONObject();
         Map<String, JSONValue> jsonMap = jsonObject.getValue();
         for (Map.Entry<K, T> entry : value.entrySet()) {

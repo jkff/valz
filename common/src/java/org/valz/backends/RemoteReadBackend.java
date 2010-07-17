@@ -1,26 +1,19 @@
 package org.valz.backends;
 
-import org.valz.protocol.ResponseParser;
-import org.valz.protocol.messages.BigMapChunkValue;
-import org.valz.util.Pair;
-import org.valz.aggregates.Aggregate;
 import org.valz.aggregates.AggregateRegistry;
 import org.valz.aggregates.Sample;
-import org.valz.bigmap.BigMapIterator;
-import org.valz.bigmap.RemoteBigMapIterator;
-import org.valz.keytypes.KeyType;
 import org.valz.keytypes.KeyTypeRegistry;
+import org.valz.protocol.ResponseParser;
+import org.valz.protocol.messages.BigMapChunkValue;
 import org.valz.protocol.messages.InteractionType;
 
 import java.util.*;
 
 public class RemoteReadBackend implements ReadBackend {
     private final List<ResponseParser> responseParsers = new ArrayList<ResponseParser>();
-    private final int chunkSize;
 
     public RemoteReadBackend(List<String> readServerUrls, KeyTypeRegistry keyTypeRegistry,
-                             AggregateRegistry aggregateRegistry, int chunkSize) {
-        this.chunkSize = chunkSize;
+                             AggregateRegistry aggregateRegistry) {
         for (String url : readServerUrls) {
             responseParsers.add(new ResponseParser(url, keyTypeRegistry, aggregateRegistry));
         }
@@ -65,93 +58,16 @@ public class RemoteReadBackend implements ReadBackend {
         return set;
     }
 
-    public void removeAggregate(String name) throws RemoteReadException {
+    public void removeAggregate(String name) throws RemoteWriteException {
         for (ResponseParser responseParser : responseParsers) {
-            responseParser.getReadDataResponse(InteractionType.REMOVE_VALUE, name);
+            responseParser.getWriteDataResponse(InteractionType.REMOVE_VALUE, name);
         }
     }
 
-    public <K, T> BigMapIterator<K, T> getBigMapIterator(String name) throws RemoteReadException {
-        class Container {
-            public KeyType<K> keyType = null;
-        }
+    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws RemoteReadException {
+        // Naive implementation. TODO: Provide some caching or refactor to "getBigMapIterator(name,fromKey)"
+        // where BigMapIterator {Chunk next(count);}
 
-        final Container container = new Container();
-        Aggregate<T> aggregate = null;
-
-        final Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>> comparator =
-                new Comparator<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>() {
-                    public int compare(Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p1,
-                                       Pair<Map.Entry<K, T>, BigMapIterator<K, T>> p2) {
-                        return container.keyType.compare(p1 == null ? null : p1.first.getKey(),
-                                p2 == null ? null : p2.first.getKey());
-                    }
-                };
-
-        final PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>> queue =
-                new PriorityQueue<Pair<Map.Entry<K, T>, BigMapIterator<K, T>>>(1, comparator);
-
-        for (ResponseParser parser : responseParsers) {
-            BigMapIterator<K, T> iter = new RemoteBigMapIterator<K, T>(parser, name, chunkSize);
-            if (iter.hasNext()) {
-                queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(iter.next(), iter));
-            }
-            if (aggregate == null) {
-                container.keyType = iter.getKeyType();
-                aggregate = iter.getAggregate();
-            } else {
-                checkEquals(aggregate, iter.getAggregate(), name, parser);
-                checkEquals(container.keyType, iter.getKeyType(), name, parser);
-            }
-        }
-        final Aggregate<T> finalAggregate = aggregate;
-
-        return new BigMapIterator<K, T>() {
-            public boolean hasNext() {
-                return !queue.isEmpty();
-            }
-
-            public Map.Entry<K, T> next() {
-                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> curPair;
-                Pair<Map.Entry<K, T>, BigMapIterator<K, T>> pair = null;
-                Map.Entry<K, T> res = null;
-
-                while (!queue.isEmpty()) {
-                    curPair = queue.peek();
-                    if (pair == null) {
-                        pair = queue.remove();
-                        res = curPair.first;
-                    } else {
-                        if (0 != comparator.compare(pair, curPair)) {
-                            break;
-                        }
-                        curPair = queue.remove();
-                        res.setValue(finalAggregate.reduce(res.getValue(), curPair.first.getValue()));
-                    }
-                    if (curPair.second.hasNext()) {
-                        Map.Entry<K, T> next = curPair.second.next();
-                        queue.offer(new Pair<Map.Entry<K, T>, BigMapIterator<K, T>>(next, curPair.second));
-                    }
-                }
-                return res;
-            }
-
-            public BigMapChunkValue<K, T> getNextChunk(String name, K fromKey, int count) throws RemoteReadException {
-                // TODO
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-            public KeyType<K> getKeyType() {
-                return container.keyType;
-            }
-
-            public Aggregate<T> getAggregate() {
-                return finalAggregate;
-            }
-        };
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {
@@ -162,11 +78,5 @@ public class RemoteReadBackend implements ReadBackend {
             set.addAll(collection);
         }
         return set;
-    }
-
-    public void removeBigMap(String name) throws RemoteReadException {
-        for (ResponseParser responseParser : responseParsers) {
-            responseParser.getReadDataResponse(InteractionType.REMOVE_BIG_MAP, name);
-        }
     }
 }

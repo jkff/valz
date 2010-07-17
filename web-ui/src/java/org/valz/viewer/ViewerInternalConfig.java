@@ -19,7 +19,7 @@ public class ViewerInternalConfig {
     public static ViewerInternalConfig getConfig(List<String> urls, int chunkSize) {
         KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
-        ReadBackend readBackend = new RemoteReadBackend(urls, keyTypeRegistry, aggregateRegistry, chunkSize);
+        ReadBackend readBackend = new RemoteReadBackend(urls, keyTypeRegistry, aggregateRegistry);
         return new ViewerInternalConfig(readBackend, aggregateRegistry);
     }
 }

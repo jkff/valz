@@ -4,12 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.valz.aggregates.Aggregate;
 import org.valz.keytypes.KeyType;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 class MemoryBigMap<K, T> {
-
     private final Aggregate<T> aggregate;
     private final KeyType<K> keyType;
     private final SortedMap<K, T> map = new TreeMap<K, T>();
@@ -47,18 +47,15 @@ class MemoryBigMap<K, T> {
         return map.put(key, value);
     }
 
-    public Map<K, T> getChunkForSubmit(K fromKey, int count) {
+    public Map<K, T> popChunk(K fromKey, int count) {
         Map<K, T> res = new TreeMap<K, T>();
 
-        SortedMap<K, T> tailMap = map.tailMap(fromKey);
-        for (Map.Entry<K, T> entry : tailMap.entrySet()) {
-            if (count <= 0) {
-                break;
-            }
-            count--;
-
+        for (Iterator<Map.Entry<K, T>> it = map.tailMap(fromKey).entrySet().iterator();
+             it.hasNext() && count > 0; --count)
+        {
+            Map.Entry<K, T> entry = it.next();
             res.put(entry.getKey(), entry.getValue());
-            map.remove(entry.getKey());
+            it.remove();
         }
 
         return res;
@@ -67,13 +64,10 @@ class MemoryBigMap<K, T> {
     public Map<K, T> getChunk(K fromKey, int count) {
         Map<K, T> res = new TreeMap<K, T>();
 
-        SortedMap<K, T> tailMap = map.tailMap(fromKey);
-        for (Map.Entry<K, T> entry : tailMap.entrySet()) {
-            if (count <= 0) {
-                break;
-            }
-            count--;
-
+        for (Iterator<Map.Entry<K, T>> it = map.tailMap(fromKey).entrySet().iterator();
+             it.hasNext() && count > 0; --count)
+        {
+            Map.Entry<K, T> entry = it.next();
             res.put(entry.getKey(), entry.getValue());
         }
 

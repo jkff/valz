@@ -86,8 +86,7 @@ public class ValzHandler extends AbstractHandler {
             } else if (InteractionType.GET_BIG_MAP_CHUNK.equals(t)) {
                 GetBigMapChunkRequest chunkRequest = (GetBigMapChunkRequest)data;
                 answer(response.getOutputStream(), InteractionType.GET_BIG_MAP_CHUNK,
-                        readBackend.getBigMapIterator(chunkRequest.name).getNextChunk(
-                                chunkRequest.name, chunkRequest.fromKey, chunkRequest.count));
+                        readBackend.getBigMapChunk(chunkRequest.name, chunkRequest.fromKey, chunkRequest.count));
             } else if (InteractionType.REMOVE_BIG_MAP.equals(t)) {
                 String name = (String)data;
                 readBackend.removeAggregate(name);

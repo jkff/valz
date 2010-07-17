@@ -4,20 +4,20 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
-import org.valz.client.Val;
-import org.valz.client.Valz;
-import org.valz.server.InternalConfig;
-import org.valz.server.ServerUtils;
-import org.valz.server.ValzServer;
 import org.valz.aggregates.AggregateRegistry;
-import org.valz.bigmap.BigMapIterator;
 import org.valz.aggregates.LongSum;
 import org.valz.backends.ReadBackend;
 import org.valz.backends.RemoteReadBackend;
 import org.valz.backends.RoundRobinWriteBackend;
 import org.valz.backends.WriteBackend;
-import org.valz.keytypes.StringKey;
+import org.valz.client.Val;
+import org.valz.client.Valz;
 import org.valz.keytypes.KeyTypeRegistry;
+import org.valz.keytypes.StringKey;
+import org.valz.protocol.messages.BigMapChunkValue;
+import org.valz.server.InternalConfig;
+import org.valz.server.ServerUtils;
+import org.valz.server.ValzServer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend =
                     new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), keyTypeRegistry,
-                            aggregateRegistry, chunkSize);
+                            aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -109,7 +109,7 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend =
                     new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), keyTypeRegistry,
-                            aggregateRegistry, chunkSize);
+                            aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -157,7 +157,7 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend =
                     new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), keyTypeRegistry,
-                            aggregateRegistry, chunkSize);
+                            aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -177,7 +177,7 @@ public class IntegrationTest {
 
             Assert.assertTrue(readBackend.listBigMaps().size() > 0);
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
-            Assert.assertEquals(1L, readBackend.getBigMapIterator(name).next().getValue());
+            Assert.assertEquals(Long.valueOf(1L), readBackend.getBigMapChunk(name, null, 1).getValue().get("foo"));
         } finally {
             server.stop();
             server.join();
@@ -214,7 +214,7 @@ public class IntegrationTest {
             // init viewer
             ReadBackend readBackend =
                     new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), keyTypeRegistry,
-                            aggregateRegistry, chunkSize);
+                            aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -239,12 +239,11 @@ public class IntegrationTest {
 
             // check values
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
-            Assert.assertNotNull(readBackend.getBigMapIterator(name).next());
 
-            BigMapIterator<String, Long> iter = readBackend.getBigMapIterator(name);
+            BigMapChunkValue<Object, Object> chunk = readBackend.getBigMapChunk(name, null, 5);
 
-            Assert.assertEquals((long)SUBMITS_COUNT, (long)iter.next().getValue());
-            Assert.assertEquals(false, iter.hasNext());
+            Assert.assertEquals(1, chunk.getValue().size());
+            Assert.assertEquals(Long.valueOf(SUBMITS_COUNT), chunk.getValue().keySet().iterator().next());
 
         } finally {
             // stop servers

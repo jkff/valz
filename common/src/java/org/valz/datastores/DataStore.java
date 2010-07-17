@@ -18,7 +18,6 @@ public interface DataStore {
 
     void removeAggregate(String name);
 
-
     <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map)
             throws InvalidAggregateException;
 
@@ -30,5 +29,6 @@ public interface DataStore {
 
     <K> KeyType<K> getBigMapKeyType(String name);
 
-    <K, T> BigMapChunkValue<K, T> getBigMapChunkForSubmit(String name, K fromKey, int count);
+    // TODO: This is not transactional!! Must be fixed to use a completely different mechanism.
+    <K, T> BigMapChunkValue<K, T> popBigMapChunk(String name, K fromKey, int count);
 }

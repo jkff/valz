@@ -50,7 +50,7 @@ public class ValzServer {
         KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
 
         DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
-        FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore, chunkSize);
+        FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore);
         NonBlockingWriteBackend nonBlockingWriteBackend =
                 new NonBlockingWriteBackend(finalStoreBackend, delayForCaching);
 
