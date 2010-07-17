@@ -130,15 +130,15 @@ public class H2DataStoreBigMaps {
         }, "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='BM'");
     }
 
-    public <K, T> BigMapChunkValue<K, T> getBigMapChunkForSubmit(String name, K key, int count) {
+    public <K, T> BigMapChunkValue<K, T> popBigMapChunk(String name, K key, int count) {
         name = name.toUpperCase();
 
         KeyType<K> keyType = getBigMapKeyType(name);
         Aggregate<T> aggregate = getBigMapAggregate(name);
-        return getBigMapChunkForSubmit(name, keyType, aggregate, key, count);
+        return popBigMapChunk(name, keyType, aggregate, key, count);
     }
 
-    public synchronized <K, T> BigMapChunkValue<K, T> getBigMapChunkForSubmit(String name, KeyType<K> keyType,
+    public synchronized <K, T> BigMapChunkValue<K, T> popBigMapChunk(String name, KeyType<K> keyType,
                                                                               Aggregate<T> aggregate,
                                                                               K fromKey, int count) {
         name = name.toUpperCase();

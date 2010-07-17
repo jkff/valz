@@ -40,7 +40,7 @@ class TransitionalSubmitter extends PeriodicWorker {
             synchronized (dataStore) {
                 KeyType keyType = dataStore.getBigMapKeyType(name);
                 Aggregate aggregate = dataStore.getBigMapAggregate(name);
-                BigMapChunkValue chunk = dataStore.getBigMapChunkForSubmit(name, keyType.getMinValue(), chunkSize);
+                BigMapChunkValue chunk = dataStore.popBigMapChunk(name, keyType.getMinValue(), chunkSize);
                 try {
                     writeBackend.submitBigMap(name, keyType, aggregate, chunk.getValue());
                 } catch (ConnectionRefusedRemoteWriteException e) {

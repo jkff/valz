@@ -82,9 +82,10 @@ public class MemoryDataStore extends AbstractDataStore {
         return bigMaps.get(name).getKeyType();
     }
 
-    public <K,T> BigMapChunkValue<K,T> getBigMapChunkForSubmit(String name, K fromKey, int count) {
-
-        return new BigMapChunkValue<K,T>(bigMaps.get(name).getKeyType(), bigMaps.get(name).getAggregate(), bigMaps.get(name).getChunkForSubmit(fromKey, count));
+    public <K,T> BigMapChunkValue<K,T> popBigMapChunk(String name, K fromKey, int count) {
+        MemoryBigMap map = bigMaps.get(name);
+        Map value = map.popChunk(fromKey, count);
+        return new BigMapChunkValue<K,T>(map.getKeyType(), map.getAggregate(), value);
     }
 
     public void removeBigMap(String name) {

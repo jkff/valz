@@ -89,8 +89,8 @@ public class H2DataStore extends AbstractDataStore {
         return bigMaps.getBigMapKeyType(name);
     }
 
-    public <K, T> BigMapChunkValue<K, T> getBigMapChunkForSubmit(String name, K fromKey, int count) {
-        return bigMaps.getBigMapChunkForSubmit(name, fromKey, count);
+    public <K, T> BigMapChunkValue<K, T> popBigMapChunk(String name, K fromKey, int count) {
+        return bigMaps.popBigMapChunk(name, fromKey, count);
     }
 
     public void removeBigMap(String name) {
