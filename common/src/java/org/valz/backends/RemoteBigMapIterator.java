@@ -28,9 +28,12 @@ public class RemoteBigMapIterator<K,T> implements BigMapIterator<K,T> {
         this.name = name;
 
         BigMapChunkValue<K,T> probe = remoteConnectors.get(0).getReadDataResponse(
-                InteractionType.GET_BIG_MAP_CHUNK, new GetBigMapChunkRequest(name, fromKey, 0));
+                InteractionType.GET_BIG_MAP_CHUNK,
+                new GetBigMapChunkRequest(name, null, null, 0));
         this.keyType = probe.getKeyType();
         this.aggregate = probe.getAggregate();
+
+        this.cursors = new PriorityQueue<Cursor>();
 
         for (int i = 0; i < remoteConnectors.size(); ++i) {
             tryPullChunk(remoteConnectors, name, fromKey, i);
@@ -40,7 +43,7 @@ public class RemoteBigMapIterator<K,T> implements BigMapIterator<K,T> {
     private void tryPullChunk(List<RemoteConnector> remoteConnectors, String name, K fromKey, int i) throws RemoteReadException {
         RemoteConnector con = remoteConnectors.get(i);
         BigMapChunkValue<K, T> chunk = con.getReadDataResponse(
-                InteractionType.GET_BIG_MAP_CHUNK, new GetBigMapChunkRequest(name, fromKey, 0));
+                InteractionType.GET_BIG_MAP_CHUNK, new GetBigMapChunkRequest(name, keyType, fromKey, 0));
         TreeMap<K, T> map = chunk.getValue();
         Iterator<Map.Entry<K, T>> it = map.entrySet().iterator();
         if (!it.hasNext())
@@ -70,6 +73,8 @@ public class RemoteBigMapIterator<K,T> implements BigMapIterator<K,T> {
                 tryPullChunk(remoteConnectors, name, curEntry.getKey(), cursor.originIndex);
             }
         }
+        if(res.size() < count)
+            res.put(curEntry.getKey(), curEntry.getValue());
         return new BigMapChunkValue<K,T>(keyType, aggregate, res);
     }
 

@@ -1,10 +1,10 @@
 package org.valz.protocol.messages;
 
 import com.sdicons.json.model.*;
-import org.valz.keytypes.KeyTypeFormat;
-import org.valz.util.ParserException;
 import org.valz.keytypes.KeyType;
+import org.valz.keytypes.KeyTypeFormat;
 import org.valz.keytypes.KeyTypeRegistry;
+import org.valz.util.ParserException;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -20,30 +20,45 @@ public class GetBigMapChunkRequest<K> {
 
         String name = ((JSONString)jsonMap.get("name")).getValue();
         int count = ((JSONInteger)jsonMap.get("count")).getValue().intValue();
-        JSONValue jsonValueKeyType = jsonMap.get("keyType");
+        JSONValue keyTypeJson = jsonMap.get("keyType");
+        JSONValue fromKeyJson = jsonMap.get("fromKey");
 
-        if (jsonValueKeyType == null || jsonValueKeyType.isNull()) {
-            return new GetBigMapChunkRequest<K>(name, null, count);
-        } else {
-            KeyType<K> keyType = KeyTypeFormat.fromJson(keyTypeRegistry, jsonMap.get("keyType"));
-            K fromKey = keyType.dataFromJson(jsonMap.get("fromKey"));
-            return new GetBigMapChunkRequest<K>(name, fromKey, count);
-        }
+        KeyType<K> keyType = keyTypeJson.isNull()
+                ? null : KeyTypeFormat.fromJson(keyTypeRegistry, keyTypeJson);
+        K fromKey = fromKeyJson.isNull()
+                ? null : keyType.dataFromJson(fromKeyJson);
+        
+        return new GetBigMapChunkRequest<K>(name, keyType, fromKey, count);
     }
 
     public final String name;
+    public final KeyType<K> keyType;
     public final K fromKey;
     public final int count;
 
-    public GetBigMapChunkRequest(String name, K fromKey, int count) {
+    /**
+     *  Pass keyType=null, fromKey=null to get just the metadata (key type) for this name.
+     */
+    public GetBigMapChunkRequest(String name, KeyType<K> keyType, K fromKey, int count) {
+        if(keyType == null && fromKey != null)
+            throw new IllegalArgumentException(
+                    "keyType and fromKey must either both be null (for a metadata-only request), " +
+                    "or both be non-null (for a chunk request)");
         this.name = name;
+        this.keyType = keyType;
         this.fromKey = fromKey;
         this.count = count;
     }
 
-    public JSONValue toJson() {
+    public JSONValue toJson(KeyTypeRegistry keyTypeRegistry) {
+        JSONValue keyTypeJson = (keyType == null)
+                ? new JSONNull()
+                : KeyTypeFormat.toJson(keyTypeRegistry, keyType);
+        JSONValue fromKeyJson = (fromKey == null)
+                ? new JSONNull()
+                : keyType.dataToJson(fromKey);
         return makeJson(ar("name", "keyType", "fromKey", "count"),
-                ar(new JSONString(name), new JSONNull(), new JSONNull(),
+                ar(new JSONString(name), keyTypeJson, fromKeyJson,
                         new JSONInteger(new BigInteger(count + ""))));
     }
 

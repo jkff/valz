@@ -222,7 +222,7 @@ public abstract class InteractionType<I, O> {
                         GetBigMapChunkRequest request, KeyTypeRegistry keyTypeRegistry,
                         AggregateRegistry aggregateRegistry)
                 {
-                    return request.toJson();
+                    return request.toJson(keyTypeRegistry);
                 }
 
                 public BigMapChunkValue responseBodyFromJson(

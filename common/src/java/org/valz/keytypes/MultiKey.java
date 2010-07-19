@@ -96,7 +96,7 @@ public class MultiKey implements KeyType<List<?>> {
             this.aggregateRegistry = aggregateRegistry;
         }
 
-        public MultiKey fromJson(JSONValue jsonValue) throws ParserException {
+        public MultiKey dataFromJson(JSONValue jsonValue) throws ParserException {
             List<KeyType> collection = new ArrayList<KeyType>();
             for (JSONValue item : ((JSONArray)jsonValue).getValue()) {
                 collection.add(fromJson(aggregateRegistry, item));
@@ -104,7 +104,7 @@ public class MultiKey implements KeyType<List<?>> {
             return new MultiKey(collection);
         }
 
-        public JSONValue toJson(MultiKey key) {
+        public JSONValue dataToJson(MultiKey key) {
             JSONArray json = new JSONArray();
             for (KeyType item : key.keys) {
                 json.getValue().add(toJson(aggregateRegistry, item));

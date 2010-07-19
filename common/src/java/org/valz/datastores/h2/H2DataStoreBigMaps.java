@@ -171,7 +171,7 @@ public class H2DataStoreBigMaps {
             fromKey = keyType.getMinValue();
         }
 
-        String keyGreater = formatKeyType(keyType, "key%d >= ?", " AND ");
+        String keyGreater = formatKeyType(keyType, "key%d > ?", " AND ");
         String columnsNames = formatKeyType(keyType, "key%d", ", ");
         final List keys = keyToList(fromKey);
 

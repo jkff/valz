@@ -87,13 +87,9 @@ public class H2DataStoreTest {
         dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("bar", 1L));
         assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, "foo"));
         assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, "bar"));
-        assertEquals(sortedMap(ar("foo", "bar"), ar(1L, 1L)), dataStore.getBigMapChunk(name, "", 100).getValue());
-
-        // check for correct chunk begin
-        assertEquals(Collections.singletonMap("foo", 1L), dataStore.getBigMapChunk(name, "foo", 100).getValue());
-
-        // check for correct chunk end
-        assertEquals(Collections.singletonMap("bar", 1L), dataStore.getBigMapChunk(name, "", 1).getValue());
+        assertEquals(sortedMap(ar("foo", "bar"), ar(1L, 1L)), dataStore.getBigMapChunk(name, null, 100).getValue());
+        assertEquals(Collections.singletonMap("foo", 1L), dataStore.getBigMapChunk(name, "baz", 100).getValue());
+        assertEquals(Collections.singletonMap("bar", 1L), dataStore.getBigMapChunk(name, null, 1).getValue());
     }
 
     @Test
