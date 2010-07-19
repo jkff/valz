@@ -1,7 +1,7 @@
 package org.valz.keytypes;
 
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.ParserException;
+import org.valz.util.ParserException;
 
 import java.util.Comparator;
 

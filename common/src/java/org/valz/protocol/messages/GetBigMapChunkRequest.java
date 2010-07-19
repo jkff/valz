@@ -1,9 +1,9 @@
 package org.valz.protocol.messages;
 
 import com.sdicons.json.model.*;
-import org.valz.aggregates.ParserException;
+import org.valz.keytypes.KeyTypeFormat;
+import org.valz.util.ParserException;
 import org.valz.keytypes.KeyType;
-import org.valz.keytypes.KeyTypeFormatter;
 import org.valz.keytypes.KeyTypeRegistry;
 
 import java.math.BigInteger;
@@ -23,37 +23,28 @@ public class GetBigMapChunkRequest<K> {
         JSONValue jsonValueKeyType = jsonMap.get("keyType");
 
         if (jsonValueKeyType == null || jsonValueKeyType.isNull()) {
-            return new GetBigMapChunkRequest<K>(name, null, count, null);
+            return new GetBigMapChunkRequest<K>(name, null, count);
         } else {
-            KeyType<K> keyType = KeyTypeFormatter.fromJson(keyTypeRegistry, jsonMap.get("keyType"));
+            KeyType<K> keyType = KeyTypeFormat.fromJson(keyTypeRegistry, jsonMap.get("keyType"));
             K fromKey = keyType.dataFromJson(jsonMap.get("fromKey"));
-            return new GetBigMapChunkRequest<K>(name, fromKey, count, keyType);
+            return new GetBigMapChunkRequest<K>(name, fromKey, count);
         }
     }
 
     public final String name;
     public final K fromKey;
     public final int count;
-    public final KeyType<K> keyType;
 
-    public GetBigMapChunkRequest(String name, K fromKey, int count, KeyType<K> keyType) {
+    public GetBigMapChunkRequest(String name, K fromKey, int count) {
         this.name = name;
         this.fromKey = fromKey;
         this.count = count;
-        this.keyType = keyType;
     }
 
-    public JSONValue toJson(KeyTypeRegistry keyTypeRegistry) {
-        if (keyType == null) {
-            // this is first request of this iterator
-            return makeJson(ar("name", "keyType", "fromKey", "count"),
-                    ar(new JSONString(name), new JSONNull(), new JSONNull(),
-                            new JSONInteger(new BigInteger(count + ""))));
-        } else {
-            return makeJson(ar("name", "keyType", "fromKey", "count"),
-                    ar(new JSONString(name), KeyTypeFormatter.toJson(keyTypeRegistry, keyType),
-                            keyType.dataToJson(fromKey), new JSONInteger(new BigInteger(count + ""))));
-        }
+    public JSONValue toJson() {
+        return makeJson(ar("name", "keyType", "fromKey", "count"),
+                ar(new JSONString(name), new JSONNull(), new JSONNull(),
+                        new JSONInteger(new BigInteger(count + ""))));
     }
 
     @Override

@@ -1,6 +1,6 @@
-package org.valz.aggregates;
+package org.valz.util;
 
-public class ParserException extends Exception {
+public class ParserException extends RuntimeException {
     public ParserException() {
     }
 

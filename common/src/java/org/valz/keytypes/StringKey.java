@@ -3,7 +3,7 @@ package org.valz.keytypes;
 import com.sdicons.json.model.JSONNull;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.ParserException;
+import org.valz.util.ParserException;
 
 public class StringKey implements KeyType<String> {
     public static final String NAME = "StringKey";
@@ -39,7 +39,7 @@ public class StringKey implements KeyType<String> {
         return 0;
     }
 
-    public static class ConfigFormatter implements KeyTypeConfigFormatter<StringKey> {
+    public static class Format extends KeyTypeFormat<StringKey> {
         public StringKey fromJson(JSONValue jsonValue) {
             return new StringKey();
         }

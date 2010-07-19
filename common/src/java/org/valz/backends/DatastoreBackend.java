@@ -1,18 +1,19 @@
 package org.valz.backends;
 
-import org.valz.aggregates.Aggregate;
-import org.valz.aggregates.Sample;
 import org.valz.datastores.DataStore;
 import org.valz.keytypes.KeyType;
+import org.valz.model.Aggregate;
+import org.valz.model.BigMapIterator;
+import org.valz.model.Sample;
 import org.valz.protocol.messages.BigMapChunkValue;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class FinalStoreBackend implements ReadBackend, WriteBackend {
+public class DatastoreBackend implements ReadBackend, WriteBackend {
     private final DataStore dataStore;
 
-    public FinalStoreBackend(DataStore dataStore) {
+    public DatastoreBackend(DataStore dataStore) {
         this.dataStore = dataStore;
     }
 
@@ -45,12 +46,18 @@ public class FinalStoreBackend implements ReadBackend, WriteBackend {
         return dataStore.listVars();
     }
 
-    public synchronized void removeAggregate(String name) throws RemoteReadException {
-        dataStore.removeAggregate(name);
-    }
-
-    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws RemoteReadException {
-        return dataStore.getBigMapChunk(name, fromKey, count);
+    public <K, T> BigMapIterator<K,T> getBigMapIterator(final String name, final K fromKey) throws RemoteReadException {
+        return new BigMapIterator<K, T>() {
+            private K lastKey = fromKey;
+            public BigMapChunkValue<K, T> next(int count) {
+                BigMapChunkValue<K, T> chunk = dataStore.getBigMapChunk(name, lastKey, count);
+                if(!chunk.getValue().isEmpty())
+                    lastKey = chunk.getValue().lastKey();
+                // otherwise lastKey will not change and all subsequent next()'s
+                // will return an empty chunk.
+                return chunk;
+            }
+        };
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {

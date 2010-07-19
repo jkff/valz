@@ -1,7 +1,7 @@
 package org.valz.backends;
 
-import org.valz.aggregates.Sample;
-import org.valz.protocol.messages.BigMapChunkValue;
+import org.valz.model.BigMapIterator;
+import org.valz.model.Sample;
 
 import java.util.Collection;
 
@@ -10,9 +10,7 @@ public interface ReadBackend {
 
     Collection<String> listVars() throws RemoteReadException;
 
-    void removeAggregate(String name) throws RemoteReadException, RemoteWriteException;
-
     Collection<String> listBigMaps() throws RemoteReadException;
 
-    <K,T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) throws RemoteReadException;
+    <K,T> BigMapIterator<K,T> getBigMapIterator(String name, K fromKey) throws RemoteReadException;
 }

@@ -1,16 +1,13 @@
 package org.valz.datastores.memory;
 
-import org.valz.aggregates.Aggregate;
-import org.valz.aggregates.Sample;
 import org.valz.datastores.AbstractDataStore;
 import org.valz.keytypes.KeyType;
+import org.valz.model.Aggregate;
+import org.valz.model.Sample;
 import org.valz.protocol.messages.BigMapChunkValue;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MemoryDataStore extends AbstractDataStore {
 
@@ -71,7 +68,9 @@ public class MemoryDataStore extends AbstractDataStore {
 
     public <K,T> BigMapChunkValue<K,T> getBigMapChunk(String name, K fromKey, int count) {
         MemoryBigMap<K,T> memoryBigMap = bigMaps.get(name);
-        return new BigMapChunkValue<K,T>(memoryBigMap.getKeyType(), memoryBigMap.getAggregate(), memoryBigMap.getChunk(fromKey, count));
+        return new BigMapChunkValue<K,T>(
+                memoryBigMap.getKeyType(), memoryBigMap.getAggregate(),
+                memoryBigMap.getChunk(fromKey, count));
     }
 
     public <T> Aggregate<T> getBigMapAggregate(String name) {
@@ -84,7 +83,7 @@ public class MemoryDataStore extends AbstractDataStore {
 
     public <K,T> BigMapChunkValue<K,T> popBigMapChunk(String name, K fromKey, int count) {
         MemoryBigMap map = bigMaps.get(name);
-        Map value = map.popChunk(fromKey, count);
+        TreeMap value = map.popChunk(fromKey, count);
         return new BigMapChunkValue<K,T>(map.getKeyType(), map.getAggregate(), value);
     }
 

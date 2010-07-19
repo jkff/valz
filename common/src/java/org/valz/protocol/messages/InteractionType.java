@@ -3,9 +3,9 @@ package org.valz.protocol.messages;
 import com.sdicons.json.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.valz.util.Pair;
-import org.valz.aggregates.AggregateRegistry;
-import org.valz.aggregates.ParserException;
-import org.valz.aggregates.Sample;
+import org.valz.model.AggregateRegistry;
+import org.valz.util.ParserException;
+import org.valz.model.Sample;
 import org.valz.keytypes.KeyTypeRegistry;
 
 import java.util.ArrayList;
@@ -209,30 +209,35 @@ public abstract class InteractionType<I, O> {
 
     public static final InteractionType<GetBigMapChunkRequest, BigMapChunkValue> GET_BIG_MAP_CHUNK =
             new InteractionType<GetBigMapChunkRequest, BigMapChunkValue>("GET_BIG_MAP_CHUNK") {
-                public GetBigMapChunkRequest requestBodyFromJson(JSONValue json,
-                                                                 KeyTypeRegistry keyTypeRegistry,
-                                                                 AggregateRegistry aggregateRegistry) throws
-                        ParserException {
+                public GetBigMapChunkRequest requestBodyFromJson(
+                        JSONValue json, KeyTypeRegistry keyTypeRegistry,
+                        AggregateRegistry aggregateRegistry)
+                        throws ParserException
+                {
                     return GetBigMapChunkRequest.fromJson(keyTypeRegistry, json);
                 }
 
                 @NotNull
-                public JSONValue requestBodyToJson(GetBigMapChunkRequest request,
-                                                   KeyTypeRegistry keyTypeRegistry,
-                                                   AggregateRegistry aggregateRegistry) {
-                    return request.toJson(keyTypeRegistry);
+                public JSONValue requestBodyToJson(
+                        GetBigMapChunkRequest request, KeyTypeRegistry keyTypeRegistry,
+                        AggregateRegistry aggregateRegistry)
+                {
+                    return request.toJson();
                 }
 
-                public BigMapChunkValue responseBodyFromJson(JSONValue json, KeyTypeRegistry keyTypeRegistry,
-                                                             AggregateRegistry aggregateRegistry) throws
-                        ParserException {
+                public BigMapChunkValue responseBodyFromJson(
+                        JSONValue json, KeyTypeRegistry keyTypeRegistry,
+                        AggregateRegistry aggregateRegistry)
+                        throws ParserException
+                {
                     return BigMapChunkValue.fromJson(keyTypeRegistry, aggregateRegistry, json);
                 }
 
                 @NotNull
-                public JSONValue responseBodyToJson(BigMapChunkValue response,
-                                                    KeyTypeRegistry keyTypeRegistry,
-                                                    AggregateRegistry aggregateRegistry) {
+                public JSONValue responseBodyToJson(
+                        BigMapChunkValue response, KeyTypeRegistry keyTypeRegistry,
+                        AggregateRegistry aggregateRegistry)
+                {
                     return response.toJson(keyTypeRegistry, aggregateRegistry);
                 }
             };

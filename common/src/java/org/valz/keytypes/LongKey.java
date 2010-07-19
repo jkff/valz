@@ -3,7 +3,7 @@ package org.valz.keytypes;
 import com.sdicons.json.model.JSONInteger;
 import com.sdicons.json.model.JSONNull;
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.ParserException;
+import org.valz.util.ParserException;
 
 import java.math.BigInteger;
 
@@ -38,7 +38,7 @@ public class LongKey implements KeyType<Long> {
         return 0;
     }
 
-    public static class ConfigFormatter implements KeyTypeConfigFormatter<LongKey> {
+    public static class Format extends KeyTypeFormat<LongKey> {
         public LongKey fromJson(JSONValue jsonValue) {
             return new LongKey();
         }

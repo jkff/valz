@@ -1,4 +1,4 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import org.jetbrains.annotations.NotNull;
 

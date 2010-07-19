@@ -1,22 +1,21 @@
 package org.valz.backends;
 
-import org.valz.aggregates.Aggregate;
-import org.valz.aggregates.AggregateRegistry;
+import org.valz.model.Aggregate;
+import org.valz.model.AggregateRegistry;
 import org.valz.keytypes.KeyType;
 import org.valz.keytypes.KeyTypeRegistry;
 import org.valz.protocol.messages.InteractionType;
-import org.valz.protocol.ResponseParser;
 import org.valz.protocol.messages.SubmitBigMapRequest;
 import org.valz.protocol.messages.SubmitRequest;
 
 import java.util.Map;
 
 public class RemoteWriteBackend implements WriteBackend {
-    private final ResponseParser responseParser;
+    private final RemoteConnector remoteConnector;
 
 
     public RemoteWriteBackend(String serverURL, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
-        this.responseParser = new ResponseParser(serverURL, keyTypeRegistry, aggregateRegistry);
+        this.remoteConnector = new RemoteConnector(serverURL, keyTypeRegistry, aggregateRegistry);
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
@@ -29,6 +28,6 @@ public class RemoteWriteBackend implements WriteBackend {
     }
 
     private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws RemoteWriteException {
-        return responseParser.getWriteDataResponse(type, request);
+        return remoteConnector.getWriteDataResponse(type, request);
     }
 }

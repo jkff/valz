@@ -3,8 +3,8 @@ package org.valz.server;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.aggregates.AggregateRegistry;
-import org.valz.backends.FinalStoreBackend;
+import org.valz.model.AggregateRegistry;
+import org.valz.backends.DatastoreBackend;
 import org.valz.backends.NonBlockingWriteBackend;
 import org.valz.datastores.DataStore;
 import org.valz.datastores.h2.H2DataStore;
@@ -50,11 +50,11 @@ public class ValzServer {
         KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
 
         DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
-        FinalStoreBackend finalStoreBackend = new FinalStoreBackend(dataStore);
+        DatastoreBackend datastoreBackend = new DatastoreBackend(dataStore);
         NonBlockingWriteBackend nonBlockingWriteBackend =
-                new NonBlockingWriteBackend(finalStoreBackend, delayForCaching);
+                new NonBlockingWriteBackend(datastoreBackend, delayForCaching);
 
-        return new InternalConfig(port, finalStoreBackend, nonBlockingWriteBackend, keyTypeRegistry, aggregateRegistry);
+        return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, keyTypeRegistry, aggregateRegistry);
     }
     
 

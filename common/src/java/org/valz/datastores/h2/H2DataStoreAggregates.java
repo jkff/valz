@@ -1,7 +1,8 @@
 package org.valz.datastores.h2;
 
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.*;
+import org.valz.model.*;
+import org.valz.util.ParserException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,13 +1,12 @@
 package org.valz.backends;
 
-import org.valz.aggregates.Aggregate;
+import org.valz.model.Aggregate;
 import org.valz.keytypes.KeyType;
 
 import java.util.List;
 import java.util.Map;
 
 public class RoundRobinWriteBackend implements WriteBackend {
-
     private final List<WriteBackend> writeBackends;
     private int nextBackend = 0;
 

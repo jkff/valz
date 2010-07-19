@@ -1,7 +1,7 @@
 package org.valz.datastores;
 
-import org.valz.aggregates.Aggregate;
-import org.valz.aggregates.Sample;
+import org.valz.model.Aggregate;
+import org.valz.model.Sample;
 import org.valz.backends.InvalidAggregateException;
 import org.valz.keytypes.KeyType;
 
@@ -31,9 +31,10 @@ public abstract class AbstractDataStore implements DataStore, Closeable {
 
 
 
-    public synchronized <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map) throws
-            InvalidAggregateException {
-
+    public synchronized <K, T> void submitBigMap(
+            String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map)
+            throws InvalidAggregateException 
+    {
         // name.toUpperCase() - because h2 database makes uppercase for table names
         name = name.toUpperCase();
 
