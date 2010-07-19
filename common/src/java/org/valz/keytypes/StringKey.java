@@ -40,11 +40,11 @@ public class StringKey implements KeyType<String> {
     }
 
     public static class Format extends KeyTypeFormat<StringKey> {
-        public StringKey fromJson(JSONValue jsonValue) {
+        public StringKey dataFromJson(JSONValue jsonValue) {
             return new StringKey();
         }
 
-        public JSONValue toJson(StringKey key) {
+        public JSONValue dataToJson(StringKey key) {
             return new JSONNull();
         }
     }

@@ -244,7 +244,7 @@ public class IntegrationTest {
             BigMapChunkValue<Object, Object> chunk = readBackend.getBigMapIterator(name, null).next(5);
 
             Assert.assertEquals(1, chunk.getValue().size());
-            Assert.assertEquals(Long.valueOf(SUBMITS_COUNT), chunk.getValue().keySet().iterator().next());
+            Assert.assertEquals(Long.valueOf(SUBMITS_COUNT), chunk.getValue().values().iterator().next());
 
         } finally {
             // stop servers

@@ -39,11 +39,11 @@ public class LongKey implements KeyType<Long> {
     }
 
     public static class Format extends KeyTypeFormat<LongKey> {
-        public LongKey fromJson(JSONValue jsonValue) {
+        public LongKey dataFromJson(JSONValue jsonValue) {
             return new LongKey();
         }
 
-        public JSONValue toJson(LongKey key) {
+        public JSONValue dataToJson(LongKey key) {
             return new JSONNull();
         }
     }
