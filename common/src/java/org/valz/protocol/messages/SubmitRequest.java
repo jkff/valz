@@ -3,7 +3,8 @@ package org.valz.protocol.messages;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.*;
+import org.valz.model.*;
+import org.valz.util.ParserException;
 
 import java.util.Map;
 

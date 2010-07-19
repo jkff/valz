@@ -6,8 +6,8 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.util.JsonUtils;
 import org.valz.util.Pair;
-import org.valz.aggregates.AggregateRegistry;
-import org.valz.aggregates.Sample;
+import org.valz.model.AggregateRegistry;
+import org.valz.model.Sample;
 import org.valz.backends.*;
 import org.valz.util.IOUtils;
 import org.valz.keytypes.KeyTypeRegistry;
@@ -68,10 +68,6 @@ public class ValzHandler extends AbstractHandler {
                 String name = (String)data;
                 answer(response.getOutputStream(), InteractionType.GET_VALUE,
                         ((Sample<?>) readBackend.getValue(name)));
-            } else if (InteractionType.REMOVE_VALUE.equals(t)) {
-                String name = (String)data;
-                readBackend.removeAggregate(name);
-                answer(response.getOutputStream(), InteractionType.REMOVE_VALUE, null);
             } else if (t == InteractionType.SUBMIT_BIG_MAP) {
                 if (!(data instanceof SubmitBigMapRequest)) {
                     throw new BadRequestException("Data is not valid submit big map request.");
@@ -86,11 +82,8 @@ public class ValzHandler extends AbstractHandler {
             } else if (InteractionType.GET_BIG_MAP_CHUNK.equals(t)) {
                 GetBigMapChunkRequest chunkRequest = (GetBigMapChunkRequest)data;
                 answer(response.getOutputStream(), InteractionType.GET_BIG_MAP_CHUNK,
-                        readBackend.getBigMapChunk(chunkRequest.name, chunkRequest.fromKey, chunkRequest.count));
-            } else if (InteractionType.REMOVE_BIG_MAP.equals(t)) {
-                String name = (String)data;
-                readBackend.removeAggregate(name);
-                answer(response.getOutputStream(), InteractionType.REMOVE_BIG_MAP, null);
+                        readBackend.getBigMapIterator(chunkRequest.name, chunkRequest.fromKey)
+                                   .next(chunkRequest.count));
             } else {
                 throw new BadRequestException("Unknown request type.");
             }

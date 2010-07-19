@@ -2,8 +2,8 @@ package org.valz.viewer;
 
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.valz.aggregates.AggregateFormat;
-import org.valz.aggregates.AggregateRegistry;
+import org.valz.model.AggregateFormat;
+import org.valz.model.AggregateRegistry;
 import org.valz.backends.ReadBackend;
 import org.valz.backends.RemoteReadException;
 

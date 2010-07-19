@@ -1,6 +1,6 @@
 package org.valz.datastores.h2;
 
-import org.valz.aggregates.*;
+import org.valz.model.*;
 import org.valz.datastores.AbstractDataStore;
 import org.valz.keytypes.KeyType;
 import org.valz.keytypes.KeyTypeRegistry;

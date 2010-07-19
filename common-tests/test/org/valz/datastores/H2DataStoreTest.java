@@ -3,7 +3,7 @@ package org.valz.datastores;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.valz.aggregates.*;
+import org.valz.model.*;
 import org.valz.backends.InvalidAggregateException;
 import org.valz.datastores.h2.H2DataStore;
 import org.valz.util.IOUtils;

@@ -6,7 +6,6 @@ import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 import org.jetbrains.annotations.NotNull;
-import org.valz.aggregates.ParserException;
 
 import java.io.StringReader;
 import java.util.Map;

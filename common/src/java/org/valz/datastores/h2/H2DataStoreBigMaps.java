@@ -2,9 +2,10 @@ package org.valz.datastores.h2;
 
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.JsonUtils;
-import org.valz.aggregates.*;
+import org.valz.model.*;
 import org.valz.keytypes.*;
 import org.valz.protocol.messages.BigMapChunkValue;
+import org.valz.util.ParserException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +41,7 @@ public class H2DataStoreBigMaps {
         // TODO: check for correct identifier
 
         database.execute("INSERT INTO BigMaps(name, keyType, aggregate) VALUES(?, ?, ?)", name,
-                KeyTypeFormatter.toJson(keyTypeRegistry, keyType).render(false),
+                KeyTypeFormat.toJson(keyTypeRegistry, keyType).render(false),
                 AggregateFormat.toJson(aggregateRegistry, aggregate).render(false));
 
         String columnsDeclaration = formatKeyType(keyType, new KeyTypeStringFormatter() {
@@ -113,7 +114,7 @@ public class H2DataStoreBigMaps {
 
         return database.executeGet(new Database.JSONValueParser<KeyType<K>>() {
             public KeyType<K> apply(JSONValue jsonValue) throws ParserException {
-                return KeyTypeFormatter.fromJson(keyTypeRegistry, jsonValue);
+                return KeyTypeFormat.fromJson(keyTypeRegistry, jsonValue);
             }
         }, "SELECT keyType FROM BigMaps WHERE name = ?", name);
     }
@@ -174,27 +175,23 @@ public class H2DataStoreBigMaps {
         String columnsNames = formatKeyType(keyType, "key%d", ", ");
         final List keys = keyToList(fromKey);
 
-        Map<K, T> map = database.executeQuery(new Database.ResultSetParser<Map<K, T>>() {
-            public Map<K, T> apply(ResultSet resultSet) throws SQLException {
-                Map<K, T> map = new TreeMap<K, T>(keyType);
+        TreeMap<K, T> map = database.executeQuery(new Database.ResultSetParser<TreeMap<K, T>>() {
+            public TreeMap<K, T> apply(ResultSet resultSet) throws SQLException {
+                TreeMap<K, T> map = new TreeMap<K, T>(keyType);
                 while (resultSet.next()) {
-                    try {
-                        List list = new ArrayList();
-                        for (int i = 0; i < keys.size(); i++) {
-                            list.add(getResultSetValue(keyType, resultSet, i));
-                        }
-
-                        K key;
-                        if (keyType instanceof MultiKey) {
-                            key = (K)list;
-                        } else {
-                            key = (K)list.get(0);
-                        }
-                        map.put(key, aggregate.dataFromJson(
-                                JsonUtils.jsonFromString((resultSet.getString(keys.size() + 1)))));
-                    } catch (ParserException e) {
-                        throw new RuntimeException(e);
+                    List list = new ArrayList();
+                    for (int i = 0; i < keys.size(); i++) {
+                        list.add(getResultSetValue(keyType, resultSet, i));
                     }
+
+                    K key;
+                    if (keyType instanceof MultiKey) {
+                        key = (K)list;
+                    } else {
+                        key = (K)list.get(0);
+                    }
+                    map.put(key, aggregate.dataFromJson(
+                            JsonUtils.jsonFromString((resultSet.getString(keys.size() + 1)))));
                 }
                 return map;
             }

@@ -1,7 +1,8 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import com.sdicons.json.model.JSONInteger;
 import com.sdicons.json.model.JSONValue;
+import org.valz.util.ParserException;
 
 import java.math.BigInteger;
 

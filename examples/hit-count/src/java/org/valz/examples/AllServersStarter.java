@@ -7,7 +7,7 @@ import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
-import org.valz.aggregates.LongSum;
+import org.valz.model.LongSum;
 import org.valz.backends.RoundRobinWriteBackend;
 import org.valz.backends.WriteBackend;
 import org.valz.viewer.ValzWebServer;

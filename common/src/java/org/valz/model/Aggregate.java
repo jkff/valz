@@ -1,8 +1,9 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.valz.util.ParserException;
 
 import java.util.Iterator;
 

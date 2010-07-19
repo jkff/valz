@@ -2,7 +2,7 @@ package org.valz.keytypes;
 
 import com.sdicons.json.model.JSONArray;
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.ParserException;
+import org.valz.util.ParserException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,18 +88,18 @@ public class MultiKey implements KeyType<List<?>> {
         return res;
     }
 
-    public static class ConfigFormatter implements KeyTypeConfigFormatter<MultiKey> {
+    public static class Format extends KeyTypeFormat<MultiKey> {
 
         private final KeyTypeRegistry aggregateRegistry;
 
-        public ConfigFormatter(KeyTypeRegistry aggregateRegistry) {
+        public Format(KeyTypeRegistry aggregateRegistry) {
             this.aggregateRegistry = aggregateRegistry;
         }
 
         public MultiKey fromJson(JSONValue jsonValue) throws ParserException {
             List<KeyType> collection = new ArrayList<KeyType>();
             for (JSONValue item : ((JSONArray)jsonValue).getValue()) {
-                collection.add(KeyTypeFormatter.fromJson(aggregateRegistry, item));
+                collection.add(fromJson(aggregateRegistry, item));
             }
             return new MultiKey(collection);
         }
@@ -107,7 +107,7 @@ public class MultiKey implements KeyType<List<?>> {
         public JSONValue toJson(MultiKey key) {
             JSONArray json = new JSONArray();
             for (KeyType item : key.keys) {
-                json.getValue().add(KeyTypeFormatter.toJson(aggregateRegistry, item));
+                json.getValue().add(toJson(aggregateRegistry, item));
             }
             return json;
         }

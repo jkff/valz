@@ -1,4 +1,4 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import java.util.HashMap;
 import java.util.Map;

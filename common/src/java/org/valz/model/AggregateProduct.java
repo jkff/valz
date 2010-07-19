@@ -1,9 +1,10 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import org.valz.util.Pair;
+import org.valz.util.ParserException;
 
 import java.util.Map;
 

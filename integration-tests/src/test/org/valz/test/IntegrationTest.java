@@ -4,8 +4,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
-import org.valz.aggregates.AggregateRegistry;
-import org.valz.aggregates.LongSum;
+import org.valz.model.AggregateRegistry;
+import org.valz.model.LongSum;
 import org.valz.backends.ReadBackend;
 import org.valz.backends.RemoteReadBackend;
 import org.valz.backends.RoundRobinWriteBackend;
@@ -177,7 +177,8 @@ public class IntegrationTest {
 
             Assert.assertTrue(readBackend.listBigMaps().size() > 0);
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
-            Assert.assertEquals(Long.valueOf(1L), readBackend.getBigMapChunk(name, null, 1).getValue().get("foo"));
+            Assert.assertEquals(Long.valueOf(1L),
+                    readBackend.getBigMapIterator(name, null).next(1).getValue().get("foo"));
         } finally {
             server.stop();
             server.join();
@@ -240,7 +241,7 @@ public class IntegrationTest {
             // check values
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
 
-            BigMapChunkValue<Object, Object> chunk = readBackend.getBigMapChunk(name, null, 5);
+            BigMapChunkValue<Object, Object> chunk = readBackend.getBigMapIterator(name, null).next(5);
 
             Assert.assertEquals(1, chunk.getValue().size());
             Assert.assertEquals(Long.valueOf(SUBMITS_COUNT), chunk.getValue().keySet().iterator().next());

@@ -1,9 +1,10 @@
-package org.valz.aggregates;
+package org.valz.model;
 
 import com.sdicons.json.model.JSONInteger;
 import com.sdicons.json.model.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.valz.util.ParserException;
 
 import java.math.BigInteger;
 import java.util.Iterator;

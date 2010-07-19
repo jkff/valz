@@ -1,7 +1,7 @@
 package org.valz.backends;
 
 import org.apache.log4j.Logger;
-import org.valz.aggregates.Aggregate;
+import org.valz.model.Aggregate;
 import org.valz.datastores.DataStore;
 import org.valz.keytypes.KeyType;
 

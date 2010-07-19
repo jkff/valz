@@ -1,7 +1,7 @@
 package org.valz.datastores;
 
-import org.valz.aggregates.Sample;
-import org.valz.aggregates.Aggregate;
+import org.valz.model.Sample;
+import org.valz.model.Aggregate;
 import org.valz.backends.InvalidAggregateException;
 import org.valz.keytypes.KeyType;
 import org.valz.protocol.messages.BigMapChunkValue;

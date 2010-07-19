@@ -1,6 +1,6 @@
 package org.valz.backends;
 
-import org.valz.aggregates.Aggregate;
+import org.valz.model.Aggregate;
 import org.valz.keytypes.KeyType;
 
 import java.util.Map;

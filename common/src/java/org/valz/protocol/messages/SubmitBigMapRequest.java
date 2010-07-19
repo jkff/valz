@@ -3,11 +3,12 @@ package org.valz.protocol.messages;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
+import org.valz.keytypes.KeyTypeFormat;
 import org.valz.util.JsonUtils;
-import org.valz.aggregates.*;
+import org.valz.model.*;
 import org.valz.keytypes.KeyType;
-import org.valz.keytypes.KeyTypeFormatter;
 import org.valz.keytypes.KeyTypeRegistry;
+import org.valz.util.ParserException;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,7 +24,7 @@ public class SubmitBigMapRequest<K, T> {
         JSONObject jsonObject = (JSONObject)jsonValue;
         Map<String, JSONValue> jsonMap = jsonObject.getValue();
         String name = ((JSONString)jsonMap.get("name")).getValue();
-        KeyType<K> keyType = KeyTypeFormatter.fromJson(keyTypeRegistry, jsonMap.get("keyType"));
+        KeyType<K> keyType = KeyTypeFormat.fromJson(keyTypeRegistry, jsonMap.get("keyType"));
         Aggregate<T> aggregate = AggregateFormat.fromJson(aggregateRegistry, jsonMap.get("aggregate"));
 
 
@@ -75,6 +76,6 @@ public class SubmitBigMapRequest<K, T> {
             map.put(keyType.dataToJson(entry.getKey()).render(false), aggregate.dataToJson(entry.getValue()));
         } 
         return makeJson(ar("name", "keyType", "aggregate", "value"),
-                ar(name, KeyTypeFormatter.toJson(keyTypeRegistry, keyType), AggregateFormat.toJson(aggregateRegistry, aggregate), mapObj));
+                ar(name, KeyTypeFormat.toJson(keyTypeRegistry, keyType), AggregateFormat.toJson(aggregateRegistry, aggregate), mapObj));
     }
 }

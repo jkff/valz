@@ -1,7 +1,7 @@
 package org.valz.datastores.memory;
 
 import org.jetbrains.annotations.NotNull;
-import org.valz.aggregates.Aggregate;
+import org.valz.model.Aggregate;
 import org.valz.keytypes.KeyType;
 
 import java.util.Iterator;
@@ -47,8 +47,8 @@ class MemoryBigMap<K, T> {
         return map.put(key, value);
     }
 
-    public Map<K, T> popChunk(K fromKey, int count) {
-        Map<K, T> res = new TreeMap<K, T>();
+    public TreeMap<K, T> popChunk(K fromKey, int count) {
+        TreeMap<K, T> res = new TreeMap<K, T>(keyType);
 
         for (Iterator<Map.Entry<K, T>> it = map.tailMap(fromKey).entrySet().iterator();
              it.hasNext() && count > 0; --count)
@@ -61,8 +61,8 @@ class MemoryBigMap<K, T> {
         return res;
     }
 
-    public Map<K, T> getChunk(K fromKey, int count) {
-        Map<K, T> res = new TreeMap<K, T>();
+    public TreeMap<K, T> getChunk(K fromKey, int count) {
+        TreeMap<K, T> res = new TreeMap<K, T>(keyType);
 
         for (Iterator<Map.Entry<K, T>> it = map.tailMap(fromKey).entrySet().iterator();
              it.hasNext() && count > 0; --count)

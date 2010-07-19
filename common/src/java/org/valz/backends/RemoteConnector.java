@@ -1,20 +1,20 @@
-package org.valz.protocol;
+package org.valz.backends;
 
 import com.sdicons.json.model.JSONValue;
-import org.valz.aggregates.AggregateRegistry;
-import org.valz.backends.RemoteReadException;
-import org.valz.backends.RemoteWriteException;
 import org.valz.keytypes.KeyTypeRegistry;
+import org.valz.model.AggregateRegistry;
+import org.valz.protocol.ConnectionException;
+import org.valz.protocol.HttpConnector;
 import org.valz.protocol.messages.InteractionType;
 import org.valz.util.JsonUtils;
 
-public class ResponseParser {
+public class RemoteConnector {
 
     private final String url;
     private final AggregateRegistry aggregateRegistry;
     private final KeyTypeRegistry keyTypeRegistry;
 
-    public ResponseParser(String url, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
+    public RemoteConnector(String url, KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry) {
         this.url = url;
         this.keyTypeRegistry = keyTypeRegistry;
         this.aggregateRegistry = aggregateRegistry;
@@ -42,9 +42,10 @@ public class ResponseParser {
     
 
 
-    private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws Exception {
-        String response =
-                HttpConnector.post(url, InteractionType.requestToJson(type, request, keyTypeRegistry, aggregateRegistry).render(false));
+    private <I, O> O getDataResponse(InteractionType<I, O> type, I request) throws ConnectionException {
+        JSONValue json = InteractionType.requestToJson(
+                type, request, keyTypeRegistry, aggregateRegistry);
+        String response = HttpConnector.post(url, json.render(false));
         JSONValue responseJson = JsonUtils.jsonFromString(response);
         return (O)InteractionType.responseFromJson(responseJson, keyTypeRegistry, aggregateRegistry).second;
     }

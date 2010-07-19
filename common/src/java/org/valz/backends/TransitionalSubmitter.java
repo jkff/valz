@@ -2,8 +2,8 @@ package org.valz.backends;
 
 import org.apache.log4j.Logger;
 import org.valz.util.PeriodicWorker;
-import org.valz.aggregates.Aggregate;
-import org.valz.aggregates.Sample;
+import org.valz.model.Aggregate;
+import org.valz.model.Sample;
 import org.valz.datastores.DataStore;
 import org.valz.keytypes.KeyType;
 import org.valz.protocol.messages.BigMapChunkValue;
@@ -74,23 +74,13 @@ class TransitionalSubmitter extends PeriodicWorker {
                 if (sample == null) {
                     continue;
                 }
-                dataStore.removeAggregate(name);
                 try {
                     writeBackend.submit(name, sample.getAggregate(), sample.getValue());
+                    dataStore.removeAggregate(name);
                 } catch (ConnectionRefusedRemoteWriteException e) {
-                    try {
-                        dataStore.submit(name, sample.getAggregate(), sample.getValue());
-                    } catch (InvalidAggregateException e1) {
-                        // Ignore
-                    }
                     LOG.error("Can not send data to remote backend. Reason: connection failed.", e);
                     break;
                 } catch (RemoteWriteException e) {
-                    try {
-                        dataStore.submit(name, sample.getAggregate(), sample.getValue());
-                    } catch (InvalidAggregateException e1) {
-                        // Ignore
-                    }
                     LOG.error("Can not send data to remote backend.", e);
                 }
             }

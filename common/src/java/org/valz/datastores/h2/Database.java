@@ -8,7 +8,7 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.valz.util.JsonUtils;
-import org.valz.aggregates.*;
+import org.valz.util.ParserException;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -46,12 +46,8 @@ public class Database implements Closeable {
                     return null;
                 }
                 String str = resultSet.getString(1);
-                try {
-                    JSONValue jsonValue = JsonUtils.jsonFromString(str);
-                    return finalFunc.apply(jsonValue);
-                } catch (ParserException e) {
-                    throw new RuntimeException(e);
-                }
+                JSONValue jsonValue = JsonUtils.jsonFromString(str);
+                return finalFunc.apply(jsonValue);
             }
         }, query, params);
     }
