@@ -1,5 +1,9 @@
 package org.valz.model;
 
+import com.sdicons.json.model.JSONObject;
+import com.sdicons.json.model.JSONString;
+import com.sdicons.json.model.JSONValue;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +25,17 @@ public class AggregateRegistry {
     }
 
     public static AggregateRegistry create() {
+        // todo: remove this method after todo in create(String aggregatesDirectory)
         AggregateRegistry aggregateRegistry = new AggregateRegistry();
         aggregateRegistry.register(LongSum.NAME, new LongSum.Format());
         aggregateRegistry.register(LongMin.NAME, new LongMin.Format());
         aggregateRegistry.register(SortedMapMerge.NAME, new SortedMapMerge.Format(aggregateRegistry));
         aggregateRegistry.register(AggregatePair.NAME, new AggregatePair.Format(aggregateRegistry));
         return aggregateRegistry;
+    }
+
+    public static AggregateRegistry create(String aggregatesDirectory) {
+        // todo: load from directory
+        return create();
     }
 }

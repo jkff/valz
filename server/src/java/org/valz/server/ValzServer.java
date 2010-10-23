@@ -18,8 +18,7 @@ public class ValzServer {
         ServerConfig config = ServerConfig.read();
 
         Server server = startServer(
-                makeInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching
-                ));
+                makeInternalServerConfig(config.dataStoreFile, config.port));
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -43,13 +42,12 @@ public class ValzServer {
         return server;
     }
 
-    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port, int delayForCaching) {
+    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port) {
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
 
         DataStore dataStore = new H2DataStore(dataStoreFile, aggregateRegistry);
         DatastoreBackend datastoreBackend = new DatastoreBackend(dataStore);
-        NonBlockingWriteBackend nonBlockingWriteBackend =
-                new NonBlockingWriteBackend(datastoreBackend, delayForCaching);
+        NonBlockingWriteBackend nonBlockingWriteBackend = new NonBlockingWriteBackend(datastoreBackend);
 
         return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, aggregateRegistry);
     }

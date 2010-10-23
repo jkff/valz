@@ -4,6 +4,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import org.valz.client.ClientConfig;
 import org.valz.model.AggregateRegistry;
 import org.valz.model.LongSum;
 import org.valz.backends.ReadBackend;
@@ -35,24 +36,21 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
+        // todo: change port in all places to 9125
         int port = 8800;
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.makeWriteBackend(
-                    aggregateRegistry,
-                    String.format("http://localhost:%d", port)));
+            Valz.init(Valz.makeDefaultWriteBackend(aggregateRegistry, new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =
-                    new RemoteReadBackend(
-                            ServerUtils.portsToLocalAddresses(port),
-                            aggregateRegistry);
+                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -145,14 +143,13 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.makeWriteBackend(
-                    aggregateRegistry,
-                    String.format("http://localhost:%d", port)));
+            Valz.init(Valz.makeDefaultWriteBackend(aggregateRegistry,
+                    new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =
