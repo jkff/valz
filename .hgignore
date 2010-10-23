@@ -7,5 +7,7 @@ build/*
 .idea/inspectionProfiles/*
 .idea/dictionaries/*
 .idea/projectCodeStyle.xml
+*.swp
+tags
 
 glob:h2store.h2.db
