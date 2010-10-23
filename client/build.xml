@@ -1,0 +1,34 @@
+<project name="ValzServer" default="all">
+    <target name="all" depends="clean, make-dist"/>
+
+    <target name="clean">
+        <delete dir="build"/>    
+    </target>
+
+    <target name="compile">
+        <path id="project.classpath">
+            <fileset dir="../common/lib" includes="**/*.jar"/>
+        </path>
+
+        <mkdir dir="build/classes"/>
+        <javac classpathref="project.classpath"
+               destdir="build/classes">
+            <src location="src/java"/>
+            <src location="../common/src/java"/>
+        </javac>
+    </target>
+    
+    <target name="make-jar" depends="compile">
+        <jar basedir="build/classes"
+             destfile="build/valz-client.jar"
+             includes="**/*"/>
+    </target>
+
+    <target name="make-dist" depends="make-jar">
+        <copy todir="build/dist">
+            <fileset dir="build">
+                <include name="valz-client.jar"/>
+            </fileset>
+        </copy>
+    </target>
+</project>
