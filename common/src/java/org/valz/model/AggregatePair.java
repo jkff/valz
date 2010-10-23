@@ -1,5 +1,6 @@
 package org.valz.model;
 
+import com.sdicons.json.model.JSONArray;
 import com.sdicons.json.model.JSONObject;
 import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
@@ -56,26 +57,18 @@ public class AggregatePair<A, B> extends AbstractAggregate<Pair<A, B>> {
         }
 
         public AggregatePair fromJson(JSONValue jsonValue) throws ParserException {
-            JSONObject jsonObject = (JSONObject)jsonValue;
+            JSONArray arr = (JSONArray) jsonValue;
 
-            String firstName = ((JSONString)jsonObject.get("firstName")).getValue();
-            AggregateFormat firstFormat = aggregateRegistry.get(firstName);
-            Aggregate firstAggregate = firstFormat.fromJson(jsonObject.get("firstAggregate"));
-
-            String secondName = ((JSONString)jsonObject.get("secondName")).getValue();
-            AggregateFormat secondFormat = aggregateRegistry.get(secondName);
-            Aggregate secondAggregate = secondFormat.fromJson(jsonObject.get("secondAggregate"));
-
-            return new AggregatePair(firstAggregate, secondAggregate);
+            return new AggregatePair(
+                    AggregateFormat.fromJson(aggregateRegistry, arr.get(0)),
+                    AggregateFormat.fromJson(aggregateRegistry, arr.get(1)));
         }
 
         public JSONValue toJson(AggregatePair aggregate) {
-            AggregateFormat firstFormatter = aggregateRegistry.get(aggregate.first.getName());
-            AggregateFormat secondFormatter = aggregateRegistry.get(aggregate.second.getName());
-            return makeJson(ar("firstName", "firstAggregate", "secondName", "secondAggregate"),
-                    ar(aggregate.first.getName(), firstFormatter.toJson(aggregate.first),
-                            aggregate.second.getName(), secondFormatter.toJson(aggregate.second)));
+            JSONArray arr = new JSONArray();
+            arr.getValue().add(AggregateFormat.toJson(aggregateRegistry, aggregate.first));
+            arr.getValue().add(AggregateFormat.toJson(aggregateRegistry, aggregate.second));
+            return arr;
         }
-
     }
 }

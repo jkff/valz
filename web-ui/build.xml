@@ -1,4 +1,4 @@
-<project name="ValzServer" default="all">
+<project name="ValzWebUi" default="all">
     <target name="all" depends="clean, make-dist"/>
 
     <target name="clean">
@@ -27,7 +27,7 @@
 
     <target name="make-jar" depends="compile, make-manifest">
         <jar basedir="build/classes"
-             destfile="build/valz-server.jar"
+             destfile="build/valz-web-server.jar"
              includes="**/*"
              manifest="build/MANIFEST.MF"/>
     </target>
@@ -38,7 +38,7 @@
                 <include name="**/*"/>
             </fileset>
             <fileset dir="build">
-                <include name="valz-server.jar"/>
+                <include name="valz-web-server.jar"/>
             </fileset>
             <fileset dir="lib">
                 <include name="**/*"/>

@@ -75,18 +75,11 @@ public class SortedMapMerge<T> extends AbstractAggregate<SortedMap<String, T>> {
         }
 
         public SortedMapMerge fromJson(JSONValue jsonValue) throws ParserException {
-            JSONObject jsonObject = (JSONObject)jsonValue;
-            String name = ((JSONString)jsonObject.get("name")).getValue();
-            AggregateFormat format = aggregateRegistry.get(name);
-            Aggregate aggregate = format.fromJson(jsonObject.get("aggregate"));
-            return (SortedMapMerge)aggregate;
+            return new SortedMapMerge(AggregateFormat.fromJson(aggregateRegistry, jsonValue));
         }
 
         public JSONValue toJson(SortedMapMerge aggregate) {
-            AggregateFormat formatter =
-                    aggregateRegistry.get(aggregate.mergeConflictsAggregate.getName());
-            return makeJson(ar("name", "aggregate"), ar(aggregate.mergeConflictsAggregate.getName(),
-                    formatter.toJson(aggregate.mergeConflictsAggregate)));
+            return AggregateFormat.toJson(aggregateRegistry, aggregate.mergeConflictsAggregate);
         }
 
     }
