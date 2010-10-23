@@ -1,5 +1,5 @@
 <project name="Valz" default="all">
-    <property name="project.version" value="0.1"/>
+    <include file="version.xml"/>
 
     <target name="clean">
         <ant dir="common" target="clean"/>
@@ -52,7 +52,7 @@
         </copy>
     </target>
 
-    <target name="zip-all">
+    <target name="create-zips">
         <zip basedir="build/dist" destfile="build/valz-client-${project.version}.zip">
             <include name="client/**/*"/>
         </zip>
@@ -62,9 +62,10 @@
         <zip basedir="build/dist" destfile="build/valz-web-ui-${project.version}.zip">
             <include name="web-ui/**/*"/>
         </zip>
+        <copy todir="build" file="client/valz-client-javadoc-${project.version}.zip"/>
     </target>
 
-    <target name="all" depends="client, server, web-ui, zip-all">
+    <target name="all" depends="client, server, web-ui, create-zips">
 
     </target>
 </project>

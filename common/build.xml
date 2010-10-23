@@ -1,4 +1,6 @@
-<project name="ValzServer" default="all">
+<project name="ValzCommon" default="all">
+    <include file="../version.xml"/>
+
     <target name="all" depends="clean, make-dist"/>
 
     <target name="clean">
