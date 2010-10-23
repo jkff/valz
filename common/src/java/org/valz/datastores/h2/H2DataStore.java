@@ -12,16 +12,16 @@ import java.util.*;
 public class H2DataStore extends AbstractDataStore {
 
     private final Database database;
-    private final H2DataStoreAggregates aggregates;
-    private final H2DataStoreBigMaps bigMaps;
+    private final H2Aggregates aggregates;
+    private final H2BigMaps bigMaps;
 
     public H2DataStore(String dbname, KeyTypeRegistry keyTypeRegistry,
                        AggregateRegistry aggregateRegistry) {
 
         String connectionString = String.format("jdbc:h2:%s;MVCC=TRUE", dbname);
         database = new Database("org.h2.Driver", connectionString);
-        aggregates = new H2DataStoreAggregates(database, aggregateRegistry);
-        bigMaps = new H2DataStoreBigMaps(database, keyTypeRegistry, aggregateRegistry);
+        aggregates = new H2Aggregates(database, aggregateRegistry);
+        bigMaps = new H2BigMaps(database, keyTypeRegistry, aggregateRegistry);
     }
 
     public void close() throws IOException {

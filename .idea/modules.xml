@@ -5,8 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/common-tests/common-tests.iml" filepath="$PROJECT_DIR$/common-tests/common-tests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/examples/hit-count/hit-count.iml" filepath="$PROJECT_DIR$/examples/hit-count/hit-count.iml" />
       <module fileurl="file://$PROJECT_DIR$/integration-tests/integration-tests.iml" filepath="$PROJECT_DIR$/integration-tests/integration-tests.iml" />
-      <module fileurl="file://$PROJECT_DIR$/examples/hit-count/sandbox.iml" filepath="$PROJECT_DIR$/examples/hit-count/sandbox.iml" />
       <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-ui/web-ui.iml" filepath="$PROJECT_DIR$/web-ui/web-ui.iml" />
     </modules>

@@ -11,13 +11,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class H2DataStoreBigMaps {
+public class H2BigMaps {
 
     private final Database database;
     private final AggregateRegistry aggregateRegistry;
     private final KeyTypeRegistry keyTypeRegistry;
 
-    public H2DataStoreBigMaps(Database database, KeyTypeRegistry keyTypeRegistry,
+    public H2BigMaps(Database database, KeyTypeRegistry keyTypeRegistry,
                               AggregateRegistry aggregateRegistry) {
 
         this.database = database;
