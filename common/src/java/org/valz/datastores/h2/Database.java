@@ -13,10 +13,7 @@ import org.valz.util.ParserException;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Database implements Closeable {
     private final DataSource dataSource;
