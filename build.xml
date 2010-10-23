@@ -1,4 +1,4 @@
-<project name="ValzServer" default="all">
+<project name="Valz" default="all">
 
     <target name="clean">
         <ant dir="common" target="clean"/>
