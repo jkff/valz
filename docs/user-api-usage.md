@@ -39,7 +39,7 @@ Trying to do anything useful...
     >>> from org.valz.datastores.memory import MemoryDataStore
     >>> from org.valz.model import SortedMapMerge, LongSum
 
-Create a memory-based backend:
+Create a memory-based store:
 
     >>> backend = DatastoreBackend(MemoryDataStore())
     >>> Valz.init(backend)
@@ -52,4 +52,12 @@ Use `val` for reporting:
 
     >>> val.submit(Long(10))
     >>> val.submit(Long(32))
+
+Read the aggregated value:
+
+    >>> sample = backend.getValue('foo')
+    >>> sample.getAggregate().getName()
+    u'LongSum'
+    >>> sample.getValue()
+    42L
 
