@@ -27,14 +27,12 @@ public class Database implements Closeable {
             throw new RuntimeException(e);
         }
 
-                connectionPool = new GenericObjectPool(null);
-         ConnectionFactory connectionFactory =
-                 new DriverManagerConnectionFactory(connectionString, null);
-        // this object aren't use, but it need for correct dataSource work
-        PoolableConnectionFactory poolableConnectionFactory =
-                new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-         dataSource = new PoolingDataSource(connectionPool);
-     }
+        connectionPool = new GenericObjectPool(null);
+        ConnectionFactory connectionFactory =
+                new DriverManagerConnectionFactory(connectionString, null);
+        new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
+        dataSource = new PoolingDataSource(connectionPool);
+    }
 
     public <T> T executeGet(JSONValueParser<T> func, String query, Object... params) {
         final JSONValueParser<T> finalFunc = func;
@@ -55,7 +53,7 @@ public class Database implements Closeable {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
-            conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "");
+            conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             for (int i = 0; i < creators.length; i++) {
                 try {
