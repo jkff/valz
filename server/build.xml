@@ -8,6 +8,7 @@
     <target name="compile">
         <path id="project.classpath">
             <fileset dir="../common/lib" includes="**/*.jar"/>
+            <fileset dir="lib" includes="**/*.jar"/>
         </path>
 
         <mkdir dir="build/classes"/>
