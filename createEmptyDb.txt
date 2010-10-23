@@ -1,1 +1,0 @@
-CREATE TABLE IF NOT EXISTS Aggregates ( name varchar PRIMARY KEY, aggregate varchar, value varchar); 
