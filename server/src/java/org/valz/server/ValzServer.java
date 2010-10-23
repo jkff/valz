@@ -8,7 +8,6 @@ import org.valz.backends.DatastoreBackend;
 import org.valz.backends.NonBlockingWriteBackend;
 import org.valz.datastores.DataStore;
 import org.valz.datastores.h2.H2DataStore;
-import org.valz.keytypes.KeyTypeRegistry;
 
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
@@ -19,8 +18,8 @@ public class ValzServer {
         ServerConfig config = ServerConfig.read();
 
         Server server = startServer(
-                makeInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching,
-                config.chunkSize));
+                makeInternalServerConfig(config.dataStoreFile, config.port, config.delayForCaching
+                ));
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -31,7 +30,7 @@ public class ValzServer {
     public static Server startServer(InternalConfig conf) throws Exception {
         Server server = new Server(conf.port);
 
-        server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.keyTypeRegistry, conf.aggregateRegistry));
+        server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.aggregateRegistry));
 
         try {
             server.start();
@@ -44,20 +43,16 @@ public class ValzServer {
         return server;
     }
 
-    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port, int delayForCaching,
-                                                         int chunkSize) {
+    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port, int delayForCaching) {
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
-        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
 
-        DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
+        DataStore dataStore = new H2DataStore(dataStoreFile, aggregateRegistry);
         DatastoreBackend datastoreBackend = new DatastoreBackend(dataStore);
         NonBlockingWriteBackend nonBlockingWriteBackend =
                 new NonBlockingWriteBackend(datastoreBackend, delayForCaching);
 
-        return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, keyTypeRegistry, aggregateRegistry);
+        return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, aggregateRegistry);
     }
-    
-
 
     private ValzServer() {
     }

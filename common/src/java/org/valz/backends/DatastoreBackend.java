@@ -1,7 +1,6 @@
 package org.valz.backends;
 
 import org.valz.datastores.DataStore;
-import org.valz.keytypes.KeyType;
 import org.valz.model.Aggregate;
 import org.valz.model.BigMapIterator;
 import org.valz.model.Sample;
@@ -27,12 +26,12 @@ public class DatastoreBackend implements ReadBackend, WriteBackend {
         }
     }
 
-    public synchronized <K, T> void submitBigMap(
-            String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value)
+    public synchronized <T> void submitBigMap(
+            String name, Aggregate<T> aggregate, Map<String, T> value)
             throws RemoteWriteException
     {
         try {
-            dataStore.submitBigMap(name, keyType, aggregate, value);
+            dataStore.submitBigMap(name, aggregate, value);
         } catch (InvalidAggregateException e) {
             throw new RemoteWriteException(e);
         }
@@ -42,15 +41,15 @@ public class DatastoreBackend implements ReadBackend, WriteBackend {
         return dataStore.getValue(name);
     }
 
-    public synchronized Collection<String> listVars() {
-        return dataStore.listVars();
+    public synchronized Collection<String> listVals() {
+        return dataStore.listVals();
     }
 
-    public <K, T> BigMapIterator<K,T> getBigMapIterator(final String name, final K fromKey) throws RemoteReadException {
-        return new BigMapIterator<K, T>() {
-            private K lastKey = fromKey;
-            public BigMapChunkValue<K, T> next(int count) {
-                BigMapChunkValue<K, T> chunk = dataStore.getBigMapChunk(name, lastKey, count);
+    public <T> BigMapIterator<T> getBigMapIterator(final String name, final String fromKey) throws RemoteReadException {
+        return new BigMapIterator<T>() {
+            private String lastKey = fromKey;
+            public BigMapChunkValue<T> next(int count) {
+                BigMapChunkValue<T> chunk = dataStore.getBigMapChunk(name, lastKey, count);
                 if(!chunk.getValue().isEmpty())
                     lastKey = chunk.getValue().lastKey();
                 // otherwise lastKey will not change and all subsequent next()'s

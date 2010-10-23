@@ -1,7 +1,6 @@
 package org.valz.backends;
 
 import org.valz.model.Aggregate;
-import org.valz.keytypes.KeyType;
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +26,12 @@ public class RoundRobinWriteBackend implements WriteBackend {
         throw new RemoteWriteException("All backends are down.");
     }
 
-    public <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value) throws
+    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
             RemoteWriteException {
         for (int i = 0; i < writeBackends.size(); i++) {
             nextBackend = (nextBackend + 1) % writeBackends.size();
             try {
-                writeBackends.get(nextBackend).submitBigMap(name, keyType, aggregate, value);
+                writeBackends.get(nextBackend).submitBigMap(name, aggregate, value);
                 return;
             } catch (RemoteWriteException e) {
                 // Ignore, proceed to next

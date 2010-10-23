@@ -3,7 +3,6 @@ package org.valz.backends;
 import org.apache.log4j.Logger;
 import org.valz.model.Aggregate;
 import org.valz.datastores.DataStore;
-import org.valz.keytypes.KeyType;
 
 import java.util.Map;
 
@@ -30,10 +29,10 @@ public class TransitionalWriteBackend implements WriteBackend {
         }
     }
 
-    public <K, T> void submitBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value) throws
+    public <T> void submitBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) throws
             RemoteWriteException {
         try {
-            dataStore.submitBigMap(name, keyType, aggregate, value);
+            dataStore.submitBigMap(name, aggregate, value);
         } catch (InvalidAggregateException e) {
             throw new RemoteWriteException(e);
         }

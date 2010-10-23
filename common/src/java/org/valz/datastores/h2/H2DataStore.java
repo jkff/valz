@@ -2,26 +2,23 @@ package org.valz.datastores.h2;
 
 import org.valz.model.*;
 import org.valz.datastores.AbstractDataStore;
-import org.valz.keytypes.KeyType;
-import org.valz.keytypes.KeyTypeRegistry;
 import org.valz.protocol.messages.BigMapChunkValue;
 
 import java.io.IOException;
 import java.util.*;
 
+// TODO Extract into a separate module
 public class H2DataStore extends AbstractDataStore {
 
     private final Database database;
     private final H2Aggregates aggregates;
     private final H2BigMaps bigMaps;
 
-    public H2DataStore(String dbname, KeyTypeRegistry keyTypeRegistry,
-                       AggregateRegistry aggregateRegistry) {
-
+    public H2DataStore(String dbname, AggregateRegistry aggregateRegistry) {
         String connectionString = String.format("jdbc:h2:%s;MVCC=TRUE", dbname);
         database = new Database("org.h2.Driver", connectionString);
         aggregates = new H2Aggregates(database, aggregateRegistry);
-        bigMaps = new H2BigMaps(database, keyTypeRegistry, aggregateRegistry);
+        bigMaps = new H2BigMaps(database, aggregateRegistry);
     }
 
     public void close() throws IOException {
@@ -39,28 +36,26 @@ public class H2DataStore extends AbstractDataStore {
     }
 
     @Override
-    protected <K, T> void createBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> map) {
-        bigMaps.createBigMap(name, keyType, aggregate, map);
+    protected <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> map) {
+        bigMaps.createBigMap(name, aggregate, map);
     }
 
     @Override
-    protected <K, T> void insertBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
-                                           T value) {
-        bigMaps.insertBigMapItem(name, keyType, aggregate, key, value);
+    protected <T> void insertBigMapItem(String name, Aggregate<T> aggregate, String key, T value) {
+        bigMaps.insertBigMapItem(name, aggregate, key, value);
     }
 
     @Override
-    protected <K, T> void updateBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
-                                           T newValue) {
-        bigMaps.updateBigMapItem(name, keyType, aggregate, key, newValue);
+    protected <T> void updateBigMapItem(String name, Aggregate<T> aggregate, String key, T newValue) {
+        bigMaps.updateBigMapItem(name, aggregate, key, newValue);
     }
 
     @Override
-    public <K, T> T getBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key) {
-        return bigMaps.getBigMapItem(name, keyType, aggregate, key);
+    public <T> T getBigMapItem(String name, Aggregate<T> aggregate, String key) {
+        return bigMaps.getBigMapItem(name, aggregate, key);
     }
 
-    public Collection<String> listVars() {
+    public Collection<String> listVals() {
         return aggregates.listVars();
     }
 
@@ -76,7 +71,7 @@ public class H2DataStore extends AbstractDataStore {
         return bigMaps.listBigMaps();
     }
 
-    public <K, T> BigMapChunkValue<K, T> getBigMapChunk(String name, K fromKey, int count) {
+    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) {
         return bigMaps.getBigMapChunk(name, fromKey, count);
     }
 
@@ -85,11 +80,7 @@ public class H2DataStore extends AbstractDataStore {
         return bigMaps.getBigMapAggregate(name);
     }
 
-    public <K> KeyType<K> getBigMapKeyType(String name) {
-        return bigMaps.getBigMapKeyType(name);
-    }
-
-    public <K, T> BigMapChunkValue<K, T> popBigMapChunk(String name, K fromKey, int count) {
+    public <T> BigMapChunkValue<T> popBigMapChunk(String name, String fromKey, int count) {
         return bigMaps.popBigMapChunk(name, fromKey, count);
     }
 

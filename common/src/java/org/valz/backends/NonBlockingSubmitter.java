@@ -32,7 +32,7 @@ class NonBlockingSubmitter extends PeriodicWorker {
         SubmitBigMapRequest request;
         while ((request = bigMapsQueue.poll()) != null) {
             try {
-                writeBackend.submitBigMap(request.getName(), request.getKeyType(), request.getAggregate(), request.getValue());
+                writeBackend.submitBigMap(request.getName(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
                 bigMapsQueue.add(request);
                 LOG.info("Invalid submit. Reason: connection failed.", e);

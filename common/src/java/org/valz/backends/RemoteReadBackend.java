@@ -3,7 +3,6 @@ package org.valz.backends;
 import org.valz.model.AggregateRegistry;
 import org.valz.model.BigMapIterator;
 import org.valz.model.Sample;
-import org.valz.keytypes.KeyTypeRegistry;
 import org.valz.protocol.messages.InteractionType;
 
 import java.util.*;
@@ -11,11 +10,10 @@ import java.util.*;
 public class RemoteReadBackend implements ReadBackend {
     private final List<RemoteConnector> remoteConnectors = new ArrayList<RemoteConnector>();
 
-    public RemoteReadBackend(List<String> readServerUrls, KeyTypeRegistry keyTypeRegistry,
-                             AggregateRegistry aggregateRegistry)
+    public RemoteReadBackend(List<String> readServerUrls, AggregateRegistry aggregateRegistry)
     {
         for (String url : readServerUrls) {
-            remoteConnectors.add(new RemoteConnector(url, keyTypeRegistry, aggregateRegistry));
+            remoteConnectors.add(new RemoteConnector(url, aggregateRegistry));
         }
     }
 
@@ -48,18 +46,18 @@ public class RemoteReadBackend implements ReadBackend {
         }
     }
 
-    public Collection<String> listVars() throws RemoteReadException {
+    public Collection<String> listVals() throws RemoteReadException {
         Set<String> set = new HashSet<String>();
         for (RemoteConnector remoteConnector : remoteConnectors) {
             Collection<String> collection =
-                    remoteConnector.getReadDataResponse(InteractionType.LIST_VARS, null);
+                    remoteConnector.getReadDataResponse(InteractionType.LIST_VALS, null);
             set.addAll(collection);
         }
         return set;
     }
 
-    public <K, T> BigMapIterator<K, T> getBigMapIterator(String name, K fromKey) throws RemoteReadException {
-        return new RemoteBigMapIterator<K,T>(remoteConnectors, name, fromKey);
+    public <T> BigMapIterator<T> getBigMapIterator(String name, String fromKey) throws RemoteReadException {
+        return new RemoteBigMapIterator<T>(remoteConnectors, name, fromKey);
     }
 
     public Collection<String> listBigMaps() throws RemoteReadException {
