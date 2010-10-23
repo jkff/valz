@@ -1,9 +1,6 @@
 package org.valz.protocol.messages;
 
 import com.sdicons.json.model.*;
-import org.valz.keytypes.KeyType;
-import org.valz.keytypes.KeyTypeFormat;
-import org.valz.keytypes.KeyTypeRegistry;
 import org.valz.util.ParserException;
 
 import java.math.BigInteger;
@@ -12,53 +9,42 @@ import java.util.Map;
 import static org.valz.util.CollectionUtils.ar;
 import static org.valz.util.JsonUtils.makeJson;
 
-public class GetBigMapChunkRequest<K> {
-    public static <K> GetBigMapChunkRequest fromJson(KeyTypeRegistry keyTypeRegistry, JSONValue json) throws
+public class GetBigMapChunkRequest {
+    public static GetBigMapChunkRequest fromJson(JSONValue json) throws
             ParserException {
         JSONObject jsonObject = (JSONObject)json;
         Map<String, JSONValue> jsonMap = jsonObject.getValue();
 
         String name = ((JSONString)jsonMap.get("name")).getValue();
         int count = ((JSONInteger)jsonMap.get("count")).getValue().intValue();
-        JSONValue keyTypeJson = jsonMap.get("keyType");
         JSONValue fromKeyJson = jsonMap.get("fromKey");
 
-        KeyType<K> keyType = keyTypeJson.isNull()
-                ? null : KeyTypeFormat.fromJson(keyTypeRegistry, keyTypeJson);
-        K fromKey = fromKeyJson.isNull()
-                ? null : keyType.dataFromJson(fromKeyJson);
+        String fromKey = (fromKeyJson instanceof JSONNull)
+                ? null
+                : ((JSONString)fromKeyJson).getValue();
         
-        return new GetBigMapChunkRequest<K>(name, keyType, fromKey, count);
+        return new GetBigMapChunkRequest(name, fromKey, count);
     }
 
     public final String name;
-    public final KeyType<K> keyType;
-    public final K fromKey;
+    public final String fromKey;
     public final int count;
 
     /**
-     *  Pass keyType=null, fromKey=null to get just the metadata (key type) for this name.
+     *  Pass fromKey=null to get just the metadata (key type) for this name.
      */
-    public GetBigMapChunkRequest(String name, KeyType<K> keyType, K fromKey, int count) {
-        if(keyType == null && fromKey != null)
-            throw new IllegalArgumentException(
-                    "keyType and fromKey must either both be null (for a metadata-only request), " +
-                    "or both be non-null (for a chunk request)");
+    public GetBigMapChunkRequest(String name, String fromKey, int count) {
         this.name = name;
-        this.keyType = keyType;
         this.fromKey = fromKey;
         this.count = count;
     }
 
-    public JSONValue toJson(KeyTypeRegistry keyTypeRegistry) {
-        JSONValue keyTypeJson = (keyType == null)
-                ? new JSONNull()
-                : KeyTypeFormat.toJson(keyTypeRegistry, keyType);
+    public JSONValue toJson() {
         JSONValue fromKeyJson = (fromKey == null)
                 ? new JSONNull()
-                : keyType.dataToJson(fromKey);
-        return makeJson(ar("name", "keyType", "fromKey", "count"),
-                ar(new JSONString(name), keyTypeJson, fromKeyJson,
+                : new JSONString(fromKey);
+        return makeJson(ar("name", "fromKey", "count"),
+                ar(new JSONString(name), fromKeyJson,
                         new JSONInteger(new BigInteger(count + ""))));
     }
 

@@ -23,7 +23,7 @@ class NonBlockingBigMapsSubmitter extends Thread {
             SubmitBigMapRequest request = null;
             try {
                 request = bigMapsQueue.take();
-                writeBackend.submitBigMap(request.getName(), request.getKeyType(), request.getAggregate(), request.getValue());
+                writeBackend.submitBigMap(request.getName(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
                 bigMapsQueue.add(request);
                 LOG.info("Invalid submit. Reason: connection failed.", e);

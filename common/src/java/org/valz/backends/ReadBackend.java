@@ -8,9 +8,9 @@ import java.util.Collection;
 public interface ReadBackend {
     Sample getValue(String name) throws RemoteReadException;
 
-    Collection<String> listVars() throws RemoteReadException;
+    Collection<String> listVals() throws RemoteReadException;
 
     Collection<String> listBigMaps() throws RemoteReadException;
 
-    <K,T> BigMapIterator<K,T> getBigMapIterator(String name, K fromKey) throws RemoteReadException;
+    <T> BigMapIterator<T> getBigMapIterator(String name, String fromKey) throws RemoteReadException;
 }

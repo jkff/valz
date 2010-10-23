@@ -18,7 +18,7 @@ public class ServerUtils {
     public static List<InternalConfig> getServerConfigs(int chunkSize, int delayForCaching, int... ports) {
         List<InternalConfig> listConfigs = new ArrayList<InternalConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.makeInternalServerConfig(getDbName(port), port, delayForCaching, chunkSize));
+            listConfigs.add(ValzServer.makeInternalServerConfig(getDbName(port), port));
         }
         return listConfigs;
     }

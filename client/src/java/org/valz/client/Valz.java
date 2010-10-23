@@ -5,8 +5,6 @@ import org.valz.datastores.DataStore;
 import org.valz.datastores.h2.H2DataStore;
 import org.valz.model.Aggregate;
 import org.valz.model.AggregateRegistry;
-import org.valz.keytypes.KeyType;
-import org.valz.keytypes.KeyTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,6 @@ public final class Valz {
 
     public static synchronized void init(ClientConfig clientConfig) {
         WriteBackend writeBackend = makeDefaultWriteBackend(
-                KeyTypeRegistry.create(),
                 AggregateRegistry.create(clientConfig.aggregatesDirectory),
                 clientConfig);
         init(writeBackend);
@@ -38,25 +35,25 @@ public final class Valz {
         };
     }
 
-    public static synchronized <K, T> Val<Map<K, T>> registerBigMap(final String name, final KeyType<K> keyType, final Aggregate<T> aggregate) {
-        return new Val<Map<K, T>>() {
-            public void submit(Map<K, T> sample) throws RemoteWriteException {
-                writeBackend.submitBigMap(name, keyType, aggregate, sample);
+    public static synchronized <T> Val<Map<String, T>> registerBigMap(final String name, final Aggregate<T> aggregate) {
+        return new Val<Map<String, T>>() {
+            public void submit(Map<String, T> sample) throws RemoteWriteException {
+                writeBackend.submitBigMap(name, aggregate, sample);
             }
         };
     }
 
     public static WriteBackend makeDefaultWriteBackend(
-            KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, ClientConfig clientConfig)
+            AggregateRegistry aggregateRegistry, ClientConfig clientConfig)
     {
         List<WriteBackend> remoteBackends = new ArrayList<WriteBackend>();
         for (String url : clientConfig.serverUrls) {
-            remoteBackends.add(new RemoteWriteBackend(url, keyTypeRegistry, aggregateRegistry));
+            remoteBackends.add(new RemoteWriteBackend(url, aggregateRegistry));
         }
         WriteBackend roundRobinBackend = new RoundRobinWriteBackend(remoteBackends);
 
         DataStore dataStore = new H2DataStore(clientConfig.temporaryDatabaseFile,
-                keyTypeRegistry, aggregateRegistry);
+                aggregateRegistry);
         WriteBackend transitionalBackend = new TransitionalWriteBackend(roundRobinBackend,
                 dataStore, clientConfig.flushToServerInterval, clientConfig.bigMapChunkSize);
 

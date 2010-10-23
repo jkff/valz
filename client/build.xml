@@ -1,5 +1,7 @@
-<project name="ValzServer" default="all">
-    <target name="all" depends="clean, make-dist"/>
+<project name="ValzClient" default="all">
+    <include file="../version.xml"/>
+
+    <target name="all" depends="clean, make-dist, javadoc"/>
 
     <target name="clean">
         <delete dir="build"/>    
@@ -30,5 +32,21 @@
                 <include name="valz-client.jar"/>
             </fileset>
         </copy>
+    </target>
+
+    <target name="javadoc" depends="compile">
+        <javadoc destdir="docs/api">
+            <classpath>
+                <fileset dir="../common/lib" includes="**/*.jar"/>
+            </classpath>
+            <sourcepath>
+                <pathelement location="../client/src/java"/>
+                <pathelement location="../common/src/java"/>
+            </sourcepath>
+        </javadoc>
+        <zip basedir="docs/api" destfile="valz-client-javadoc-${project.version}.zip">
+            <include name="**/*"/>
+        </zip>
+        <delete dir="docs"/>
     </target>
 </project>

@@ -1,7 +1,6 @@
 package org.valz.datastores.memory;
 
 import org.valz.datastores.AbstractDataStore;
-import org.valz.keytypes.KeyType;
 import org.valz.model.Aggregate;
 import org.valz.model.Sample;
 import org.valz.protocol.messages.BigMapChunkValue;
@@ -10,22 +9,21 @@ import java.io.IOException;
 import java.util.*;
 
 public class MemoryDataStore extends AbstractDataStore {
-
     private final Map<String, Sample> aggregates = new HashMap<String, Sample>();
     private final Map<String, MemoryBigMap> bigMaps = new HashMap<String, MemoryBigMap>();
 
     @Override
     protected <T> void createAggregate(String name, Aggregate<T> aggregate, T value) {
-        aggregates.put(name, new Sample(aggregate, value));
+        aggregates.put(name, new Sample<T>(aggregate, value));
     }
 
     @Override
     protected <T> void setAggregateValue(String name, T newValue) {
-        Aggregate aggregate = aggregates.get(name).getAggregate();
-        aggregates.put(name, new Sample(aggregate, newValue));
+        Aggregate<T> aggregate = aggregates.get(name).getAggregate();
+        aggregates.put(name, new Sample<T>(aggregate, newValue));
     }
 
-    public Collection<String> listVars() {
+    public Collection<String> listVals() {
         return new ArrayList<String>(aggregates.keySet());
     }
 
@@ -39,26 +37,26 @@ public class MemoryDataStore extends AbstractDataStore {
 
 
 
-    public <K, T> void createBigMap(String name, KeyType<K> keyType, Aggregate<T> aggregate, Map<K, T> value) {
-        MemoryBigMap<K,T> bigMap = new MemoryBigMap<K,T>(keyType, aggregate);
+    public <T> void createBigMap(String name, Aggregate<T> aggregate, Map<String, T> value) {
+        MemoryBigMap<T> bigMap = new MemoryBigMap<T>(aggregate);
         bigMap.append(value);
         bigMaps.put(name, bigMap);
     }
 
     @Override
-    protected <K, T> void insertBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
+    protected <T> void insertBigMapItem(String name, Aggregate<T> aggregate, String key,
                                            T value) {
         bigMaps.get(name).put(key, value);
     }
 
     @Override
-    protected <K, T> void updateBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key,
+    protected <T> void updateBigMapItem(String name, Aggregate<T> aggregate, String key,
                                            T newValue) {
         bigMaps.get(name).put(key, newValue);
     }
 
     @Override
-    protected <K, T> T getBigMapItem(String name, KeyType<K> keyType, Aggregate<T> aggregate, K key) {
+    protected <T> T getBigMapItem(String name, Aggregate<T> aggregate, String key) {
         return (T)bigMaps.get(name).get(key);
     }
 
@@ -66,10 +64,10 @@ public class MemoryDataStore extends AbstractDataStore {
         return new ArrayList<String>(bigMaps.keySet());
     }
 
-    public <K,T> BigMapChunkValue<K,T> getBigMapChunk(String name, K fromKey, int count) {
-        MemoryBigMap<K,T> memoryBigMap = bigMaps.get(name);
-        return new BigMapChunkValue<K,T>(
-                memoryBigMap.getKeyType(), memoryBigMap.getAggregate(),
+    public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) {
+        MemoryBigMap memoryBigMap = bigMaps.get(name);
+        return new BigMapChunkValue<T>(
+                memoryBigMap.getAggregate(),
                 memoryBigMap.getChunk(fromKey, count));
     }
 
@@ -77,14 +75,10 @@ public class MemoryDataStore extends AbstractDataStore {
         return bigMaps.get(name).getAggregate();
     }
 
-    public <K> KeyType<K> getBigMapKeyType(String name) {
-        return bigMaps.get(name).getKeyType();
-    }
-
-    public <K,T> BigMapChunkValue<K,T> popBigMapChunk(String name, K fromKey, int count) {
+    public <T> BigMapChunkValue<T> popBigMapChunk(String name, String fromKey, int count) {
         MemoryBigMap map = bigMaps.get(name);
         TreeMap value = map.popChunk(fromKey, count);
-        return new BigMapChunkValue<K,T>(map.getKeyType(), map.getAggregate(), value);
+        return new BigMapChunkValue<T>(map.getAggregate(), value);
     }
 
     public void removeBigMap(String name) {

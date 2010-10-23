@@ -13,8 +13,6 @@ import org.valz.backends.RoundRobinWriteBackend;
 import org.valz.backends.WriteBackend;
 import org.valz.client.Val;
 import org.valz.client.Valz;
-import org.valz.keytypes.KeyTypeRegistry;
-import org.valz.keytypes.StringKey;
 import org.valz.protocol.messages.BigMapChunkValue;
 import org.valz.server.InternalConfig;
 import org.valz.server.ServerUtils;
@@ -28,8 +26,6 @@ import java.util.Map;
 
 
 public class IntegrationTest {
-
-    private final KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
     private final AggregateRegistry aggregateRegistry = AggregateRegistry.create();
 
     private void removeFiles(String dbname) {
@@ -45,17 +41,16 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.makeDefaultWriteBackend(keyTypeRegistry, aggregateRegistry, new ClientConfig()));
+            Valz.init(Valz.makeDefaultWriteBackend(aggregateRegistry, new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =
-                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), keyTypeRegistry,
-                            aggregateRegistry);
+                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), aggregateRegistry);
 
             // Produce a fresh name to avoid using values
             // from previous launches of the program.
@@ -73,7 +68,7 @@ public class IntegrationTest {
             // delay for sending samples by daemon threads
             Thread.sleep(delayForCaching * 3);
 
-            Assert.assertTrue(readBackend.listVars().contains(name));
+            Assert.assertTrue(readBackend.listVals().contains(name));
             Assert.assertEquals(3L, readBackend.getValue(name).getValue());
         } finally {
             server.stop();
@@ -109,7 +104,8 @@ public class IntegrationTest {
 
             // init viewer
             ReadBackend readBackend =
-                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), keyTypeRegistry,
+                    new RemoteReadBackend(
+                            ServerUtils.portsToLocalAddresses(ports),
                             aggregateRegistry);
 
             // Produce a fresh name to avoid using values
@@ -129,7 +125,7 @@ public class IntegrationTest {
             Thread.sleep(SUBMITS_COUNT * 10);
 
             // check values
-            Assert.assertTrue(readBackend.listVars().contains(name));
+            Assert.assertTrue(readBackend.listVals().contains(name));
             Assert.assertEquals((long)SUBMITS_COUNT, readBackend.getValue(name).getValue());
 
         } finally {
@@ -147,17 +143,18 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port, delayForCaching, chunkSize);
+        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
         Server server = ValzServer.startServer(config);
 
         try {
             // init client
-            Valz.init(Valz.makeDefaultWriteBackend(keyTypeRegistry, aggregateRegistry,
+            Valz.init(Valz.makeDefaultWriteBackend(aggregateRegistry,
                     new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =
-                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(port), keyTypeRegistry,
+                    new RemoteReadBackend(
+                            ServerUtils.portsToLocalAddresses(port),
                             aggregateRegistry);
 
             // Produce a fresh name to avoid using values
@@ -165,8 +162,7 @@ public class IntegrationTest {
             // It would be better to clear the data before test,
             // but this approach will suffice for now.
             String name = ("MAP" + (1 + Math.random())).replace('.', '_');
-            Val<Map<String, Long>> map = Valz.registerBigMap(name, new StringKey(), new LongSum());
-
+            Val<Map<String, Long>> map = Valz.registerBigMap(name, new LongSum());
 
             // submit data
             map.submit(Collections.singletonMap("foo", 1L));
@@ -187,6 +183,7 @@ public class IntegrationTest {
             removeFiles(ServerUtils.getDbName(port));
         }
     }
+
 
     @Test
     public void testOneClientManyServersOneBigMap() throws Exception {
@@ -214,7 +211,7 @@ public class IntegrationTest {
 
             // init viewer
             ReadBackend readBackend =
-                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports), keyTypeRegistry,
+                    new RemoteReadBackend(ServerUtils.portsToLocalAddresses(ports),
                             aggregateRegistry);
 
             // Produce a fresh name to avoid using values
@@ -222,7 +219,7 @@ public class IntegrationTest {
             // It would be better to clear the data before test,
             // but this approach will suffice for now.
             String name = ("MAP" + (1 + Math.random())).replace('.', '_');
-            Val<Map<String, Long>> map = Valz.registerBigMap(name, new StringKey(), new LongSum());
+            Val<Map<String, Long>> map = Valz.registerBigMap(name, new LongSum());
 
 
             // submit data
@@ -241,7 +238,7 @@ public class IntegrationTest {
             // check values
             Assert.assertTrue(readBackend.listBigMaps().contains(name));
 
-            BigMapChunkValue<Object, Object> chunk = readBackend.getBigMapIterator(name, null).next(5);
+            BigMapChunkValue<Object> chunk = readBackend.getBigMapIterator(name, null).next(5);
 
             Assert.assertEquals(1, chunk.getValue().size());
             Assert.assertEquals(Long.valueOf(SUBMITS_COUNT), chunk.getValue().values().iterator().next());
