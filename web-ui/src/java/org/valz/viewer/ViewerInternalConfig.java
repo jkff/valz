@@ -3,7 +3,6 @@ package org.valz.viewer;
 import org.valz.model.AggregateRegistry;
 import org.valz.backends.ReadBackend;
 import org.valz.backends.RemoteReadBackend;
-import org.valz.keytypes.KeyTypeRegistry;
 
 import java.util.List;
 
@@ -17,9 +16,8 @@ public class ViewerInternalConfig {
     }
 
     public static ViewerInternalConfig getConfig(List<String> urls, int chunkSize) {
-        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
-        ReadBackend readBackend = new RemoteReadBackend(urls, keyTypeRegistry, aggregateRegistry);
+        ReadBackend readBackend = new RemoteReadBackend(urls, aggregateRegistry);
         return new ViewerInternalConfig(readBackend, aggregateRegistry);
     }
 }

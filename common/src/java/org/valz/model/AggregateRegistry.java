@@ -25,7 +25,7 @@ public class AggregateRegistry {
         aggregateRegistry.register(LongSum.NAME, new LongSum.Format());
         aggregateRegistry.register(LongMin.NAME, new LongMin.Format());
         aggregateRegistry.register(SortedMapMerge.NAME, new SortedMapMerge.Format(aggregateRegistry));
-        aggregateRegistry.register(AggregateProduct.NAME, new AggregateProduct.Format(aggregateRegistry));
+        aggregateRegistry.register(AggregatePair.NAME, new AggregatePair.Format(aggregateRegistry));
         return aggregateRegistry;
     }
 }
