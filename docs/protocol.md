@@ -59,7 +59,7 @@ type, its behaviour is unspecified.
 
 #### `LongSum` aggregate
 
-Sum of integer values.
+Sum of 64-bit signed integer values.
 
     Value = Int
 
@@ -81,7 +81,12 @@ Note: Values **should** be in range `(-2^63, 2^63 - 1)`.
 
 #### `AggregatePair` aggregate
 
-A pair of two aggregate values of any type.
+A pair of two aggregate values of any type. Aggregation is performed according
+to the law:
+
+    (A, C) + (B, D) = (A + C, B + D)
+
+Types:
 
     Value = {"first": Value, "second": Value}
 
@@ -140,8 +145,8 @@ Server:
 
     HTTP/1.1 204 No Content
 
-A client **should** support the `SUBMIT` operation and **may** support some
-operations listed below for a server.
+A client **should** support issuing the `SUBMIT` request and **may** support
+some issuing the operations listed below for a server.
 
 A server **should** support these operations:
 
