@@ -9,12 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class H2DataStoreAggregates {
+public class H2Aggregates {
 
     private final Database database;
     private final AggregateRegistry aggregateRegistry;
 
-    public H2DataStoreAggregates(Database database, AggregateRegistry aggregateRegistry) {
+    public H2Aggregates(Database database, AggregateRegistry aggregateRegistry) {
         this.database = database;
         this.aggregateRegistry = aggregateRegistry;
 

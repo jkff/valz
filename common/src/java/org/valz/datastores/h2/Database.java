@@ -33,8 +33,6 @@ public class Database implements Closeable {
         connectionPool = new GenericObjectPool(null);
         ConnectionFactory connectionFactory =
                 new DriverManagerConnectionFactory(connectionString, null);
-        PoolableConnectionFactory poolableConnectionFactory =
-                new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
         dataSource = new PoolingDataSource(connectionPool);
     }
 
