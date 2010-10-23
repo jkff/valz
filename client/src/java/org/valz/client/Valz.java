@@ -1,11 +1,10 @@
 package org.valz.client;
 
+import org.valz.backends.*;
+import org.valz.datastores.DataStore;
+import org.valz.datastores.h2.H2DataStore;
 import org.valz.model.Aggregate;
 import org.valz.model.AggregateRegistry;
-import org.valz.backends.RemoteWriteBackend;
-import org.valz.backends.RemoteWriteException;
-import org.valz.backends.RoundRobinWriteBackend;
-import org.valz.backends.WriteBackend;
 import org.valz.keytypes.KeyType;
 import org.valz.keytypes.KeyTypeRegistry;
 
@@ -23,10 +22,10 @@ public final class Valz {
     }
 
     public static synchronized void init(ClientConfig clientConfig) {
-        WriteBackend writeBackend = makeWriteBackend(
+        WriteBackend writeBackend = makeDefaultWriteBackend(
                 KeyTypeRegistry.create(),
                 AggregateRegistry.create(clientConfig.aggregatesDirectory),
-                clientConfig.serverUrls);
+                clientConfig);
         init(writeBackend);
     }
 
@@ -47,14 +46,23 @@ public final class Valz {
         };
     }
 
-    public static WriteBackend makeWriteBackend(
-            KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, String... serverURLs)
+    public static WriteBackend makeDefaultWriteBackend(
+            KeyTypeRegistry keyTypeRegistry, AggregateRegistry aggregateRegistry, ClientConfig clientConfig)
     {
-        List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
-        for (String url : serverURLs) {
-            writeBackends.add(new RemoteWriteBackend(url, keyTypeRegistry, aggregateRegistry));
+        List<WriteBackend> remoteBackends = new ArrayList<WriteBackend>();
+        for (String url : clientConfig.serverUrls) {
+            remoteBackends.add(new RemoteWriteBackend(url, keyTypeRegistry, aggregateRegistry));
         }
-        return new RoundRobinWriteBackend(writeBackends);
+        WriteBackend roundRobinBackend = new RoundRobinWriteBackend(remoteBackends);
+
+        DataStore dataStore = new H2DataStore(clientConfig.temporaryDatabaseFile,
+                keyTypeRegistry, aggregateRegistry);
+        WriteBackend transitionalBackend = new TransitionalWriteBackend(roundRobinBackend,
+                dataStore, clientConfig.flushToServerInterval, clientConfig.bigMapChunkSize);
+
+        WriteBackend nonBlockingBackend = new NonBlockingWriteBackend(transitionalBackend);
+
+        return nonBlockingBackend;
     }
 
     private Valz() {

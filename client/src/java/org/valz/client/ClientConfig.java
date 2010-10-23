@@ -12,8 +12,9 @@ public class ClientConfig {
 
     public static final String defaultServerUrl = "127.0.0.1:9125";
     public static final String defaultAggregatesDirectory = "aggregates";
-    public static final boolean defaultUseNonBlockingSubmit = false;
-    public static final boolean defaultTemporarySaveSubmitsAtHdd = false;
+    public static final String defaultTemporaryDatabaseFile = "h2store.db";
+    public static final int defaultFlushToServerInterval = 2000;
+    public static final int defaultBigMapChunkSize = 100;
 
     /**
      * List of all avaiable.
@@ -26,21 +27,20 @@ public class ClientConfig {
     public final String aggregatesDirectory;
 
     /**
-     * If true, submit will push data to non blocking queue,
-     * special thread will send data from this queue to valz servers.
-     *
-     * Else, submit will immediately send data to valz servers.
-     * If client is stopped, data in this queue will be lost.
+     * File for h2 database, which will be used for local temporary
+     * storing data if there is no server connection.
      */
-    public final boolean useNonBlockingSubmit;
+    public final String temporaryDatabaseFile;
 
     /**
-     * If true, data will be saved in local database.
-     * If you use client without server connection (for example, server temporary is down),
-     * you can close client and data will not be lost.
-     * Client will send saved data to server at first time when both of them will work.  
+     * Interval between flushes data from local temporary database to server, milliseconds.
      */
-    public final boolean temporarySaveSubmitsAtHdd;
+    public final int flushToServerInterval;
+
+    /**
+     * Records count int bigmap chunk at flushing data to server.
+     */
+    public final int bigMapChunkSize;
 
 
     /**
@@ -48,16 +48,18 @@ public class ClientConfig {
      *
      * @param serverUrls
      * @param aggregatesDirectory
-     * @param useNonBlockingSubmit
-     * @param temporarySaveSubmitsAtHdd
+     * @param temporaryDatabaseFile
+     * @param flushToServerInterval
+     * @param bigMapChunkSize
      */
-    public ClientConfig(String[] serverUrls, String aggregatesDirectory, boolean useNonBlockingSubmit,
-                        boolean temporarySaveSubmitsAtHdd) {
+    public ClientConfig(String[] serverUrls, String aggregatesDirectory, String temporaryDatabaseFile,
+                        int flushToServerInterval, int bigMapChunkSize) {
 
         this.serverUrls = serverUrls;
         this.aggregatesDirectory = aggregatesDirectory;
-        this.useNonBlockingSubmit = useNonBlockingSubmit;
-        this.temporarySaveSubmitsAtHdd = temporarySaveSubmitsAtHdd;
+        this.temporaryDatabaseFile = temporaryDatabaseFile;
+        this.flushToServerInterval = flushToServerInterval;
+        this.bigMapChunkSize = bigMapChunkSize;
     }
 
     /**
@@ -65,10 +67,8 @@ public class ClientConfig {
      * Default parameters are constants in this class.
      */
     public ClientConfig() {
-        this(new String[] {defaultServerUrl},
-                defaultAggregatesDirectory,
-                defaultUseNonBlockingSubmit,
-                defaultTemporarySaveSubmitsAtHdd);
+        this(new String[] {defaultServerUrl}, defaultAggregatesDirectory,
+                defaultTemporaryDatabaseFile, defaultFlushToServerInterval, defaultBigMapChunkSize);
     }
 
     /**
@@ -83,13 +83,11 @@ public class ClientConfig {
         String allServers = prefs.get("servers", defaultServerUrl);
         String[] serverUrls = allServers.split("[\\s]+");
         String aggregatesDirectory = prefs.get("aggregates", defaultAggregatesDirectory);
-        boolean useNonBlockingSubmit = prefs.getBoolean("useNonBlockingSubmit", defaultUseNonBlockingSubmit);
-        boolean temporarySaveSubmitsAtHdd = prefs.getBoolean("temporarySaveSubmitsAtHdd", defaultTemporarySaveSubmitsAtHdd);
+        String temporaryDatabaseFile = prefs.get("temporaryDatabaseFile", defaultTemporaryDatabaseFile);
+        int flushToServerInterval = prefs.getInt("flushToServerInterval", defaultFlushToServerInterval);
+        int bigMapChunkSize = prefs.getInt("bigMapChunkSize", defaultBigMapChunkSize);
 
-        return new ClientConfig(
-                serverUrls,
-                aggregatesDirectory,
-                useNonBlockingSubmit,
-                temporarySaveSubmitsAtHdd);
+        return new ClientConfig(serverUrls, aggregatesDirectory,
+                temporaryDatabaseFile, flushToServerInterval, bigMapChunkSize);
     }
 }

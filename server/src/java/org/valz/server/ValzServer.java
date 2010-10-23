@@ -51,8 +51,7 @@ public class ValzServer {
 
         DataStore dataStore = new H2DataStore(dataStoreFile, keyTypeRegistry, aggregateRegistry);
         DatastoreBackend datastoreBackend = new DatastoreBackend(dataStore);
-        NonBlockingWriteBackend nonBlockingWriteBackend =
-                new NonBlockingWriteBackend(datastoreBackend, delayForCaching);
+        NonBlockingWriteBackend nonBlockingWriteBackend = new NonBlockingWriteBackend(datastoreBackend);
 
         return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, keyTypeRegistry, aggregateRegistry);
     }

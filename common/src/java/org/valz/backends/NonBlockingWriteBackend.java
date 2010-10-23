@@ -7,15 +7,18 @@ import org.valz.protocol.messages.SubmitRequest;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class NonBlockingWriteBackend implements WriteBackend {
 
-    private final Queue<SubmitRequest> aggregatesQueue = new ConcurrentLinkedQueue<SubmitRequest>();
-    private final Queue<SubmitBigMapRequest> bigMapsQueue = new ConcurrentLinkedQueue<SubmitBigMapRequest>();
+    private final BlockingQueue<SubmitRequest> aggregatesQueue = new LinkedBlockingQueue<SubmitRequest>();
+    private final BlockingQueue<SubmitBigMapRequest> bigMapsQueue = new LinkedBlockingQueue<SubmitBigMapRequest>();
 
-    public NonBlockingWriteBackend(WriteBackend writeBackend, long intervalMillis) {
-        new NonBlockingSubmitter(writeBackend, aggregatesQueue, bigMapsQueue, intervalMillis).start();
+    public NonBlockingWriteBackend(WriteBackend writeBackend) {
+        new NonBlockingSubmitter(writeBackend, aggregatesQueue).start();
+        new NonBlockingBigMapsSubmitter(writeBackend, bigMapsQueue).start();
     }
 
     public <T> void submit(String name, Aggregate<T> aggregate, T value) throws RemoteWriteException {
