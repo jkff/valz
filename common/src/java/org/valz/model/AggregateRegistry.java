@@ -21,11 +21,17 @@ public class AggregateRegistry {
     }
 
     public static AggregateRegistry create() {
+        // todo: remove this method after todo in create(String aggregatesDirectory)
         AggregateRegistry aggregateRegistry = new AggregateRegistry();
         aggregateRegistry.register(LongSum.NAME, new LongSum.Format());
         aggregateRegistry.register(LongMin.NAME, new LongMin.Format());
         aggregateRegistry.register(SortedMapMerge.NAME, new SortedMapMerge.Format(aggregateRegistry));
         aggregateRegistry.register(AggregateProduct.NAME, new AggregateProduct.Format(aggregateRegistry));
         return aggregateRegistry;
+    }
+
+    public static AggregateRegistry create(String aggregatesDirectory) {
+        // todo: load from directory
+        return create();
     }
 }

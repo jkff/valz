@@ -187,7 +187,6 @@ public class IntegrationTest {
         }
     }
 
-
     @Test
     public void testOneClientManyServersOneBigMap() throws Exception {
 

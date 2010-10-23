@@ -17,8 +17,8 @@ import org.valz.viewer.ViewerInternalConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllServersStarter {
-    private static final Logger log = Logger.getLogger(AllServersStarter.class);
+public class OldTutorial {
+    private static final Logger log = Logger.getLogger(OldTutorial.class);
 
 
     public static void main(String[] args) throws Exception {
@@ -64,6 +64,6 @@ public class AllServersStarter {
         ServerUtils.stopServers(servers);
     }
 
-    private AllServersStarter() {
+    private OldTutorial() {
     }
 }

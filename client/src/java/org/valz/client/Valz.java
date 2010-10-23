@@ -22,6 +22,14 @@ public final class Valz {
         Valz.writeBackend = writeBackend;
     }
 
+    public static synchronized void init(ClientConfig clientConfig) {
+        WriteBackend writeBackend = makeWriteBackend(
+                KeyTypeRegistry.create(),
+                AggregateRegistry.create(clientConfig.aggregatesDirectory),
+                clientConfig.serverUrls);
+        init(writeBackend);
+    }
+
     public static synchronized <T> Val<T> register(
             final String name, final Aggregate<T> aggregate) {
         return new Val<T>() {
