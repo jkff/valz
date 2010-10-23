@@ -7,7 +7,6 @@ import org.valz.model.*;
 import org.valz.backends.InvalidAggregateException;
 import org.valz.datastores.h2.H2DataStore;
 import org.valz.util.IOUtils;
-import org.valz.keytypes.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -32,8 +31,7 @@ public class H2DataStoreTest {
     public void setUp() {
         removeFiles();
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
-        KeyTypeRegistry keyTypeRegistry = KeyTypeRegistry.create();
-        dataStore = new H2DataStore(dbname, keyTypeRegistry, aggregateRegistry);
+        dataStore = new H2DataStore(dbname, aggregateRegistry);
     }
 
     @After
@@ -46,33 +44,32 @@ public class H2DataStoreTest {
     public void testBasics() throws InvalidAggregateException {
         String name = "var1";
 
-        assertArrayEquals(new String[] {}, dataStore.listVars().toArray());
+        assertArrayEquals(new String[] {}, dataStore.listVals().toArray());
 
         dataStore.submit(name, new LongSum(), 1L);
         assertEquals(1L, dataStore.getValue(name).getValue());
         assertEquals(new LongSum(), dataStore.getValue(name).getAggregate());
 
-        assertArrayEquals(new String[] {name}, dataStore.listVars().toArray());
+        assertArrayEquals(new String[] {name}, dataStore.listVals().toArray());
 
         dataStore.submit(name, new LongSum(), 1L);
         assertEquals(2L, dataStore.getValue(name).getValue());
 
         dataStore.removeAggregate(name);
-        assertArrayEquals(new String[] {}, dataStore.listVars().toArray());
+        assertArrayEquals(new String[] {}, dataStore.listVals().toArray());
     }
 
     @Test
     public void testBigMapsSimple() throws InvalidAggregateException {
         String name = "var1";
 
-        KeyType keyType = new StringKey();
         Aggregate aggregate = new LongSum();
 
         assertArrayEquals(new String[] {}, dataStore.listBigMaps().toArray());
 
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("foo", 1L));
+        dataStore.submitBigMap(name, aggregate, Collections.singletonMap("foo", 1L));
         assertEquals(new LongSum(), dataStore.getBigMapAggregate(name));
-        assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, "foo"));
+        assertEquals(1L, dataStore.getBigMapItem(name, aggregate, "foo"));
         assertEquals(Collections.singletonMap("foo", 1L), dataStore.getBigMapChunk(name, "", 1).getValue());
     }
 
@@ -80,13 +77,12 @@ public class H2DataStoreTest {
     public void testBigMapsTwoVars() throws InvalidAggregateException {
         String name = "var1";
 
-        KeyType keyType = new StringKey();
         Aggregate aggregate = new LongSum();
 
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("foo", 1L));
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("bar", 1L));
-        assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, "foo"));
-        assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, "bar"));
+        dataStore.submitBigMap(name, aggregate, Collections.singletonMap("foo", 1L));
+        dataStore.submitBigMap(name, aggregate, Collections.singletonMap("bar", 1L));
+        assertEquals(1L, dataStore.getBigMapItem(name, aggregate, "foo"));
+        assertEquals(1L, dataStore.getBigMapItem(name, aggregate, "bar"));
         assertEquals(sortedMap(ar("foo", "bar"), ar(1L, 1L)), dataStore.getBigMapChunk(name, null, 100).getValue());
         assertEquals(Collections.singletonMap("foo", 1L), dataStore.getBigMapChunk(name, "baz", 100).getValue());
         assertEquals(Collections.singletonMap("bar", 1L), dataStore.getBigMapChunk(name, null, 1).getValue());
@@ -96,12 +92,11 @@ public class H2DataStoreTest {
     public void testBigMapsTwoSubmits() throws InvalidAggregateException {
         String name = "var1";
 
-        KeyType keyType = new StringKey();
         Aggregate aggregate = new LongSum();
 
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("foo", 1L));
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap("foo", 1L));
-        assertEquals(2L, dataStore.getBigMapItem(name, keyType, aggregate, "foo"));
+        dataStore.submitBigMap(name, aggregate, Collections.singletonMap("foo", 1L));
+        dataStore.submitBigMap(name, aggregate, Collections.singletonMap("foo", 1L));
+        assertEquals(2L, dataStore.getBigMapItem(name, aggregate, "foo"));
         assertEquals(Collections.singletonMap("foo", 2L), dataStore.getBigMapChunk(name, "", 1).getValue());
     }
 
@@ -110,45 +105,15 @@ public class H2DataStoreTest {
         String name = "var1";
         Aggregate aggregate;
 
-        dataStore.submitBigMap(name, new StringKey(), new LongSum(), Collections.singletonMap("foo", 1L));
+        dataStore.submitBigMap(name, new LongSum(), Collections.singletonMap("foo", 1L));
         aggregate = dataStore.getBigMapAggregate(name);
 
         dataStore.removeBigMap(name);
         aggregate = dataStore.getBigMapAggregate(name);
 
-        dataStore.submitBigMap(name, new StringKey(), new LongMin(), Collections.singletonMap("foo", 1L));
+        dataStore.submitBigMap(name, new LongMin(), Collections.singletonMap("foo", 1L));
         aggregate = dataStore.getBigMapAggregate(name);
 
         assertEquals(new LongMin(), dataStore.getBigMapAggregate(name));
-    }
-
-    @Test
-    public void testBigMapsKeyLong() throws InvalidAggregateException {
-        String name = "var1";
-
-        KeyType keyType = new LongKey();
-        Aggregate aggregate = new LongSum();
-
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap(1L, 1L));
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap(1L, 1L));
-
-        assertEquals(new LongSum(), dataStore.getBigMapAggregate(name));
-        assertEquals(2L, dataStore.getBigMapItem(name, keyType, aggregate, 1L));
-    }
-
-    @Test
-    public void testBigMapsMultiKey() throws InvalidAggregateException {
-        String name = "var1";
-
-        KeyType keyType = new MultiKey(Arrays.asList((KeyType)new StringKey(), new LongKey()));
-        Aggregate aggregate = new LongSum();
-
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap(Arrays.asList("foo", 1L), 1L));
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap(Arrays.asList("foo", 1L), 1L));
-        dataStore.submitBigMap(name, keyType, aggregate, Collections.singletonMap(Arrays.asList("foo", 2L), 1L));
-
-        assertEquals(new LongSum(), dataStore.getBigMapAggregate(name));
-        assertEquals(2L, dataStore.getBigMapItem(name, keyType, aggregate, Arrays.asList("foo", 1L)));
-        assertEquals(1L, dataStore.getBigMapItem(name, keyType, aggregate, Arrays.asList("foo", 2L)));
     }
 }

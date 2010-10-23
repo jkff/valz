@@ -35,7 +35,7 @@ public class ValzWebHandler extends AbstractHandler {
                         html("td").children(text("Aggregate name")),
                         html("td").children(text("Aggregate data")),
                         html("td").children(text("Value"))));
-            for(String var : readBackend.listVars()) {
+            for(String var : readBackend.listVals()) {
                 tbody.addChild(html("tr").children(
                         html("td").children(text(var)),
                         html("td").children(text(readBackend.getValue(var).getAggregate().getName())),

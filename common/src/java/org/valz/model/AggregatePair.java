@@ -11,13 +11,13 @@ import java.util.Map;
 import static org.valz.util.CollectionUtils.ar;
 import static org.valz.util.JsonUtils.makeJson;
 
-public class AggregateProduct<A, B> extends AbstractAggregate<Pair<A, B>> {
-    public static final String NAME = "AggregateProduct";
+public class AggregatePair<A, B> extends AbstractAggregate<Pair<A, B>> {
+    public static final String NAME = "AggregatePair";
 
     public final Aggregate<A> first;
     public final Aggregate<B> second;
 
-    public AggregateProduct(Aggregate<A> first, Aggregate<B> second) {
+    public AggregatePair(Aggregate<A> first, Aggregate<B> second) {
         this.first = first;
         this.second = second;
     }
@@ -47,7 +47,7 @@ public class AggregateProduct<A, B> extends AbstractAggregate<Pair<A, B>> {
         return NAME;
     }
 
-    public static class Format extends AggregateFormat<AggregateProduct<?, ?>> {
+    public static class Format extends AggregateFormat<AggregatePair<?, ?>> {
 
         private final AggregateRegistry aggregateRegistry;
 
@@ -55,7 +55,7 @@ public class AggregateProduct<A, B> extends AbstractAggregate<Pair<A, B>> {
             this.aggregateRegistry = aggregateRegistry;
         }
 
-        public AggregateProduct fromJson(JSONValue jsonValue) throws ParserException {
+        public AggregatePair fromJson(JSONValue jsonValue) throws ParserException {
             JSONObject jsonObject = (JSONObject)jsonValue;
 
             String firstName = ((JSONString)jsonObject.get("firstName")).getValue();
@@ -66,10 +66,10 @@ public class AggregateProduct<A, B> extends AbstractAggregate<Pair<A, B>> {
             AggregateFormat secondFormat = aggregateRegistry.get(secondName);
             Aggregate secondAggregate = secondFormat.fromJson(jsonObject.get("secondAggregate"));
 
-            return new AggregateProduct(firstAggregate, secondAggregate);
+            return new AggregatePair(firstAggregate, secondAggregate);
         }
 
-        public JSONValue toJson(AggregateProduct aggregate) {
+        public JSONValue toJson(AggregatePair aggregate) {
             AggregateFormat firstFormatter = aggregateRegistry.get(aggregate.first.getName());
             AggregateFormat secondFormatter = aggregateRegistry.get(aggregate.second.getName());
             return makeJson(ar("firstName", "firstAggregate", "secondName", "secondAggregate"),
