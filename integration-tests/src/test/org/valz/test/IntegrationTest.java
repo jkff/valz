@@ -4,6 +4,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import org.valz.client.ClientConfig;
 import org.valz.model.AggregateRegistry;
 import org.valz.model.LongSum;
 import org.valz.backends.ReadBackend;
@@ -39,6 +40,7 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
+        // todo: change port in all places to 9125
         int port = 8800;
         int delayForCaching = 100;
         int chunkSize = 100;
@@ -48,8 +50,7 @@ public class IntegrationTest {
 
         try {
             // init client
-            Valz.init(Valz.makeWriteBackend(keyTypeRegistry, aggregateRegistry,
-                    String.format("http://localhost:%d", port)));
+            Valz.init(Valz.makeDefaultWriteBackend(keyTypeRegistry, aggregateRegistry, new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =
@@ -151,8 +152,8 @@ public class IntegrationTest {
 
         try {
             // init client
-            Valz.init(Valz.makeWriteBackend(keyTypeRegistry, aggregateRegistry,
-                    String.format("http://localhost:%d", port)));
+            Valz.init(Valz.makeDefaultWriteBackend(keyTypeRegistry, aggregateRegistry,
+                    new ClientConfig()));
 
             // init viewer
             ReadBackend readBackend =

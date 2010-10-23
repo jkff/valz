@@ -1,38 +1,36 @@
 package org.valz.backends;
 
 import org.apache.log4j.Logger;
-import org.valz.util.PeriodicWorker;
 import org.valz.protocol.messages.SubmitBigMapRequest;
 import org.valz.protocol.messages.SubmitRequest;
 
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
-class NonBlockingSubmitter extends Thread {
-    private static final Logger LOG = Logger.getLogger(NonBlockingSubmitter.class);
+class NonBlockingBigMapsSubmitter extends Thread {
+    private static final Logger LOG = Logger.getLogger(NonBlockingBigMapsSubmitter.class);
 
     private final WriteBackend writeBackend;
-    private final BlockingQueue<SubmitRequest> aggregatesQueue;
+    private final BlockingQueue<SubmitBigMapRequest> bigMapsQueue;
 
-    public NonBlockingSubmitter(WriteBackend writeBackend, BlockingQueue<SubmitRequest> aggregatesQueue) {
+    public NonBlockingBigMapsSubmitter(WriteBackend writeBackend, BlockingQueue<SubmitBigMapRequest> bigMapsQueue) {
         this.writeBackend = writeBackend;
-        this.aggregatesQueue = aggregatesQueue;
+        this.bigMapsQueue = bigMapsQueue;
     }
 
     @Override
     public void run() {
         while (true) {
-            SubmitRequest request = null;
+            SubmitBigMapRequest request = null;
             try {
-                request = aggregatesQueue.take();
-                writeBackend.submit(request.getName(), request.getAggregate(), request.getValue());
+                request = bigMapsQueue.take();
+                writeBackend.submitBigMap(request.getName(), request.getKeyType(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
-                aggregatesQueue.add(request);
+                bigMapsQueue.add(request);
                 LOG.info("Invalid submit. Reason: connection failed.", e);
             } catch (RemoteWriteException e) {
                 LOG.info("Invalid submit. Reason: unknown.", e);
             } catch (InterruptedException e) {
-                aggregatesQueue.add(request);
+                bigMapsQueue.add(request);
                 LOG.info("Invalid submit. Reason: thread is interrupted.", e);
                 break;
             }
