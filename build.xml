@@ -1,0 +1,70 @@
+<project name="Valz" default="all">
+    <property name="project.version" value="0.1"/>
+
+    <target name="clean">
+        <ant dir="common" target="clean"/>
+        <ant dir="client" target="clean"/>
+        <ant dir="server" target="clean"/>
+        <ant dir="web-ui" target="clean"/>
+        <delete dir="build" />
+    </target>
+
+    <target name="submodules" depends="clean">
+        <ant dir="common"/>
+        <ant dir="client"/>
+        <ant dir="server"/>
+        <ant dir="web-ui"/>
+    </target>
+
+    <target name="client" depends="submodules">
+        <mkdir dir="build/dist/client" />
+        <copy todir="build/dist/client">
+            <fileset dir="common/build/dist">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="client/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="server" depends="submodules">
+        <mkdir dir="build/dist/server" />
+        <copy todir="build/dist/server">
+            <fileset dir="common/build/dist">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="server/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="web-ui" depends="submodules">
+        <mkdir dir="build/dist/web-ui" />
+        <copy todir="build/dist/web-ui">
+            <fileset dir="common/build/dist">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="web-ui/build/dist">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="zip-all">
+        <zip basedir="build/dist" destfile="build/valz-client-${project.version}.zip">
+            <include name="client/**/*"/>
+        </zip>
+        <zip basedir="build/dist" destfile="build/valz-server-${project.version}.zip">
+            <include name="server/**/*"/>
+        </zip>
+        <zip basedir="build/dist" destfile="build/valz-web-ui-${project.version}.zip">
+            <include name="web-ui/**/*"/>
+        </zip>
+    </target>
+
+    <target name="all" depends="client, server, web-ui, zip-all">
+
+    </target>
+</project>
