@@ -3,11 +3,14 @@ syntax: glob
 out/*
 build/*
 */build/*
+docs/_build
+
 .idea/workspace.xml
 .idea/inspectionProfiles/*
 .idea/dictionaries/*
-.idea/projectCodeStyle.xml
+.idea/projectCodeStyle.xmil
+
 *.swp
 tags
+h2store.h2.db
 
-glob:h2store.h2.db

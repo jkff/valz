@@ -1,28 +1,25 @@
 Valz Protocol Specification
 ===========================
 
-This document describes the network protocol used for communication among `valz`
+This document describes the network protocol used for communication among Valz
 clients and servers. Clients written in different languages may use it to
-connect to the `valz` server.
+connect to the Valz server.
 
 
-Contents
---------
 
-1. Packet Format
-    1. Packet Envelope
-    2. Standard Aggregated Values
-2. Network Protocol
+Packet Format
+-------------
 
-
-1. Packet Format
-----------------
-
-### 1.1. Packet Envelope
+Packet Envelope
+~~~~~~~~~~~~~~~
 
 Serialization format: JSON.
 
-Note: A simple JSON type notation is used below.
+.. note::
+
+    A simple JSON type notation is used below.
+
+::
 
     Packet = {"type": Type, "data": Request | Response}
 
@@ -30,16 +27,21 @@ Note: A simple JSON type notation is used below.
          | "GET_VALUE"
          | "LIST_VALS"
          | "REMOVE_VALUE"
-         | "SUBMIT_BIG_MAP"    // Deprecated
+         | "SUBMIT_BIG_MAP"
          | "GET_BIG_MAP_CHUNK"
          | "LIST_BIG_MAPS"
          | "REMOVE_BIG_MAP"
 
 
-### 1.2. Standard Aggregated Values
+.. deprecated:: 0.2
+   ``SUBMIT_BIG_MAP`` operation is covered by ``SUBMIT``.
 
-Many operations described below use the following `Aggregate` and `Value`
-constructs.
+
+Standard Aggregated Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many operations described below use the following ``Aggregate`` and ``Value``
+constructs. ::
 
     Aggregate = {"name": String, "config": Any}
 
@@ -47,46 +49,53 @@ constructs.
 
 These aggregate types and their formats are defined in the protocol:
 
-* `LongSum`
-* `LongMin`
-* `AggregatePair`
-* `SortedMapMerge`
+* ``LongSum``
+* ``LongMin``
+* ``AggregatePair``
+* ``SortedMapMerge``
 
 Any client and server **should** support these types. Peers **may** introduce
 new aggregate types. If a server does not support aggregates of the requested
 type, its behaviour is unspecified.
 
 
-#### `LongSum` aggregate
+``LongSum`` aggregate
+~~~~~~~~~~~~~~~~~~~~~
 
-Sum of 64-bit signed integer values.
+Sum of 64-bit signed integer values. ::
 
     Value = Int
 
     Aggregate = {"name": "LongSum", "config": null}
 
-Note: Values **should** be in range `(-2^63, 2^63 - 1)`.
+.. note::
+
+    Values **should** be in range ``(-2^63, 2^63 - 1)``.
 
 
-#### `LongMin` aggregate
+``LongMin`` aggregate
+~~~~~~~~~~~~~~~~~~~~~
 
-Minimum of integer values.
+Minimum of integer values. ::
 
     Value = Int
 
     Aggregate = {"name": "LongMin", "config": null}
 
-Note: Values **should** be in range `(-2^63, 2^63 - 1)`.
+.. note::
+
+    Values **should** be in range ``(-2^63, 2^63 - 1)``.
 
 
-#### `AggregatePair` aggregate
+``AggregatePair`` aggregate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A pair of two aggregate values of any type. Aggregation is performed according
-to the law:
+to the law::
 
     (A, C) + (B, D) = (A + C, B + D)
 
-Types:
+Types::
 
     Value = {"first": Value, "second": Value}
 
@@ -96,10 +105,11 @@ Types:
     }
 
 
-#### `SortedMapMerge` aggregate
+``SortedMapMerge`` aggregate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sum of maps with string keys. Merging conflicts are resolved by applying the
-specified aggregate function.
+specified aggregate function. ::
 
     Value = {String: Any}
 
@@ -109,11 +119,10 @@ specified aggregate function.
     }
 
 
+Network Protocol
+----------------
 
-2. Network Protocol
--------------------
-
-The protocol is a custom remote-procedure call protocol on top of `HTTP POST`.
+The protocol is a custom remote-procedure call protocol on top of ``HTTP POST``.
 
 Application protocol: HTTP.
 
@@ -121,12 +130,12 @@ TCP port: 9125.
 
 A server **may** use a different port number.
 
-HTTP request and response `Content-Type`: `application/json`. Character
-encoding: UTF-8. All requests are sent via `POST` method.
+HTTP request and response ``Content-Type`` **should** be ``application/json``.
+Character encoding: UTF-8. All requests are sent via ``POST`` method.
 
 An example of an actual network exchange:
 
-Client:
+Client::
 
      POST / HTTP/1.1
      Host: example.com
@@ -141,96 +150,105 @@ Client:
          }
      }
 
-Server:
+Server::
 
     HTTP/1.1 204 No Content
 
-A client **should** support issuing the `SUBMIT` request and **may** support
+A client **should** support issuing the ``SUBMIT`` request and **may** support
 some issuing the operations listed below for a server.
 
 A server **should** support these operations:
 
-* `SUBMIT`
-* `GET_VALUE`
-* `LIST_VALS`
-* `REMOVE_VALUE`
-* `GET_BIG_MAP_CHUNK`
-* `LIST_BIG_MAPS`
-* `REMOVE_BIG_MAP`
+* ``SUBMIT``
+* ``GET_VALUE``
+* ``LIST_VALS``
+* ``REMOVE_VALUE``
+* ``GET_BIG_MAP_CHUNK``
+* ``LIST_BIG_MAPS``
+* ``REMOVE_BIG_MAP``
 
 
-### 2.1. `SUBMIT` call
+``SUBMIT`` call
+~~~~~~~~~~~~~~~
 
 Adds the value to the global value of a val.
 
-Types:
+Types::
 
     Request = {"name": String, "aggregate": Aggregate, "value": Value}
 
-Operation definition:
+Operation definition::
 
     Request -> void
 
-Note: `void` means that the HTTP response contains no body.
+.. note::
+
+    ``void`` means that the HTTP response contains no body.
 
 
-### 2.2. `GET_VALUE` call
+``GET_VALUE`` call
+~~~~~~~~~~~~~~~~~~
 
 Returns the global value of a val.
 
-Operation definition:
+Operation definition::
 
     String -> {"aggregate": Aggregate, "value": Any}
 
 
-### 2.3. `LIST_VALS` call
+``LIST_VALS`` call
+~~~~~~~~~~~~~~~~~~
 
 Returns a list of all the registered val names.
 
-Operation definition:
+Operation definition::
 
     void -> [String]
 
 
-### 2.4. `REMOVE_VALUE` call
+``REMOVE_VALUE`` call
+~~~~~~~~~~~~~~~~~~~~~
 
 Removes the global value of a val.
 
-Operation definition:
+Operation definition::
 
     String -> void
 
 
-### 2.5. `GET_BIG_MAP_CHUNK` call
+``GET_BIG_MAP_CHUNK`` call
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns `count` map elements starting from the given key. If the key value is
-`null` then the response starts the first element in the map.
+Returns ``count`` map elements starting from the given key. If the key value is
+``null`` then the response starts the first element in the map.
 
-Types:
+Types::
 
     Request = {"name": String, "count": Int, "fromKey": String | null}
 
     Response = {"aggregate": Aggregate, "value": {String: Any}}
 
-Operation definition:
+Operation definition::
 
     Request -> Response
 
 
-### 2.6. `LIST_BIG_MAPS` call
+``LIST_BIG_MAPS`` call
+~~~~~~~~~~~~~~~~~~~~~~
 
 Returns a list of all the registered maps.
 
-Operation definition:
+Operation definition::
 
     void -> [String]
 
 
-### 2.7. `REMOVE_BIG_MAP` call
+``REMOVE_BIG_MAP`` call
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Removes the specified map.
 
-Operation definition:
+Operation definition::
 
     String -> void
 
