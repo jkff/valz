@@ -16,13 +16,15 @@ protocol based on HTTP and JSON.
 Documentation
 =============
 
-`Getting Started`__
+Getting Started
    for overview
+`Use Cases`__
+   for scenarios where Valz may be useful
 `Valz Protocol`__
    for developing client APIs for other languages
 
-__ getting-started
-__ protocol
+__ use-cases.html
+__ protocol.html
 
 
 Contents
@@ -31,6 +33,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   use-cases
    protocol
 
 
