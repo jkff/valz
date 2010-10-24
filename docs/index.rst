@@ -4,46 +4,48 @@
    contain the root `toctree` directive.
 
 
-Valz Documentation
-==================
+Valz
+====
 
 Valz is a data aggregation library written in Java, that makes scalable robust
 data aggregation as easy as logging. Client APIs are available for Java, Python,
 and PHP (not yet). Other languages may use the Valz client-server protocol based
 on HTTP and JSON.
 
-
 Documentation
-=============
+-------------
 
 Getting Started
    for overview
 `Use Cases`__
    for scenarios where Valz may be useful
-`Valz Java Client API`__
+`Java Client API`__
    for API reference
 `Valz Protocol`__
-   for developing client APIs for other languages
+   for developers of client APIs for other languages
+`Architecture Overview`__
+   for Valz developers
 
 __ use-cases.html
 __ ./javadoc/
 __ protocol.html
+__ architecture.html
 
 
-Contents
-========
+Table of Contents
+-----------------
 
 .. toctree::
    :maxdepth: 2
 
    use-cases
    protocol
+   architecture
 
 
 Indices and Tables
-==================
+------------------
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 

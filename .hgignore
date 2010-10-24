@@ -4,6 +4,7 @@ out/*
 build/*
 */build/*
 docs/_build
+docs/_images/*.png
 
 .idea/workspace.xml
 .idea/inspectionProfiles/*
@@ -11,6 +12,7 @@ docs/_build
 .idea/projectCodeStyle.xmil
 
 *.swp
+*~
 tags
 h2store.h2.db
 
