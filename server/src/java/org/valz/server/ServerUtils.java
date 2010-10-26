@@ -7,6 +7,10 @@ import java.util.List;
 
 public class ServerUtils {
 
+    public static String portToLocalAddress(int port) {
+        return String.format("http://localhost:%d", port);
+    }
+
     public static List<String> portsToLocalAddresses(int... ports) {
         List<String> list = new ArrayList<String>();
         for (int item : ports) {
@@ -15,10 +19,10 @@ public class ServerUtils {
         return list;
     }
 
-    public static List<InternalConfig> getServerConfigs(int chunkSize, int delayForCaching, int... ports) {
-        List<InternalConfig> listConfigs = new ArrayList<InternalConfig>();
+    public static List<ServerConfig> getServerConfigs(int delayForCaching, int... ports) {
+        List<ServerConfig> listConfigs = new ArrayList<ServerConfig>();
         for (int port : ports) {
-            listConfigs.add(ValzServer.makeInternalServerConfig(getDbName(port), port));
+            listConfigs.add(new ServerConfig(port, getDbName(port), delayForCaching));
         }
         return listConfigs;
     }
@@ -35,9 +39,9 @@ public class ServerUtils {
         return dbnames;
     }
 
-    public static List<Server> startServers(List<InternalConfig> listConfigs) throws Exception {
+    public static List<Server> startServers(List<ServerConfig> listConfigs) throws Exception {
         List<Server> listServers = new ArrayList<Server>();
-        for (InternalConfig config : listConfigs) {
+        for (ServerConfig config : listConfigs) {
             listServers.add(ValzServer.startServer(config));
         }
         return listServers;
