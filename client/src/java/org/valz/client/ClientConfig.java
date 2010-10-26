@@ -12,7 +12,7 @@ public class ClientConfig {
 
     public static final String defaultServerUrl = "127.0.0.1:9125";
     public static final String defaultAggregatesDirectory = "aggregates";
-    public static final String defaultTemporaryDatabaseFile = "h2store.db";
+    public static final String defaultTemporaryDatabaseFile = "h2client-storage.db";
     public static final int defaultFlushToServerInterval = 2000;
     public static final int defaultBigMapChunkSize = 100;
 
@@ -60,6 +60,12 @@ public class ClientConfig {
         this.temporaryDatabaseFile = temporaryDatabaseFile;
         this.flushToServerInterval = flushToServerInterval;
         this.bigMapChunkSize = bigMapChunkSize;
+    }
+
+    public ClientConfig(String... serverUrls) {
+
+        this(serverUrls, defaultAggregatesDirectory,
+                defaultTemporaryDatabaseFile, defaultFlushToServerInterval, defaultBigMapChunkSize);
     }
 
     /**
