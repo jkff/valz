@@ -4,25 +4,34 @@ import java.util.prefs.Preferences;
 
 public class ServerConfig {
 
+    public static final String defaultDataStoreFile = "h2server-storage.db";
+    public static final int defaultPort = 9125;
+    public static final int defaultDelayForCaching = 100;
+
     public final String dataStoreFile;
     public final int port;
     public final int delayForCaching;
-    public final int chunkSize;
 
-    public ServerConfig(String dataStoreFile, int port, int delayForCaching, int chunkSize) {
+    public ServerConfig(int port, String dataStoreFile, int delayForCaching) {
         this.dataStoreFile = dataStoreFile;
         this.port = port;
         this.delayForCaching = delayForCaching;
-        this.chunkSize = chunkSize;
+    }
+
+    public ServerConfig(int port) {
+        this(port, defaultDataStoreFile, defaultDelayForCaching);
+    }
+
+    public ServerConfig() {
+        this(defaultPort, defaultDataStoreFile, defaultDelayForCaching);
     }
 
     public static ServerConfig read() {
         Preferences prefs = Preferences.userRoot().node("server.config");
         return new ServerConfig(
-                prefs.get("dataStoreFile", "h2store"),
-                prefs.getInt("port", 8080),
-                prefs.getInt("delayForCaching", 100),
-                prefs.getInt("chunkSize", 100)
+                prefs.getInt("port", defaultPort),
+                prefs.get("dataStoreFile", defaultDataStoreFile),
+                prefs.getInt("delayForCaching", defaultDelayForCaching)
         );
     }
 }
