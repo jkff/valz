@@ -17,8 +17,7 @@ public class ValzServer {
         PropertyConfigurator.configure("log4j.properties");
         ServerConfig config = ServerConfig.read();
 
-        Server server = startServer(
-                makeInternalServerConfig(config.dataStoreFile, config.port));
+        Server server = startServer(config);
         try {
             server.join();
         } catch (InterruptedException e) {
@@ -26,10 +25,10 @@ public class ValzServer {
         }
     }
 
-    public static Server startServer(InternalConfig conf) throws Exception {
-        Server server = new Server(conf.port);
+    public static Server startServer(ServerConfig config) throws Exception {
+        Server server = new Server(config.port);
 
-        server.addHandler(new ValzHandler(conf.readBackend, conf.writeBackend, conf.aggregateRegistry));
+        server.addHandler(makeValzHandler(config));
 
         try {
             server.start();
@@ -38,18 +37,18 @@ public class ValzServer {
             throw e;
         }
 
-        log.info("Started server at :" + conf.port);
+        log.info("Started server at :" + config.port);
         return server;
     }
 
-    public static InternalConfig makeInternalServerConfig(String dataStoreFile, int port) {
+    public static ValzHandler makeValzHandler(ServerConfig config) {
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
 
-        DataStore dataStore = new H2DataStore(dataStoreFile, aggregateRegistry);
+        DataStore dataStore = new H2DataStore(config.dataStoreFile, aggregateRegistry);
         DatastoreBackend datastoreBackend = new DatastoreBackend(dataStore);
         NonBlockingWriteBackend nonBlockingWriteBackend = new NonBlockingWriteBackend(datastoreBackend);
 
-        return new InternalConfig(port, datastoreBackend, nonBlockingWriteBackend, aggregateRegistry);
+        return new ValzHandler(datastoreBackend, nonBlockingWriteBackend, aggregateRegistry);
     }
 
     private ValzServer() {

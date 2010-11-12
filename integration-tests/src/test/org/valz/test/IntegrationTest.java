@@ -4,17 +4,15 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import org.valz.backends.*;
 import org.valz.client.ClientConfig;
 import org.valz.model.AggregateRegistry;
 import org.valz.model.LongSum;
-import org.valz.backends.ReadBackend;
-import org.valz.backends.RemoteReadBackend;
-import org.valz.backends.RoundRobinWriteBackend;
-import org.valz.backends.WriteBackend;
 import org.valz.client.Val;
 import org.valz.client.Valz;
 import org.valz.protocol.messages.BigMapChunkValue;
-import org.valz.server.InternalConfig;
+//import org.valz.server.InternalConfig;
+import org.valz.server.ServerConfig;
 import org.valz.server.ServerUtils;
 import org.valz.server.ValzServer;
 
@@ -36,17 +34,20 @@ public class IntegrationTest {
 
     @Test
     public void testOneClientOneServerOneVar() throws Exception {
-        // todo: change port in all places to 9125
+
+        PropertyConfigurator.configure("log4j.properties");
+
         int port = 8800;
         int delayForCaching = 100;
-        int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
-        Server server = ValzServer.startServer(config);
+        removeFiles(ServerUtils.getDbName(port));
+
+
+        Server server = ValzServer.startServer(new ServerConfig(port));
 
         try {
             // init client
-            Valz.init(Valz.makeDefaultWriteBackend(aggregateRegistry, new ClientConfig()));
+            Valz.init(new RemoteWriteBackend(ServerUtils.portToLocalAddress(port), aggregateRegistry));
 
             // init viewer
             ReadBackend readBackend =
@@ -86,17 +87,17 @@ public class IntegrationTest {
         // init and start valz servers
         int[] ports = {8800, 8801};
         int delayForCaching = 100;
-        int chunkSize = 100;
 
-        List<InternalConfig> listConfigs = ServerUtils.getServerConfigs(chunkSize, delayForCaching, ports);
+        List<ServerConfig> listConfigs = ServerUtils.getServerConfigs(delayForCaching, ports);
         List<Server> listServers = ServerUtils.startServers(listConfigs);
 
         try {
             // init client
             {
                 List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-                for (InternalConfig config : listConfigs) {
-                    listWriteBackends.add(config.writeBackend);
+                for (ServerConfig config : listConfigs) {
+                    listWriteBackends.add(new RemoteWriteBackend(
+                            "127.0.0.1:" + config.port, AggregateRegistry.create()));
                 }
                 WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
                 Valz.init(clientWriteBackend);
@@ -143,8 +144,8 @@ public class IntegrationTest {
         int delayForCaching = 100;
         int chunkSize = 100;
 
-        InternalConfig config = ValzServer.makeInternalServerConfig(ServerUtils.getDbName(port), port);
-        Server server = ValzServer.startServer(config);
+        List<ServerConfig> configs = ServerUtils.getServerConfigs(port);
+        Server server = ValzServer.startServer(configs.get(0));
 
         try {
             // init client
@@ -193,17 +194,17 @@ public class IntegrationTest {
         // init and start valz servers
         int[] ports = {8950, 8951};
         int delayForCaching = 100;
-        int chunkSize = 100;
 
-        List<InternalConfig> listConfigs = ServerUtils.getServerConfigs(chunkSize, delayForCaching, ports);
+        List<ServerConfig> listConfigs = ServerUtils.getServerConfigs(delayForCaching, ports);
         List<Server> listServers = ServerUtils.startServers(listConfigs);
 
         try {
             // init client
             {
                 List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-                for (InternalConfig config : listConfigs) {
-                    listWriteBackends.add(config.writeBackend);
+                for (ServerConfig config : listConfigs) {
+                    listWriteBackends.add(new RemoteWriteBackend(
+                            "127.0.0.1:" + config.port, AggregateRegistry.create()));
                 }
                 WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
                 Valz.init(clientWriteBackend);
