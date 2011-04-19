@@ -10,7 +10,7 @@ import java.util.prefs.Preferences;
  */
 public class ClientConfig {
 
-    public static final String defaultServerUrl = "127.0.0.1:9125";
+    public static final String defaultServerUrl = "http://127.0.0.1:9125";
     public static final String defaultAggregatesDirectory = "aggregates";
     public static final String defaultTemporaryDatabaseFile = "h2client-storage.db";
     public static final int defaultFlushToServerInterval = 2000;
