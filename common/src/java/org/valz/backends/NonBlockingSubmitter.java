@@ -28,12 +28,12 @@ class NonBlockingSubmitter extends Thread {
                 writeBackend.submit(request.getName(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
                 aggregatesQueue.add(request);
-                LOG.info("Invalid submit. Reason: connection failed.", e);
+                LOG.warn("Invalid submit. Reason: connection failed.", e);
             } catch (RemoteWriteException e) {
-                LOG.info("Invalid submit. Reason: unknown.", e);
+                LOG.warn("Invalid submit. Reason: unknown.", e);
             } catch (InterruptedException e) {
                 aggregatesQueue.add(request);
-                LOG.info("Invalid submit. Reason: thread is interrupted.", e);
+                LOG.warn("Invalid submit. Reason: thread is interrupted.", e);
                 break;
             }
         }
