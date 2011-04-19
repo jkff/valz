@@ -1,0 +1,18 @@
+syntax: glob
+
+out/*
+build/*
+*/build/*
+docs/_build
+docs/_images/*.png
+
+.idea/workspace.xml
+.idea/inspectionProfiles/*
+.idea/dictionaries/*
+.idea/projectCodeStyle.xmil
+
+*.swp
+*~
+tags
+h2store.h2.db
+

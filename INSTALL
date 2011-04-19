@@ -1,0 +1,24 @@
+Valz Installation
+=================
+
+Requirements
+------------
+
+* Java SE Runtime
+
+For building Valz:
+
+* Java SE SDK
+* apache-ant
+
+For building documentation:
+
+* python 2
+* python-sphinx
+* dia
+
+Instructions
+------------
+
+TODO
+
