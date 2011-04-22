@@ -1,11 +1,14 @@
 package org.valz.viewer;
 
+import org.apache.log4j.Logger;
+
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class ViewerConfig {
-	
+    private static final Logger log = Logger.getLogger(ViewerConfig.class);
+
 	public static final String DEFAULT_URL = "http://localhost:9125";
 
     public final List<String> urls;
@@ -25,6 +28,7 @@ public class ViewerConfig {
                 urls.add(urlPrefs.get(key, "http://localhost:9125"));
             }
         } catch (BackingStoreException e) {
+            log.warn("BackingStoreException: (now we ingore it)", e);
             // Ignore
         }
 
