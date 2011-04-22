@@ -12,12 +12,11 @@ import org.valz.datastores.h2.H2DataStore;
 public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
 
-
     public static void main(String[] args) throws Exception {
         PropertyConfigurator.configure("log4j.properties");
         ServerConfig config = ServerConfig.read();
-
         Server server = startServer(config);
+
         try {
             server.join();
         } catch (InterruptedException e) {

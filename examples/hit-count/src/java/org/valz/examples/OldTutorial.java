@@ -21,46 +21,7 @@ public class OldTutorial {
 
 
     public static void main(String[] args) throws Exception {
-
         PropertyConfigurator.configure("log4j.properties");
-
-//        int[] ports = {8800, 8801};
-//        int delayForCaching = 100;
-//        int chunkSize = 100;
-//        List<InternalConfig> configs = ServerUtils.getServerConfigs(delayForCaching, chunkSize, ports);
-//        List<Server> servers = ServerUtils.startServers(configs);
-//
-//        Server valzWebServer = ValzWebServer
-//                .startServer(8900, ViewerInternalConfig.getConfig(ViewerConfig.read().urls, 0));
-//
-//
-//        // init client
-//        {
-//            List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-//            for (InternalConfig config : configs) {
-//                listWriteBackends.add(config.writeBackend);
-//            }
-//            WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
-//            Valz.init(clientWriteBackend);
-//        }
-//
-//        // send data
-//        {
-//            String name = "counter" + Math.random();
-//            Val<Long> counter = Valz.register(name, new LongSum());
-//
-//            final int SUBMITS_COUNT = 100;
-//            for (int i = 0; i < SUBMITS_COUNT; i++) {
-//                counter.submit(1L);
-//            }
-//        }
-//
-//        try {
-//            valzWebServer.join();
-//        } catch (InterruptedException e) {
-//            log.error("Could not stop valz web server", e);
-//        }
-//        ServerUtils.stopServers(servers);
     }
 
     private OldTutorial() {
