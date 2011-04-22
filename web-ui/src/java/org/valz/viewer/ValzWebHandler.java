@@ -1,5 +1,6 @@
 package org.valz.viewer;
 
+import org.apache.log4j.Logger;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.valz.model.AggregateFormat;
@@ -16,6 +17,8 @@ import static org.valz.viewer.HtmlBuilder.html;
 import static org.valz.viewer.HtmlBuilder.text;
 
 public class ValzWebHandler extends AbstractHandler {
+    private static final Logger log = Logger.getLogger(ValzWebHandler.class);
+
     private final ReadBackend readBackend;
     private final AggregateRegistry aggregateRegistry;
 
@@ -53,9 +56,11 @@ public class ValzWebHandler extends AbstractHandler {
                     .toString(new StringBuilder()).toString());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (RemoteReadException e) {
+            log.error("RemoteReadException: ", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write(e.getMessage());
         } finally {
+            log.info("Finally: set handl for request");
             ((Request)request).setHandled(true);
         }
     }
