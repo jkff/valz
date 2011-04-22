@@ -86,6 +86,7 @@ public class ValzHandler extends AbstractHandler {
             }
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (BadRequestException e) {
+            log.error("BadRequestException.", e);
             IOUtils.writeOutputStream(response.getOutputStream(), e.getMessage(), "utf-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (RemoteReadException e) {

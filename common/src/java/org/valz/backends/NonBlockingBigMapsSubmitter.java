@@ -26,12 +26,12 @@ class NonBlockingBigMapsSubmitter extends Thread {
                 writeBackend.submitBigMap(request.getName(), request.getAggregate(), request.getValue());
             } catch (ConnectionRefusedRemoteWriteException e) {
                 bigMapsQueue.add(request);
-                LOG.info("Invalid submit. Reason: connection failed.", e);
+                LOG.warn("Invalid submit. Reason: connection failed.", e);
             } catch (RemoteWriteException e) {
-                LOG.info("Invalid submit. Reason: unknown.", e);
+                LOG.warn("Invalid submit. Reason: unknown.", e);
             } catch (InterruptedException e) {
                 bigMapsQueue.add(request);
-                LOG.info("Invalid submit. Reason: thread is interrupted.", e);
+                LOG.warn("Invalid submit. Reason: thread is interrupted.", e);
                 break;
             }
         }
