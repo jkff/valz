@@ -12,6 +12,8 @@ docs/_images/*.png
 .idea/projectCodeStyle.xmil
 
 *.DS_Store
+target/*
+*/target/*
 
 *.swp
 *~
