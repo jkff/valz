@@ -21,9 +21,17 @@
 
 	<modules>
 		<module>valz-common</module>
+<<<<<<< local
 		<module>valz-client</module>
+=======
+		<!--<module>valz-client</module>
+>>>>>>> other
 		<module>valz-server</module>
+<<<<<<< local
 		<module>valz-viewer</module>
+=======
+		<module>valz-viewer</module>-->
+>>>>>>> other
 	</modules>
 
 	<!-- TODO: decide on the repository
