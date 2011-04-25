@@ -11,6 +11,8 @@ docs/_images/*.png
 .idea/dictionaries/*
 .idea/projectCodeStyle.xmil
 
+*.DS_Store
+
 *.swp
 *~
 tags
