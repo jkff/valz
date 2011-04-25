@@ -28,7 +28,7 @@ public class ViewerConfig {
                 urls.add(urlPrefs.get(key, "http://localhost:9125"));
             }
         } catch (BackingStoreException e) {
-            log.warn("BackingStoreException: (now we ingore it)", e);
+            log.warn("BackingStoreException:", e);
             // Ignore
         }
 

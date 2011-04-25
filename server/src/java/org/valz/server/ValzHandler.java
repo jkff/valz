@@ -100,7 +100,7 @@ public class ValzHandler extends AbstractHandler {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
-        log.info("Set handled 'true' to request");
+        log.info("The request was completed.");
         ((Request)request).setHandled(true);
     }
 

@@ -60,8 +60,8 @@ public class ValzWebHandler extends AbstractHandler {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write(e.getMessage());
         } finally {
-            log.info("Finally: set handl for request");
             ((Request)request).setHandled(true);
         }
+        log.info("The request was completed.");
     }
 }

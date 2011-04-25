@@ -37,7 +37,6 @@ public class ServerUtils {
 
     public static List<String> getMultipleDbNames(int... ports) {
         List<String> dbnames = new ArrayList<String>();
-        log.info("Create list data base");
 
         for (int port : ports) {
             dbnames.add(getDbName(port));
