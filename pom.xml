@@ -24,7 +24,7 @@
 		<module>valz-client</module>
 		<module>valz-server</module>
 		<module>valz-viewer</module>
-	</modules>
+    </modules>
 
 	<!-- TODO: decide on the repository
 

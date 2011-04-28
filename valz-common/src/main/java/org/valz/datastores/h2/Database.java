@@ -7,6 +7,7 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
 import org.valz.util.JsonUtils;
 import org.valz.util.ParserException;
 
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.sql.*;
 
 public class Database implements Closeable {
+    private static final Logger LOG = Logger.getLogger(Database.class);
+
     private final DataSource dataSource;
     private final ObjectPool connectionPool;
 
@@ -24,6 +27,7 @@ public class Database implements Closeable {
         try {
             Class.forName(driverName);
         } catch (ClassNotFoundException e) {
+            LOG.error("ClassNotFoundException", e);
             throw new RuntimeException(e);
         }
 
@@ -70,6 +74,7 @@ public class Database implements Closeable {
                             resultSet.close();
                         }
                     } catch (SQLException e) {
+                        LOG.warn("SQLException:", e);
                         // Ignore
                     }
                     try {
@@ -78,6 +83,7 @@ public class Database implements Closeable {
                         }
                         statement = null;
                     } catch (SQLException e) {
+                        LOG.warn("SQLException:", e);
                         // Ignore
                     }
                 }
@@ -89,8 +95,10 @@ public class Database implements Closeable {
                     conn.rollback();
                 }
             } catch (SQLException ex) {
+                LOG.warn("SQLException:", e);
                 // Ignore
             }
+            LOG.error("throw RuntimeException:", e);
             throw new RuntimeException(e);
         } finally {
             try {
@@ -99,6 +107,7 @@ public class Database implements Closeable {
                     conn.close();
                 }
             } catch (SQLException e) {
+                LOG.warn("SQLException:", e);
                 // Ignore
             }
         }
@@ -124,6 +133,8 @@ public class Database implements Closeable {
         try {
             connectionPool.close();
         } catch (Exception e) {
+            LOG.error("Exception:", e);
+            LOG.error("Throw IOException: ", e);
             throw new IOException(e);
         }
     }
