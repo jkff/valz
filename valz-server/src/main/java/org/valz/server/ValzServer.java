@@ -13,8 +13,7 @@ public class ValzServer {
     private static final Logger log = Logger.getLogger(ValzServer.class);
 
     public static void main(String[] args) throws Exception {
-        //PropertyConfigurator.configure("/home/kurian/valz/valz/valz-server/resources/log4j.properties");
-        PropertyConfigurator.configure("main/log4j.properties");
+        PropertyConfigurator.configure("valz-server/resources/log4j.properties");
 
         ServerConfig config = ServerConfig.read();
         Server server = startServer(config);
