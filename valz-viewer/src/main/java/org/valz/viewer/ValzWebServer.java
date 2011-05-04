@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
 
+import java.io.File;
+
 public class ValzWebServer {
     private static final Logger log = Logger.getLogger(ValzWebServer.class);
 
@@ -11,7 +13,7 @@ public class ValzWebServer {
     }
 
     public static void main(String[] args) throws Exception {
-        PropertyConfigurator.configure("log4j.properties");
+        PropertyConfigurator.configure("valz-viewer/resources/log4j.properties");
 
         ViewerConfig config = ViewerConfig.read();
 
