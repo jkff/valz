@@ -14,7 +14,9 @@ docs/_images/*.png
 *.DS_Store
 target/*
 */target/*
-
+.idea*
+*.ipr
+*.iml
 *.swp
 *~
 tags
