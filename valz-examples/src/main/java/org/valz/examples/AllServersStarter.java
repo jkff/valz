@@ -3,13 +3,13 @@ package org.valz.examples;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.client.Val;
-import org.valz.client.Valz;
-import org.valz.server.InternalConfig;
-import org.valz.server.ServerUtils;
-import org.valz.model.LongSum;
 import org.valz.backends.RoundRobinWriteBackend;
 import org.valz.backends.WriteBackend;
+import org.valz.client.Val;
+import org.valz.client.Valz;
+import org.valz.model.LongSum;
+import org.valz.server.ServerConfig;
+import org.valz.server.ServerUtils;
 import org.valz.viewer.ValzWebServer;
 import org.valz.viewer.ViewerConfig;
 import org.valz.viewer.ViewerInternalConfig;
@@ -27,8 +27,7 @@ public class AllServersStarter {
 
         int[] ports = {8800, 8801};
         int delayForCaching = 100;
-        int chunkSize = 100;
-        List<InternalConfig> configs = ServerUtils.getServerConfigs(delayForCaching, chunkSize, ports);
+        List<ServerConfig> configs = ServerUtils.getServerConfigs(delayForCaching, ports);
         List<Server> servers = ServerUtils.startServers(configs);
 
         Server valzWebServer = ValzWebServer
@@ -38,8 +37,8 @@ public class AllServersStarter {
         // init client
         {
             List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
-            for (InternalConfig config : configs) {
-                listWriteBackends.add(config.writeBackend);
+            for (ServerConfig config : configs) {
+
             }
             WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
             Valz.init(clientWriteBackend);
@@ -64,6 +63,4 @@ public class AllServersStarter {
         ServerUtils.stopServers(servers);
     }
 
-    private AllServersStarter() {
-    }
 }
