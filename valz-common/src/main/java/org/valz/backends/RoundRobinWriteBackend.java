@@ -20,6 +20,9 @@ public class RoundRobinWriteBackend implements WriteBackend {
                 writeBackends.get(nextBackend).submit(name, aggregate, value);
                 return;
             } catch (RemoteWriteException e) {
+                // TODO This doesn't actually mean that the update has not been performed.
+                // Maybe it has, but we failed to receive the server's confirmation.
+                // TODO we need some sort of global consistency here.
                 // Ignore, proceed to next
             }
         }

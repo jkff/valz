@@ -3,10 +3,10 @@ package org.valz.examples;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Server;
-import org.valz.backends.RoundRobinWriteBackend;
-import org.valz.backends.WriteBackend;
+import org.valz.backends.*;
 import org.valz.client.Val;
 import org.valz.client.Valz;
+import org.valz.model.AggregateRegistry;
 import org.valz.model.LongSum;
 import org.valz.server.ServerConfig;
 import org.valz.server.ServerUtils;
@@ -33,14 +33,15 @@ public class AllServersStarter {
         Server valzWebServer = ValzWebServer
                 .startServer(8900, ViewerInternalConfig.getConfig(ViewerConfig.read().urls, 0));
 
+        AggregateRegistry registry = AggregateRegistry.create();
 
         // init client
         {
-            List<WriteBackend> listWriteBackends = new ArrayList<WriteBackend>();
+            List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
             for (ServerConfig config : configs) {
-
+                // TODO Roundrobin between remotes; put nb + transitional on top.
             }
-            WriteBackend clientWriteBackend = new RoundRobinWriteBackend(listWriteBackends);
+            WriteBackend clientWriteBackend = new RoundRobinWriteBackend(writeBackends);
             Valz.init(clientWriteBackend);
         }
 
