@@ -17,6 +17,7 @@ target/*
 .idea*
 *.ipr
 *.iml
+*.iws
 *.swp
 *~
 tags
