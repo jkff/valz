@@ -8,12 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version> 
 	<name>Valz examples</name>
 
-	<dependencies>	
-        <dependency>
-            <groupId>org.valz</groupId>
-            <artifactId>valz</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
