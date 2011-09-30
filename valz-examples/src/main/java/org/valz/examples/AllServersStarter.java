@@ -6,6 +6,7 @@ import org.mortbay.jetty.Server;
 import org.valz.backends.*;
 import org.valz.client.Val;
 import org.valz.client.Valz;
+import org.valz.datastores.h2.H2DataStore;
 import org.valz.model.AggregateRegistry;
 import org.valz.model.LongSum;
 import org.valz.server.ServerConfig;
@@ -39,8 +40,15 @@ public class AllServersStarter {
         {
             List<WriteBackend> writeBackends = new ArrayList<WriteBackend>();
             for (ServerConfig config : configs) {
-                // TODO Roundrobin between remotes; put nb + transitional on top.
+                //Roundrobin between remotes; put nb + transitional on top.
+                final H2DataStore h2DataStore = new H2DataStore(config.dataStoreFile, registry);
+
+                final NonBlockingWriteBackend backend = new NonBlockingWriteBackend(new TransitionalWriteBackend(
+                        new DatastoreBackend(h2DataStore), h2DataStore, 100L, 1024));
+
+                writeBackends.add(backend);
             }
+
             WriteBackend clientWriteBackend = new RoundRobinWriteBackend(writeBackends);
             Valz.init(clientWriteBackend);
         }
