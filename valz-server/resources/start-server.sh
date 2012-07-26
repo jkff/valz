@@ -1,5 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
-CLASSPATH=$(find $(dirname $0) -name '*.jar' -printf '%p:')
-
+CLASSPATH=$(find ../ -name '*-with-dependencies.jar')
 java -cp "$CLASSPATH" org.valz.server.ValzServer

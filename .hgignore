@@ -14,9 +14,12 @@ docs/_images/*.png
 *.DS_Store
 target/*
 */target/*
-
+.idea*
+*.ipr
+*.iml
+*.iws
 *.swp
 *~
 tags
 h2store.h2.db
-
+atlassian-ide-plugin.xml

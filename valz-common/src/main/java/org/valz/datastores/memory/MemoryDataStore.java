@@ -1,5 +1,6 @@
 package org.valz.datastores.memory;
 
+import org.apache.log4j.Logger;
 import org.valz.datastores.AbstractDataStore;
 import org.valz.model.Aggregate;
 import org.valz.model.Sample;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class MemoryDataStore extends AbstractDataStore {
+    private static final Logger LOG = Logger.getLogger(MemoryDataStore.class);
     private final Map<String, Sample> aggregates = new HashMap<String, Sample>();
     private final Map<String, MemoryBigMap> bigMaps = new HashMap<String, MemoryBigMap>();
 
@@ -52,6 +54,7 @@ public class MemoryDataStore extends AbstractDataStore {
     @Override
     protected <T> void updateBigMapItem(String name, Aggregate<T> aggregate, String key,
                                            T newValue) {
+        LOG.info("After we use unchecked or unsafe method.");
         bigMaps.get(name).put(key, newValue);
     }
 
@@ -66,6 +69,7 @@ public class MemoryDataStore extends AbstractDataStore {
 
     public <T> BigMapChunkValue<T> getBigMapChunk(String name, String fromKey, int count) {
         MemoryBigMap memoryBigMap = bigMaps.get(name);
+
         return new BigMapChunkValue<T>(
                 memoryBigMap.getAggregate(),
                 memoryBigMap.getChunk(fromKey, count));
