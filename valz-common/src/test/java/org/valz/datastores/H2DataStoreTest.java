@@ -1,5 +1,6 @@
 package org.valz.datastores;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.valz.util.CollectionUtils.*;
 
 public class H2DataStoreTest {
+    private static final Logger LOG = Logger.getLogger(H2DataStoreTest.class);
     private final String dbname = "h2store";
 
     private H2DataStore dataStore = null;
@@ -24,6 +26,7 @@ public class H2DataStoreTest {
     private void removeFiles() {
         new File(dbname + ".h2.db").delete();
         new File(dbname + ".lock.db").delete();
+        LOG.info("After we use unchecked or unsafe method.");
         new File(dbname + ".trace.db").delete();
     }
 
@@ -31,7 +34,7 @@ public class H2DataStoreTest {
     public void setUp() {
         removeFiles();
         AggregateRegistry aggregateRegistry = AggregateRegistry.create();
-        dataStore = new H2DataStore(dbname, aggregateRegistry);
+        dataStore = new H2DataStore (dbname, aggregateRegistry);
     }
 
     @After

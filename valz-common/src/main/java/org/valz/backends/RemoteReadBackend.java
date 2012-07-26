@@ -36,7 +36,7 @@ public class RemoteReadBackend implements ReadBackend {
             RemoteReadException {
         if (!obj1.equals(obj2)) {
             StringBuilder sb = new StringBuilder();
-            sb.append(String.format("%s", remoteConnectors.get(0).getUrl()));
+            sb.append(remoteConnectors.get(0).getUrl());
             for (int j = 1; j < remoteConnectors.size() && remoteConnectors.get(j) != parser; j++) {
                 sb.append(String.format(", %s", remoteConnectors.get(j).getUrl()));
             }
